@@ -1,0 +1,66 @@
+selinux_mode: permissive	# please chose: |   disabled | permissive | enforcing
+
+# ansible-playbook --extra-vars "oracle_ver=v12cR1" (or v12cR2 v18c v19c)
+oracle_ver: "v12cR1"
+
+oracle_os_user: 
+  oracle:
+    name: oracle
+    uid: 800
+
+oracle_os_groups: 
+  oinstall:
+    name: oinstall
+    gid: 800
+  dba:
+    name: dba
+    gid: 801
+  oper:
+    name: oper
+    gid: 802
+  asmadmin:
+    name: asmadmin
+    gid: 803
+  asmdba:
+    name: asmdba
+    gid: 804
+  asmoper:
+    name: asmoper
+    gid: 805
+
+oracle_config:
+  v12cR1:
+    ver: "12.1"
+    nver: 121
+    ver_path: "12.1.0.2"
+    db:
+      images: ['linuxamd64_12102_database_1of2.zip', 'linuxamd64_12102_database_2of2.zip']
+    gi:
+      images: ['linuxamd64_12102_grid_1of2.zip', 'linuxamd64_12102_grid_2of2.zip']
+
+  v12cR2:
+    ver: "12.2"
+    nver: 122
+    ver_path: "12.2.0.1"
+    db:
+      images: ['linuxx64_12201_database.zip']
+    gi:
+      images: ['linuxx64_12201_grid_home.zip']
+
+  v18c:
+    ver: "18.3"
+    nver: 183
+    ver_path: "18.3.0.0"
+    db:
+      images: ['LINUX.X64_180000_db_home.zip']
+    gi:
+      images: ['LINUX.X64_180000_grid_home.zip']
+
+  v19c:
+    ver: "19.3"
+    nver: 193
+    ver_path: "19.3.0.0"
+    db:
+      images: ['LINUX.X64_193000_db_home.zip']
+    gi:
+      images: ['LINUX.X64_193000_grid_home.zip']

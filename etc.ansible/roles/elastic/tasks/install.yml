@@ -1,0 +1,96 @@
+- name: Add user "elastic" to the remote server
+  user:
+    name: elastic
+    comment: "Elastic User"
+    uid: 901
+#    group: oinstall
+    append: yes
+    shell: /bin/bash
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+
+- name: Set authorized key for Elastic
+  authorized_key:
+    user: elastic
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/authorized_keys') }}"
+
+# - name: Extract elasticsearch-7.2.0-linux-x86_64.tar.gz into /opt
+#   unarchive:
+#     src: elasticsearch-7.2.0-linux-x86_64.tar.gz
+#     dest: /opt
+#     owner: elastic
+#     group: oinstall
+
+- name: Elastic GPG key
+  rpm_key:
+    state: present
+    key: http://192.168.8.200/oracle/GPG-KEY-elasticsearch
+
+- name: Elastic rpm
+  yum:
+    name: elasticsearch
+
+#- template:
+- debug: msg="elastic_node_a {{ elastic_node_a }}"
+- debug: msg="elastic_node_b {{ elastic_node_b }}"
+
+- name: start Elasticsearch
+  systemd: 
+    state=stopped
+    name=elasticsearch.service
+    enabled=yes
+    daemon_reload=yes
+
+- template:
+    src: elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+
+- template:
+    src: jvm.options
+    dest: /etc/elasticsearch/jvm.options
+
+- copy:
+    src: elasticsearch.keystore
+    dest: /etc/elasticsearch/elasticsearch.keystore
+
+- copy:
+    src: 99-elasticsearch.conf
+    dest: /etc/security/limits.d/99-elasticsearch.conf
+
+- name: Disable Firewall Deamon (firewalld)
+  service: name=firewalld state=stopped enabled=no
+
+- name: Create a logical volume u01
+  lvol:
+    vg: vg01
+    lv: elastic
+    size: 48g
+    shrink: no
+
+- name: Create FS on /dev/vg01/elastic
+  filesystem:
+    fstype: ext4
+    dev: /dev/vg01/elastic
+
+- name: Mount /dev/vg01/elastic
+  mount:
+    path: /elasticsearch
+    src: /dev/vg01/elastic
+    state: mounted
+    fstype: auto
+
+- name: Creates directory
+  file:
+    path: /elasticsearch
+    state: directory
+    mode: 02755
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: start Elasticsearch
+  systemd: 
+    state=started 
+    name=elasticsearch.service
+    enabled=yes
+    daemon_reload=yes

@@ -1,0 +1,6 @@
+---
+- name: Configure Kafka
+  template:
+    src: server.properties
+    dest: /home/kafka/server.properties
+

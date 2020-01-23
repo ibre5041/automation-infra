@@ -1,0 +1,38 @@
+
+- name: Grid Setup
+  block:
+    - name: install grid.rsp
+      copy:
+        src: grid.rsp
+        dest: /oracle/u01/gi/grid.rsp
+        mode: '0644'
+    - shell: "./runInstaller -silent -responseFile /oracle/u01/gi/grid.rsp -ignoreSysPrereqs -waitforcompletion"
+      args:
+        chdir: "/home/oracle/grid/"
+        creates: "/oracle/u01/oraInventory"
+      ignore_errors: true
+      register: grid_setup_out
+    - debug: 
+        msg: "Return code is {{ grid_setup_out.rc }}"
+      when: grid_setup_out.rc >= 2
+
+    - name: delete install directory
+      file:
+        path: "/home/oracle/grid"
+        state: absent
+
+  rescue:
+    - debug:
+        msg: '"./runInstaller failed'
+    - name: delete install .zip package
+      file:
+        path: /oracle/u01/gi/grid.rsp
+        state: absent
+
+    - name: delete install directory
+      file:
+        path: "/home/oracle/grid"
+        state: absent
+
+  become: yes
+  become_user: oracle

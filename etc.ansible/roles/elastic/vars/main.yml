@@ -1,0 +1,7 @@
+---
+# vars file for elastic
+#elastic_node_a: "{{ groups['elastic'][0] }}"
+#elastic_node_b: "{{ groups['elastic'][1] }}"
+
+elastic_node_a: "{{ ansible_play_batch[0] }}"
+elastic_node_b: "{{ ansible_play_batch[1] }}"

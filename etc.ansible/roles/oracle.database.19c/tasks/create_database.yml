@@ -1,0 +1,38 @@
+
+- name: Create Database TEST19C
+  block:
+    - name: install dbca.rsp
+      copy:
+        src: dbca.rsp
+        dest: /home/oracle/dbca.rsp
+        mode: '0644'
+    - name: "Create database"
+      shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
+      args:
+        chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
+        creates: "/oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log"
+      ignore_errors: true
+      register: db_create_out
+    # - shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
+    #   args:
+    #     chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
+    #     creates: "/oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log"
+    #   ignore_errors: true
+    #   register: db_create_out
+    - debug: 
+        msg: "Return code is {{ db_create_out }}"
+      when: db_create_out.rc >= 0
+    - debug: 
+        msg: "Return code is {{ db_create_out.rc }}"
+      when: db_create_out.rc >= 0
+
+  rescue:
+    - debug:
+        msg: './dcba failed'
+    - name: delete install dbca.rsp
+      file:
+        path: /home/oracle/dbca.rsp
+        state: absent
+
+  become: yes
+  become_user: oracle

@@ -1,0 +1,12 @@
+[Unit]
+Description=Post-clone vmware boot
+ConditionPathExists=/root/nmcli.flag
+After=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/nmcli.sh
+
+[Install]
+WantedBy=multi-user.target
+

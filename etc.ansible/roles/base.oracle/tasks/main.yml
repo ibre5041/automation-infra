@@ -1,0 +1,195 @@
+---
+# tasks file for oraclebase
+
+- debug: var=ansible_memory_mb
+- debug: msg="total RAM is {{ ansible_memory_mb.real.total }} required 4096M "
+- fail: msg="not enough RAM"
+  when: ansible_memory_mb.real.total < 4096
+
+- debug: msg="MEM {{ mem }}"
+- debug: msg="SHMA {{ shma }}"
+- debug: msg="SHMM {{ shmm }}"
+
+- name: tuned oracle dir
+  file:
+    path: /usr/lib/tuned/oracle/
+    state: directory
+    recurse: yes
+
+- name: tuned.conf
+  copy:
+    src: tuned.conf
+    dest: /usr/lib/tuned/oracle/tuned.conf
+
+- name: oracle .rpms
+  yum:
+    name: glibc-devel,libstdc++-devel,compat-libcap1,libaio-devel,libXtst,perl-Data-Dumper,unzip,libXrender,compat-libstdc++-33,bc,net-tools
+    state: latest
+
+- sysctl:
+    name: kernel.shmmni
+    value: "4096"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: kernel.sem
+    value: "1010 129280 1010 128"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: fs.file-max
+    value: "6815744"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: net.ipv4.ip_local_port_range
+    value: "9000 65501"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: net.core.rmem_default
+    value: "262144"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: net.core.rmem_max
+    value: "4194304"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: net.core.wmem_default
+    value: "262144"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: net.core.wmem_max
+    value: "1048576"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: fs.aio-max-nr
+    value: "4194304"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: kernel.panic_on_oops
+    value: "1"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: kernel.shmall
+    value: "{{ shma }}"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- sysctl:
+    name: kernel.shmmax
+    value: "{{ shmm }}"
+    reload: yes
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- name: Ensure group "oinstall" exists
+  group:
+    name: oinstall
+    gid: 800
+
+- name: Ensure group "dba" exists
+  group:
+    name: dba
+    gid: 801
+
+- name: Ensure group "oper" exists
+  group:
+    name: oper
+    gid: 802
+
+- name: Ensure group "asmadmin" exists
+  group:
+    name: asmadmin
+    gid: 803
+
+- name: Ensure group "asmdba" exists
+  group:
+    name: asmdba
+    gid: 804
+
+- name: Ensure group "asmoper" exists
+  group:
+    name: asmoper
+    gid: 805
+
+- name: Add the user "oracle"
+  user:
+    name: oracle
+    shell: /bin/bash
+    uid: 800
+    group: oinstall
+    comment: "Oracle instalation owner"
+    groups: oinstall,dba,oper,asmadmin,asmdba,asmoper
+    append: yes
+    system: yes
+    password: '$6$a5MJYlNAPSevwLhh$m1EJvszxPAMkwumqCQcHS07fLyLPYTWUyPFR7K58hghtDyiSL0GF.svFSA8f7MxkBXUx8uTczpPIJKrb1O14h'
+
+- user: 
+    name: oracle
+    # python -c 'import crypt; print crypt.crypt("acror", "$1$SomeSalt$")'
+    password: "$1$SomeSalt$V2yJBnrIRWQytrgM9BB2Y1"
+
+- name: Add the user "oracle" keys (1)
+  authorized_key:
+    user: oracle
+    key: '{{ item }}'
+  with_file:
+    - autorized_keys.thinkpad
+
+- name: Oracle sudo
+  copy:
+    src: sudoerrs
+    dest: /etc/sudoers.d/oracle
+    mode: '0440'
+
+- name: Create a logical volume u01
+  lvol:
+    vg: vg01
+    lv: u01
+    size: 20g
+    shrink: no
+
+- name: Create /dev/vg01/u01
+  filesystem:
+    fstype: ext4
+    dev: /dev/vg01/u01
+
+- name: Mount /dev/vg01/u01
+  mount:
+    path: /oracle
+    src: /dev/vg01/u01
+    state: mounted
+    fstype: auto
+
+- name: u01 directory
+  file:
+    path: /oracle/u01
+    owner: oracle
+    group: oinstall
+    mode: '0775'
+    state: directory
+
+# - name: Base packages
+#   yum: 
+#     name=haf-oracle-profile,haf-oracle-rlwrap
+#     state=latest 
+#     disable_gpg_check=yes 
+#     state=latest
+
+- name: Limits
+  copy:
+    src: 99-oracle-limits.conf
+    dest: /etc/security/limits.d/99-oracle-limits.conf
+
+- name: 'Extend the /tmp'
+  lvol:
+    vg: vg00
+    lv: lv_tmp
+    size: 2g
+    shrink: no
+    resizefs: yes

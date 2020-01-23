@@ -1,0 +1,25 @@
+- name: install zookeeper systemd unit file
+  template: 
+    src: zookeeper.service
+    dest: /etc/systemd/system/zookeeper.service
+  delegate_to: "{{ zookeeper_node }}"
+
+- name: start zookeeper
+  systemd: 
+    state=restarted 
+    name=zookeeper
+    enabled=yes
+    daemon_reload=yes
+  delegate_to: "{{ zookeeper_node }}"
+
+- name: install kafka systemd unit file
+  template: 
+    src: kafka.service
+    dest: /etc/systemd/system/kafka.service
+
+- name: start kafka
+  systemd: 
+    state=restarted 
+    name=kafka 
+    enabled=yes
+    daemon_reload=yes

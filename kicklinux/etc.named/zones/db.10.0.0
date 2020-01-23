@@ -1,0 +1,93 @@
+$TTL    604800
+@       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
+                             31         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; name servers
+    IN      NS      kicklinux.prod.vmware.haf.
+
+; PTR Records
+50 IN      PTR     rhel7-rac-a-node-1.barn.vmware.haf.  ; 10.0.0.50
+51 IN      PTR     rhel7-rac-a-node-2.barn.vmware.haf.  ; 10.0.0.51
+52 IN      PTR     rhel7-rac-a-lis-1.barn.vmware.haf.   ; 10.0.0.52
+53 IN      PTR     rhel7-rac-a-lis-2.barn.vmware.haf.   ; 10.0.0.53
+54 IN      PTR     rhel7-rac-a-scan.barn.vmware.haf.    ; 10.0.0.54
+55 IN      PTR     rhel7-rac-a-scan.barn.vmware.haf.    ; 10.0.0.55
+56 IN      PTR     rhel7-rac-a-scan.barn.vmware.haf.    ; 10.0.0.56
+57 IN      PTR     rhel7-rac-a-vip-1.barn.vmware.haf.   ; 10.0.0.57
+58 IN      PTR     rhel7-rac-a-vip-2.barn.vmware.haf.   ; 10.0.0.58
+59 IN      PTR     rhel7-rac-a-vip-3.barn.vmware.haf.   ; 10.0.0.59
+
+60 IN      PTR     rhel7-rac-b-node-1.barn.vmware.haf.  ; 10.0.0.60
+61 IN      PTR     rhel7-rac-b-node-2.barn.vmware.haf.  ; 10.0.0.61
+62 IN      PTR     rhel7-rac-b-lis-1.barn.vmware.haf.   ; 10.0.0.62
+63 IN      PTR     rhel7-rac-b-lis-2.barn.vmware.haf.   ; 10.0.0.63
+64 IN      PTR     rhel7-rac-b-scan.barn.vmware.haf.    ; 10.0.0.64
+65 IN      PTR     rhel7-rac-b-scan.barn.vmware.haf.    ; 10.0.0.65
+66 IN      PTR     rhel7-rac-b-scan.barn.vmware.haf.    ; 10.0.0.66
+67 IN      PTR     rhel7-rac-b-vip-1.barn.vmware.haf.   ; 10.0.0.67
+68 IN      PTR     rhel7-rac-b-vip-2.barn.vmware.haf.   ; 10.0.0.68
+69 IN      PTR     rhel7-rac-b-vip-3.barn.vmware.haf.   ; 10.0.0.69
+
+70 IN      PTR     rhel7-rac-c-node-1.barn.vmware.haf.  ; 10.0.0.70
+71 IN      PTR     rhel7-rac-c-node-2.barn.vmware.haf.  ; 10.0.0.71
+72 IN      PTR     rhel7-rac-c-lis-1.barn.vmware.haf.   ; 10.0.0.72
+73 IN      PTR     rhel7-rac-c-lis-2.barn.vmware.haf.   ; 10.0.0.73
+74 IN      PTR     rhel7-rac-c-scan.barn.vmware.haf.    ; 10.0.0.74
+75 IN      PTR     rhel7-rac-c-scan.barn.vmware.haf.    ; 10.0.0.75
+76 IN      PTR     rhel7-rac-c-scan.barn.vmware.haf.    ; 10.0.0.76
+77 IN      PTR     rhel7-rac-c-vip-1.barn.vmware.haf.   ; 10.0.0.77
+78 IN      PTR     rhel7-rac-c-vip-2.barn.vmware.haf.   ; 10.0.0.78
+79 IN      PTR     rhel7-rac-c-vip-3.barn.vmware.haf.   ; 10.0.0.79
+
+80 IN      PTR     rhel7-rac-d-node-1.barn.vmware.haf.  ; 10.0.0.80
+81 IN      PTR     rhel7-rac-d-node-2.barn.vmware.haf.  ; 10.0.0.81
+82 IN      PTR     rhel7-rac-d-lis-1.barn.vmware.haf.   ; 10.0.0.82
+83 IN      PTR     rhel7-rac-d-lis-2.barn.vmware.haf.   ; 10.0.0.83
+84 IN      PTR     rhel7-rac-d-scan.barn.vmware.haf.    ; 10.0.0.84
+85 IN      PTR     rhel7-rac-d-scan.barn.vmware.haf.    ; 10.0.0.85
+86 IN      PTR     rhel7-rac-d-scan.barn.vmware.haf.    ; 10.0.0.86
+87 IN      PTR     rhel7-rac-d-vip-1.barn.vmware.haf.   ; 10.0.0.87
+88 IN      PTR     rhel7-rac-d-vip-2.barn.vmware.haf.   ; 10.0.0.88
+89 IN      PTR     rhel7-rac-d-vip-3.barn.vmware.haf.   ; 10.0.0.89
+
+90 IN      PTR     rhel7-rac-e-node-1.barn.vmware.haf.  ; 10.0.0.90
+91 IN      PTR     rhel7-rac-e-node-2.barn.vmware.haf.  ; 10.0.0.91
+92 IN      PTR     rhel7-rac-e-lis-1.barn.vmware.haf.   ; 10.0.0.92
+93 IN      PTR     rhel7-rac-e-lis-2.barn.vmware.haf.   ; 10.0.0.93
+94 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.94
+95 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.95
+96 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.96
+97 IN      PTR     rhel7-rac-e-vip-1.barn.vmware.haf.   ; 10.0.0.97
+98 IN      PTR     rhel7-rac-e-vip-2.barn.vmware.haf.   ; 10.0.0.98
+99 IN      PTR     rhel7-rac-e-vip-3.barn.vmware.haf.   ; 10.0.0.99
+
+200 IN      PTR     kicklinux.barn.vmware.haf.  ; 10.0.0.200
+201 IN      PTR     rac1.barn.vmware.haf.  ; 10.0.0.201
+202 IN      PTR     rac2.barn.vmware.haf.  ; 10.0.0.202
+203 IN      PTR     pxe1.barn.vmware.haf.  ; 10.0.0.203
+204 IN      PTR     pxe2.barn.vmware.haf.  ; 10.0.0.204
+205 IN      PTR     gentoo.barn.vmware.haf.; 10.0.0.205
+206 IN      PTR     dg.barn.vmware.haf.    ; 10.0.0.206
+
+221 IN      PTR     ceph1.barn.vmware.haf. ; 10.0.0.221
+222 IN      PTR     ceph2.barn.vmware.haf. ; 10.0.0.222
+223 IN      PTR     ceph3.barn.vmware.haf. ; 10.0.0.223
+224 IN      PTR     ceph4.barn.vmware.haf. ; 10.0.0.224
+225 IN      PTR     ceph5.barn.vmware.haf. ; 10.0.0.225
+226 IN      PTR     ceph6.barn.vmware.haf. ; 10.0.0.226
+227 IN      PTR     dock.barn.vmware.haf.  ; 10.0.0.227
+
+230 IN      PTR     devel.barn.vmware.haf. ; 10.0.0.230
+
+240 IN      PTR     rhel5.barn.vmware.haf. ; 10.0.0.240
+241 IN      PTR     rhel6.barn.vmware.haf. ; 10.0.0.241
+242 IN      PTR     rhel7.barn.vmware.haf. ; 10.0.0.242
+
+250 IN      PTR     rhel7-a.barn.vmware.haf. ; 10.0.0.250
+251 IN      PTR     rhel7-b.barn.vmware.haf. ; 10.0.0.251
+252 IN      PTR     rhel7-c.barn.vmware.haf. ; 10.0.0.252
+253 IN      PTR     rhel7-d.barn.vmware.haf. ; 10.0.0.253
+254 IN      PTR     rhel7-e.barn.vmware.haf. ; 10.0.0.254

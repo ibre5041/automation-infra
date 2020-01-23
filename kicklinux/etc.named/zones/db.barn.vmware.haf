@@ -1,0 +1,97 @@
+$TTL    604800
+@       IN      SOA     ns1.barn.vmware.haf. admin.barn.vmware.haf. (
+                 30     ; Serial
+             604800     ; Refresh
+              86400     ; Retry
+            2419200     ; Expire
+             604800 )   ; Negative Cache TTL
+
+; name servers - NS records
+    IN      NS      kicklinux.barn.vmware.haf.
+
+; name servers - A records
+ns1.barn.vmware.haf.          IN      CNAME  kicklinux.barn.vmware.haf.
+kicklinux.barn.vmware.haf.    IN      A      10.0.0.200
+
+; 192.168.8.0/24 - A records
+
+;
+rhel7-rac-a-node-1.barn.vmware.haf. IN A 10.0.0.50
+rhel7-rac-a-node-2.barn.vmware.haf. IN A 10.0.0.51
+rhel7-rac-a-lis-1.barn.vmware.haf.  IN A 10.0.0.52
+rhel7-rac-a-lis-2.barn.vmware.haf.  IN A 10.0.0.53
+rhel7-rac-a-scan.barn.vmware.haf.   IN A 10.0.0.54
+rhel7-rac-a-scan.barn.vmware.haf.   IN A 10.0.0.55
+rhel7-rac-a-scan.barn.vmware.haf.   IN A 10.0.0.56
+rhel7-rac-a-vip-1.barn.vmware.haf.  IN A 10.0.0.57
+rhel7-rac-a-vip-2.barn.vmware.haf.  IN A 10.0.0.58
+rhel7-rac-a-vip-3.barn.vmware.haf.  IN A 10.0.0.59
+
+rhel7-rac-b-node-1.barn.vmware.haf. IN A 10.0.0.60
+rhel7-rac-b-node-2.barn.vmware.haf. IN A 10.0.0.61
+rhel7-rac-b-lis-1.barn.vmware.haf.  IN A 10.0.0.62
+rhel7-rac-b-lis-2.barn.vmware.haf.  IN A 10.0.0.63
+rhel7-rac-b-scan.barn.vmware.haf.   IN A 10.0.0.64
+rhel7-rac-b-scan.barn.vmware.haf.   IN A 10.0.0.65
+rhel7-rac-b-scan.barn.vmware.haf.   IN A 10.0.0.66
+rhel7-rac-b-vip-1.barn.vmware.haf.  IN A 10.0.0.67
+rhel7-rac-b-vip-2.barn.vmware.haf.  IN A 10.0.0.68
+rhel7-rac-b-vip-3.barn.vmware.haf.  IN A 10.0.0.69
+
+rhel7-rac-c-node-1.barn.vmware.haf. IN A 10.0.0.70
+rhel7-rac-c-node-2.barn.vmware.haf. IN A 10.0.0.71
+rhel7-rac-c-lis-1.barn.vmware.haf.  IN A 10.0.0.72
+rhel7-rac-c-lis-2.barn.vmware.haf.  IN A 10.0.0.73
+rhel7-rac-c-scan.barn.vmware.haf.   IN A 10.0.0.74
+rhel7-rac-c-scan.barn.vmware.haf.   IN A 10.0.0.75
+rhel7-rac-c-scan.barn.vmware.haf.   IN A 10.0.0.76
+rhel7-rac-c-vip-1.barn.vmware.haf.  IN A 10.0.0.77
+rhel7-rac-c-vip-2.barn.vmware.haf.  IN A 10.0.0.78
+rhel7-rac-c-vip-3.barn.vmware.haf.  IN A 10.0.0.79
+
+rhel7-rac-d-node-1.barn.vmware.haf. IN A 10.0.0.80
+rhel7-rac-d-node-2.barn.vmware.haf. IN A 10.0.0.81
+rhel7-rac-d-lis-1.barn.vmware.haf.  IN A 10.0.0.82
+rhel7-rac-d-lis-2.barn.vmware.haf.  IN A 10.0.0.83
+rhel7-rac-d-scan.barn.vmware.haf.   IN A 10.0.0.84
+rhel7-rac-d-scan.barn.vmware.haf.   IN A 10.0.0.85
+rhel7-rac-d-scan.barn.vmware.haf.   IN A 10.0.0.86
+rhel7-rac-d-vip-1.barn.vmware.haf.  IN A 10.0.0.87
+rhel7-rac-d-vip-2.barn.vmware.haf.  IN A 10.0.0.88
+rhel7-rac-d-vip-3.barn.vmware.haf.  IN A 10.0.0.89
+
+rhel7-rac-e-node-1.barn.vmware.haf. IN A 10.0.0.90
+rhel7-rac-e-node-2.barn.vmware.haf. IN A 10.0.0.91
+rhel7-rac-e-lis-1.barn.vmware.haf.  IN A 10.0.0.92
+rhel7-rac-e-lis-2.barn.vmware.haf.  IN A 10.0.0.93
+rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.94
+rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.95
+rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.96
+rhel7-rac-e-vip-1.barn.vmware.haf.  IN A 10.0.0.97
+rhel7-rac-e-vip-2.barn.vmware.haf.  IN A 10.0.0.98
+rhel7-rac-e-vip-3.barn.vmware.haf.  IN A 10.0.0.99
+
+rac1.barn.vmware.haf.        IN      A      10.0.0.201
+rac2.barn.vmware.haf.        IN      A      10.0.0.202
+pxe1.barn.vmware.haf.        IN      A      10.0.0.203
+gentoo.barn.vmware.haf.      IN      A      10.0.0.205
+dg.barn.vmware.haf.          IN      A      10.0.0.206
+
+ceph1.barn.vmware.haf.       IN      A      10.0.0.221
+ceph2.barn.vmware.haf.       IN      A      10.0.0.222
+ceph3.barn.vmware.haf.       IN      A      10.0.0.223
+ceph4.barn.vmware.haf.       IN      A      10.0.0.224
+ceph5.barn.vmware.haf.       IN      A      10.0.0.225
+ceph6.barn.vmware.haf.       IN      A      10.0.0.226
+dock.barn.vmware.haf.        IN      A      10.0.0.227
+
+devel.barn.vmware.haf.       IN      A      10.0.0.230
+
+rhel5.barn.vmware.haf.       IN      A      10.0.0.240
+rhel6.barn.vmware.haf.       IN      A      10.0.0.241
+rhel7.barn.vmware.haf.       IN      A      10.0.0.242
+
+tmplrhel7.barn.vmware.haf.   IN      A      10.0.0.250
+tmplrhel7racnode.barn.vmware.haf. IN A      10.0.0.251
+
+

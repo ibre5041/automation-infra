@@ -1,0 +1,14 @@
+---
+# tasks file for elastic
+#- debug: msg="zookeeper_node {{ zookeeper_node }}"
+- import_tasks: install.yml
+# - import_tasks: configure.yml
+# - import_tasks: service.yml
+# - import_tasks: kafkat.yml
+#   delegate_to: "{{ zookeeper_node }}"
+
+# - name: show debug
+#   debug: msg="target = {{ item }} default ipv4 = {{ hostvars[item]['ansible_default_ipv4']['address'] }}"
+#   with_items: "{{ play_hosts }}"
+
+

@@ -1,0 +1,42 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 6
+  cpu: 1
+  scsi:
+    - adapter:
+        pciSlotNumber: 128
+  disks:
+    - disk: rootdg
+      size: 50
+      bus: 0
+    - disk: appdg
+      size: 50
+      bus: 0
+
+  network:
+    - adapter:
+        pciSlotNumber: 192
+        network: "VM network inerconnect"
+    - adapter:
+        pciSlotNumber: 224
+        network: "VM Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+
+- machine:
+  name: rhel7-d
+  template: 'RHEL7 Template'
+  scsi:
+    - adapter:
+        pciSlotNumber: 256
+  disks:
+    - disk: datadg
+      size: 8
+      bus: 1
+      count: 5
+  vmware:
+    datastore: Kingston890G

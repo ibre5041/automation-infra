@@ -1,0 +1,199 @@
+---
+# tasks file for oraclerestart
+
+- name: 'Extend the u01'
+  lvol:
+    vg: vg01
+    lv: u01
+    size: 29G
+    shrink: no
+    resizefs: yes
+
+- name: Oracle CRS required packages
+  yum: 
+    name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++,net-tools
+    state=latest
+
+- name: Oracle CRS required packages
+  yum: 
+    name=cvuqdisk
+    state=latest
+    disable_gpg_check=yes 
+
+- name: udev 55
+  copy:
+    src: 55-usm.rules
+    dest: /etc/udev/rules.d/55-usm.rules
+
+- name: udev 12
+  copy:
+    src: 12-dm-permissions.rules
+    dest: /etc/udev/rules.d/12-dm-permissions.rules
+
+- name: udev 10
+  copy:
+    src: 10-scsi-asm.rules
+    dest: /etc/udev/rules.d/10-scsi-asm.rules
+
+- name: install udevasm.sh
+  copy:
+    src: udevasm.sh
+    dest: /etc/udev/udevasm.sh
+    mode: '0750'
+
+- name: reload udev
+  command: udevadm trigger
+
+- name: Wait for ASM DISK detection
+  wait_for:
+    path: /dev/asmshared0103      
+    delay: 0
+    timeout: 30
+    state: present
+
+# - name: multipath.conf
+#   copy:
+#     src: multipath.conf
+#     dest: /etc/multipath.conf
+#     mode: '0644'
+# - command: mpathconf --enable
+# - name: start multipath
+#   systemd:
+#     name: multipathd
+#     state: restarted
+
+- name: ASM paritions
+  parted:
+    device: "/dev/{{item}}"
+    label: gpt
+    number: 1
+    state: present    
+  with_items: ["asmshared0100", "asmshared0101", "asmshared0102", "asmshared0103"]
+
+- name: "ora_1_env file"
+  template:
+    src: ora_1_env.ASM
+    dest: "/home/oracle/.ora_1_env"
+
+- name: "Gi fome"
+  file:
+    path: "/oracle/u01/gi/{{ oracle_ver_path }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+    recurse: yes
+    mode: '0755'
+
+- name: "Oracle KB"
+  file:
+    path: "/home/oracle/.ORACLE_KB"
+    state: directory
+    owner: oracle
+    group: oinstall
+
+- name: check if Oracle CRS unpacked
+  stat: 
+    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/
+  register: crs_unpacked
+  
+- debug:
+    msg: "Install package exists: {{ crs_unpacked.stat.exists }}"
+
+- include: download.package.yml
+  when: crs_unpacked.stat.exists != True
+
+
+- name: check if Oracle CRS set up
+  stat: 
+    path: /oracle/u01/oraInventory
+  register: crs_set_up
+
+- include: setup.grid.yml
+  when: crs_set_up.stat.exists != True
+  
+- name: orainstRoot.sh
+  shell: /oracle/u01/oraInventory/orainstRoot.sh
+  args:
+    creates: /etc/oraInst.loc
+
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+  register: oracle_ohasd_service
+
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+
+- name: root.sh   
+  shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+  when: oracle_ohasd_service.status.LoadState == "not-found"
+
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+    state: started
+    enabled: yes
+  register: oracle_ohasd_service
+
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+
+- name: Check asm configured
+  command: "sh -c '/oracle/u01/gi/{{ oracle_ver_path }}/bin/crsctl status res ora.asm | grep ONLINE'"
+  register: oracle_asm_status
+  ignore_errors: true
+
+- debug:
+    msg: "{{ oracle_asm_status }}"
+
+- name: "ASM test"
+  block:
+    - debug:
+        msg: "ASM not ONLINE"
+    - name: install grid.rsp
+      copy:
+        src: grid.rsp
+        dest: /oracle/u01/gi/grid.rsp
+        mode: '0644'
+
+    - name: Grid Setup ASM
+      shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
+      args:
+        chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
+
+    - name: delete install .zip package
+      file:
+        path: /oracle/u01/gi/grid.rsp
+        state: absent
+
+  rescue:
+    - name: delete install .zip package
+      file:
+        path: /oracle/u01/gi/grid.rsp
+        state: absent
+
+  become: yes
+  become_user: oracle
+  when: oracle_asm_status.stdout is not match(".*ONLINE")
+
+# Not needed for 19c
+# - name: file perm fixup
+#   file:
+#     path: /oracle/u01/gi/{{ oracle_ver_path }}/cdata/localhost/{{ansible_hostname}}.olr
+#     owner: oracle
+#     group: oinstall
+#     mode: '0600'
+
+- name: file perm fixup
+  file:
+    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
+    owner: oracle
+    group: oinstall
+    mode: '6755'
+
+- name: file perm fixup
+  file:
+    path: /oracle/u01/gi/{{ oracle_ver_path }}
+    owner: root
+    group: oinstall
+    mode: '0755'

@@ -1,0 +1,62 @@
+---
+# tasks file for oracledatabase 12c
+
+- name: 'Extend the /tmp'
+  lvol:
+    vg: vg00
+    lv: lv_tmp
+    size: 4g
+    shrink: no
+    resizefs: yes
+
+- name: "ora_1_env file"
+  template:
+    src: ora_2_env
+    dest: "/home/oracle/.ora_2_env"
+    owner: oracle
+    group: oinstall
+
+- name: "DB home"
+  file:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+    recurse: yes
+    mode: '0755'
+
+- name: install db.rsp
+  copy:
+    src: db.rsp
+    dest: /oracle/u01/db/db.rsp
+    mode: '0644'
+    owner: oracle
+    group: oinstall
+
+- name: check if install package exists
+  stat: 
+    path: /home/oracle/database
+  register: install_package
+  
+- debug:
+    msg: "Install package exists: {{ install_package.stat.exists }}"
+
+- include: download.package.yml
+  when: install_package.stat.exists != True
+
+
+- name: check if oracle home installed
+  stat:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/bin/oracle"
+  register: oracle_home_installed
+
+- include: setup.db.yml
+  when: oracle_home_installed.stat.exists != True
+
+- name: "DBA home"
+  file:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/DBA"
+    state: directory
+    owner: oracle
+    group: oinstall
+    mode: '0755'

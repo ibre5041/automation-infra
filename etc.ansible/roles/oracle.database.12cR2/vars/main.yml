@@ -1,0 +1,10 @@
+---
+# vars file for oraclerestart
+
+oracle_major_version: "12.2"
+
+oracle_install_package_name: "linuxx64_12201_database.zip"
+
+oracle_ver_path: "12.2.0.1"
+
+oracle_sid: "TEST12R2"

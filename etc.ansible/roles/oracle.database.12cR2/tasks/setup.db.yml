@@ -1,0 +1,39 @@
+
+- name: DB Home Setup
+  block:
+    - name: install db.rsp
+      copy:
+        src: db.rsp
+        dest: /oracle/u01/db/db.rsp
+        mode: '0644'
+    - shell: "./runInstaller -responseFile /oracle/u01/db/db.rsp -waitForCompletion  -silent -ignorePrereqFailure"
+      args:
+        chdir: "/home/oracle/database"
+        creates: "/oracle/u01/db/{{ oracle_ver_path }}/bin/oraInst.loc"
+      ignore_errors: true
+      register: db_setup_out
+    - debug: 
+        msg: "Return code is {{ db_setup_out }}"
+    - debug:
+        msg: "Return code is {{ db_setup_out.rc }}"
+      when: db_setup_out.rc >= 0
+
+    - name: delete install directory
+      file:
+        path: "/home/oracle/database"
+        state: absent
+
+  rescue:
+    - debug:
+        msg: './runInstaller failed'
+    - name: delete install db.rsp
+      file:
+        path: /oracle/u01/db/db.rsp
+        state: absent
+    - name: delete install directory
+      file:
+        path: "/home/oracle/database"
+        state: absent
+
+  become: yes
+  become_user: oracle

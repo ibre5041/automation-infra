@@ -1,0 +1,21 @@
+---
+- name: kafkat (ruby)
+  package: 
+    name=ruby,ruby-devel,rubygem-abrt,rubygems-devel
+    state=latest  
+    lock_timeout=30
+
+- name: kafkat (gem)
+  gem:
+    name: kafkat
+    state: latest
+
+- name: kafkat (optimist)
+  gem:
+    name: optimist
+    state: latest
+
+- name: kafkat .cfg
+  template:
+    src: kafkatcfg
+    dest: /root/.kafkatcfg

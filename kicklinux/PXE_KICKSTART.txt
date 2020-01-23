@@ -1,0 +1,112 @@
+http://www.golinuxhub.com/2014/08/how-to-configure-pxe-boot-server-in.html
+
+Install sw:
+yum -y install dhcp tftp-server syslinux http ftp vsftpd xinetd
+
+RPM ROOT:
+mkdir -p /var/lib/tftpboot/images/centos/6/x86_64/
+
+HTTP server
+# vi /etc/httpd/conf/httpd.conf
+Alias /tftp/ "/var/lib/tftpboot/images/"
+<Directory /var/lib/tftpboot/images/>
+  AllowOverride None
+  Options Indexes FollowSymlinks
+  Order allow,deny
+  Allow from all
+</Directory>
+
+
+FTP server
+# vi /etc/vsftpd/vsftpd.conf
+anonymous_enable=YES
+anon_root=/var/lib/tftpboot/images
+
+Configure TFTP server
+firewall-cmd --add-service=tftp
+
+Once these packages are installed copy the below files from the specified directory to /var/lib/tftpboot
+# cp /usr/share/syslinux/pxelinux.0     /var/lib/tftpboot/
+# cp /usr/share/syslinux/chain.c32     /var/lib/tftpboot/
+# cp /usr/share/syslinux/menu.c32     /var/lib/tftpboot/
+# cp /usr/share/syslinux/memdisk     /var/lib/tftpboot/
+# cp /usr/share/syslinux/mboot.c32     /var/lib/tftpboot/
+
+cp /usr/share/syslinux/pxelinux.0     /var/lib/tftpboot/
+cp /usr/share/syslinux/chain.c32     /var/lib/tftpboot/
+cp /usr/share/syslinux/menu.c32     /var/lib/tftpboot/
+cp /usr/share/syslinux/memdisk     /var/lib/tftpboot/
+cp /usr/share/syslinux/mboot.c32     /var/lib/tftpboot/
+
+mkdir /var/lib/tftpboot/pxelinux.cfg
+
+Enable the tftp service in xinetd
+service tftp
+{
+        socket_type             = dgram
+        protocol                = udp
+        wait                    = yes
+        user                    = root
+        server                  = /usr/sbin/in.tftpd
+        server_args             = -s /var/lib/tftpboot
+        disable                 = no
+        per_source              = 11
+        cps                     = 100 2
+        flags                   = IPv4
+}
+
+DHCPD
+/etc/dhcp/dhcpd.conf
+# http://www.golinuxhub.com/2014/08/how-to-configure-pxe-boot-server-in.html
+
+option space pxelinux;
+option pxelinux.magic code 208 = string;
+option pxelinux.configfile code 209 = text;
+option pxelinux.pathprefix code 210 = text;
+option pxelinux.reboottime code 211 = unsigned integer 32;
+
+option domain-name "barn.vmware.haf";
+option domain-name-servers 10.0.0.200;
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+       range dynamic-bootp 10.0.0.231 10.0.0.250;
+       option broadcast-address 10.0.0.255;
+       #option routers 192.168.1.1;
+
+       allow booting;
+       allow bootp;
+       
+       # class "pxeclients" {
+       #         match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
+       #         next-server 10.0.0.200;
+
+       #         if option arch = 00:06 {
+       #                filename "pxelinux/bootia32.efi";
+       #         } else if option arch = 00:07 {
+       #                filename "pxelinux/bootx64.efi";
+       #         } else {
+       #                filename "pxelinux/pxelinux.0";
+       #         }
+       # }
+
+       next-server 10.0.0.200;
+       filename "pxelinux.0";
+}
+
+
+https://www.andrewzammit.com/blog/install-centos-6-with-anaconda-kickstart-esxi-vmware-tools/
+
+DEST=/repo/centos
+mkdir -p /repo/centos
+MIRROR=rsync://ftp.sh.cvut.cz/centos/6.9/
+export DEST
+export MIRROR
+rsync -avSHP --delete --exclude "local*" --exclude "isos" --exclude "i386" $MIRROR $DEST
+
+VCenter login
+root
+K0likmn!
+

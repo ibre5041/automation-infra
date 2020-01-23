@@ -1,0 +1,4 @@
+---
+# vars file for kafka
+#zookeeper_node: "{{ groups[group_names | first] | first }}"
+zookeeper_node: "{{  ansible_play_batch[0] }}"

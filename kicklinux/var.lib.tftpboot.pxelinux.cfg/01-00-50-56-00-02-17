@@ -1,0 +1,14 @@
+DEFAULT menu.c32
+PROMPT 0
+TIMEOUT 60
+ONTIMEOUT CentOS7
+
+MENU TITLE PXE Menu
+
+LABEL CentOS7
+KERNEL vmlinuz7
+APPEND initrd=initrd7.img inst.ks=http://10.0.0.200/centos/rhel7-ora-e-ks.cfg id=dhcp
+
+#MENU seperator
+LABEL Local
+LOCALBOOT 0Here two things which you need to change

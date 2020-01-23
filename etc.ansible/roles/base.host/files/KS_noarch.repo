@@ -1,0 +1,4 @@
+[KS_noarch]
+name=KS_noarch
+enabled=1
+baseurl=http://192.168.8.200/oracle/rpm/noarch/

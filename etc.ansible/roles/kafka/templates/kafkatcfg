@@ -1,0 +1,5 @@
+{
+  "kafka_path": "~/kafka",
+  "log_path": "/tmp/kafka-logs",
+  "zk_path": "localhost:2181"
+}

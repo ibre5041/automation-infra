@@ -1,0 +1,39 @@
+---
+# tasks file for basehost
+- name: DNS search
+  copy:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+
+- name: Nexus .repo(x86_64)
+  copy:
+    src: KS_x86_64.repo
+    dest: /etc/yum.repos.d/
+  tags: packages
+
+- name: Nexus .repo(noarch)
+  copy:
+    src: KS_noarch.repo
+    dest: /etc/yum.repos.d/
+  tags: packages
+
+- name: Base packages
+  yum: 
+    name: wget,mlocate,strace,psmisc,nfs-utils,emacs-nox,patch,gcc,xauth
+    state: latest
+    lock_timeout: 160
+    disable_gpg_check: yes 
+  tags: packages
+
+- name: Mount NFS
+  mount:
+    path: /oinstall
+    src: kicklinux:/var/www/html/oracle
+    fstype: nfs4
+    opts: ro
+    state: mounted
+
+- name: Set authorized key for root
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/authorized_keys') }}"

@@ -1,0 +1,1 @@
+selinux_mode: permissive	# please chose: |   disabled | permissive | enforcing

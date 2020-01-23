@@ -1,0 +1,162 @@
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
+from utils import *
+
+import atexit
+import sys
+import logging
+import socket
+
+from config import Config, Machine
+
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+logging.basicConfig(stream=sys.stdout,
+                    level=logging.DEBUG,
+                    format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
+
+
+def create_vm(service_instance, machine):
+    devices = []
+    datastore_path = machine.pathVSphere
+    vmx_file = vim.vm.FileInfo(logDirectory=None
+                               , snapshotDirectory=None
+                               , suspendDirectory=None
+                               , vmPathName=datastore_path)
+
+    for net_adapter in machine.netAdapters:
+        net = get_obj(content, [vim.Network], net_adapter['network'])
+        nicspec = vim.vm.device.VirtualDeviceSpec()
+        nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        nic_type = vim.vm.device.VirtualVmxnet3()
+        nicspec.device = nic_type
+        if 'mac' in net_adapter:
+            nicspec.device.addressType = 'manual'
+            nicspec.device.macAddress = net_adapter['mac']
+        nicspec.device.deviceInfo = vim.Description()
+        nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
+        nicspec.device.backing.network = net
+        nicspec.device.backing.deviceName = net.name
+        nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+        nicspec.device.connectable.startConnected = True
+        nicspec.device.connectable.allowGuestControl = True
+        devices.append(nicspec)
+
+    device = None  # 1st SCSI adapter
+    for i, scsi_adapter in enumerate(machine.scsiAdapters):
+        scsi_ctr = vim.vm.device.VirtualDeviceSpec()
+        scsi_ctr.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        scsi_ctr.device = vim.vm.device.ParaVirtualSCSIController()
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.slotInfo = vim.vm.device.VirtualDevice.PciBusSlotInfo()
+        scsi_ctr.device.slotInfo.pciSlotNumber = scsi_adapter['pciSlotNumber']
+        scsi_ctr.device.controllerKey = 100
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.deviceInfo.label = 'Shared SCSI'
+        scsi_ctr.device.deviceInfo.label = 'BUS for Shared SCSI disks'
+        scsi_ctr.device.unitNumber = 3
+        scsi_ctr.device.busNumber = i
+        scsi_ctr.device.hotAddRemove = True
+        # 1st SCSI adapter for local disk, rest for shared ones
+        scsi_ctr.device.sharedBus = vim.vm.device.VirtualSCSIController.Sharing.noSharing if i == 0 else vim.vm.device.VirtualSCSIController.Sharing.virtualSharing
+        scsi_ctr.device.scsiCtlrUnitNumber = 7
+        devices.append(scsi_ctr)
+        if i == 0:
+            device = scsi_ctr.device
+
+    for i, disk in enumerate(machine.disks):
+        sizeGB = 50
+        controller = device
+        disk_spec = vim.vm.device.VirtualDeviceSpec()
+        disk_spec.fileOperation = "create"
+        disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        disk_spec.device = vim.vm.device.VirtualDisk()
+        disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+        disk_spec.device.backing.diskMode = 'persistent'
+        disk_spec.device.backing.fileName = disk['pathVSphere']
+        disk_spec.device.unitNumber = i
+        disk_spec.device.capacityInKB = sizeGB * 1024 * 1024
+        disk_spec.device.controllerKey = controller.key
+        devices.append(disk_spec)
+
+    # dc = get_obj(content, [vim.Datacenter], 'Datacenter')
+    # allhosts = []
+    # for entity in dc.hostFolder.childEntity:
+    #     for host in entity.host:
+    #         allhosts.append(host)
+    # print(allhosts)
+    # dc_view = content.viewManager.CreateContainerView(content.rootFolder, [vim.Datacenter], True)
+
+    rp = service_instance.RetrieveContent().rootFolder.childEntity[0].hostFolder.childEntity[0].resourcePool
+    vm_folder = get_obj(content, [vim.Folder], machine.folder)
+    config = vim.vm.ConfigSpec(name=machine.nameVSphere
+                               , memoryMB=6 * 1024  # TODO
+                               , numCPUs=machine.cpu
+                               , files=vmx_file
+                               , guestId='ubuntu64Guest'
+                               , version='vmx-13'
+                               , deviceChange=devices)
+
+    config.extraConfig = []
+    opt = vim.option.OptionValue()
+    opt.key = 'guestinfo.hostname'
+    opt.value = machine.name
+    config.extraConfig.append(opt)
+
+    opt = vim.option.OptionValue()
+    opt.key = 'guestinfo.dns'
+    opt.value = '192.168.8.200'
+    config.extraConfig.append(opt)
+
+    prod_ip = socket.gethostbyname("{host}.prod.vmware.haf".format(host=machine.name))
+    opt = vim.option.OptionValue()
+    opt.key = 'guestinfo.prod_ip'
+    opt.value = prod_ip
+    config.extraConfig.append(opt)
+
+    barn_ip = socket.gethostbyname("{host}.barn.vmware.haf".format(host=machine.name))
+    opt = vim.option.OptionValue()
+    opt.key = 'guestinfo.barn_ip'
+    opt.value = barn_ip
+    config.extraConfig.append(opt)
+
+    task = vm_folder.CreateVM_Task(config=config
+                                   #, host=esx_host
+                                   , pool=rp
+                                   )
+    vm = wait_for_tasks(service_instance, [task])
+    logging.debug("{machine} created.".format(machine=machine.nameVSphere))
+
+    vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
+    task = vm.PowerOn()
+    wait_for_tasks(service_instance, [task])
+    logging.debug("{machine} state: {state}".format(machine=machine.nameVSphere, state=str(vm.runtime.powerState)))
+
+
+# Start program
+if __name__ == "__main__":
+    # parse yaml file
+    c = Config.createFromYAML('rac-a.yaml')
+    # Connect
+    config = VsCreadential.load('.credentials.yaml')
+    #
+    si = SmartConnect(
+        host=config.hostname,
+        user=config.username,
+        pwd=config.password,
+        port=443)
+    # disconnect this thing
+    atexit.register(Disconnect, si)
+
+    content = si.RetrieveContent()
+
+    c.validate(content)
+
+    #sys.exit(0)
+
+    for machine in c.machines:
+        create_vm(service_instance=si, machine=machine)
+
+    #for disk in c.cl
+
