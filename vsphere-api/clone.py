@@ -6,7 +6,7 @@ import atexit
 import sys
 import logging
 
-from config import Config
+from config import Config, VsCreadential
 
 import ssl
 
@@ -114,8 +114,16 @@ if __name__ == "__main__":
                         level=logging.DEBUG,
                         format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file',
+                        required=False,
+                        action='store',
+                        help='Config filename to process', default='rhel7-a.yaml')
+
+    args = parser.parse_args()
+
     # parse yaml file
-    c = Config.createFromYAML('rac-a.yaml')
+    c = Config.createFromYAML(args.file)
     # Connect
     config = VsCreadential.load('.credentials.yaml')
     #

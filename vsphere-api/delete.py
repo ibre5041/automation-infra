@@ -40,8 +40,16 @@ def delete_vm(service_instance, machine):
 if __name__ == "__main__":
     config = VsCreadential.load('.credentials.yaml')
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file',
+                        required=False,
+                        action='store',
+                        help='Config filename to process', default='rhel7-a.yaml')
+
+    args = parser.parse_args()
+
     # parse yaml file
-    c = Config.createFromYAML('rac-a.yaml')
+    c = Config.createFromYAML(args.file)
     # Connect
     si = SmartConnect(
         host=config.hostname,

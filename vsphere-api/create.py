@@ -6,8 +6,10 @@ import atexit
 import sys
 import logging
 import socket
+import humanfriendly
+import argparse
 
-from config import Config, Machine
+from config import Config, Machine, VsCreadential
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -66,17 +68,19 @@ def create_vm(service_instance, machine):
             device = scsi_ctr.device
 
     for i, disk in enumerate(machine.disks):
-        sizeGB = 50
+        sizeB = humanfriendly.parse_size(disk['size'], binary=True)
         controller = device
         disk_spec = vim.vm.device.VirtualDeviceSpec()
         disk_spec.fileOperation = "create"
         disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
         disk_spec.device = vim.vm.device.VirtualDisk()
         disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+        disk_spec.device.backing.eagerlyScrub = False
+        disk_spec.device.backing.thinProvisioned = True
         disk_spec.device.backing.diskMode = 'persistent'
         disk_spec.device.backing.fileName = disk['pathVSphere']
         disk_spec.device.unitNumber = i
-        disk_spec.device.capacityInKB = sizeGB * 1024 * 1024
+        disk_spec.device.capacityInKB = int(sizeB / 1024)
         disk_spec.device.controllerKey = controller.key
         devices.append(disk_spec)
 
@@ -115,11 +119,14 @@ def create_vm(service_instance, machine):
     opt.value = prod_ip
     config.extraConfig.append(opt)
 
-    barn_ip = socket.gethostbyname("{host}.barn.vmware.haf".format(host=machine.name))
-    opt = vim.option.OptionValue()
-    opt.key = 'guestinfo.barn_ip'
-    opt.value = barn_ip
-    config.extraConfig.append(opt)
+    try:
+        barn_ip = socket.gethostbyname("{host}.barn.vmware.haf".format(host=machine.name))
+        opt = vim.option.OptionValue()
+        opt.key = 'guestinfo.barn_ip'
+        opt.value = barn_ip
+        config.extraConfig.append(opt)
+    except:
+        logging.warn("No IP for: {host}.barn.vmware.haf in DNS".format(host=machine.name))
 
     task = vm_folder.CreateVM_Task(config=config
                                    #, host=esx_host
@@ -137,7 +144,15 @@ def create_vm(service_instance, machine):
 # Start program
 if __name__ == "__main__":
     # parse yaml file
-    c = Config.createFromYAML('rac-a.yaml')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file',
+                        required=False,
+                        action='store',
+                        help='Config filename to process', default='rhel7-a.yaml')
+
+    args = parser.parse_args()
+    #
+    c = Config.createFromYAML(args.file)
     # Connect
     config = VsCreadential.load('.credentials.yaml')
     #

@@ -1,0 +1,57 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 6G
+  cpu: 1
+  scsi:
+    - adapter:
+        pciSlotNumber: 128
+  disks:
+    - disk: rootdg
+      size: 20g
+      bus: 0
+    - disk: appdg
+      size: 20g
+      bus: 0
+  network:
+    - adapter:
+        pciSlotNumber: 192
+        network: "VM network inerconnect"
+    - adapter:
+        pciSlotNumber: 224
+        network: "VM Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+
+- machine:
+  name: ceph1
+  template: default
+  network:
+
+- machine:
+  name: ceph2
+  template: default
+  network:
+
+- machine:
+  name: ceph3
+  template: default
+  network:
+
+- machine:
+  name: ceph4
+  template: default
+  network:
+
+- machine:
+  name: ceph5
+  template: default
+  network:
+
+- machine:
+  name: ceph6
+  template: default
+  network:
