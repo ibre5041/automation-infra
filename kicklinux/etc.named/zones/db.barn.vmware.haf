@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     ns1.barn.vmware.haf. admin.barn.vmware.haf. (
-                 30     ; Serial
+                 33     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -77,6 +77,8 @@ pxe1.barn.vmware.haf.        IN      A      10.0.0.203
 gentoo.barn.vmware.haf.      IN      A      10.0.0.205
 dg.barn.vmware.haf.          IN      A      10.0.0.206
 
+rhel7-template.barn.vmware.haf.   IN      A 10.0.0.219
+
 ceph1.barn.vmware.haf.       IN      A      10.0.0.221
 ceph2.barn.vmware.haf.       IN      A      10.0.0.222
 ceph3.barn.vmware.haf.       IN      A      10.0.0.223
@@ -91,7 +93,11 @@ rhel5.barn.vmware.haf.       IN      A      10.0.0.240
 rhel6.barn.vmware.haf.       IN      A      10.0.0.241
 rhel7.barn.vmware.haf.       IN      A      10.0.0.242
 
-tmplrhel7.barn.vmware.haf.   IN      A      10.0.0.250
-tmplrhel7racnode.barn.vmware.haf. IN A      10.0.0.251
+;tmplrhel7.barn.vmware.haf.   IN      A      10.0.0.250
+;tmplrhel7racnode.barn.vmware.haf. IN A      10.0.0.251
 
-
+rhel7-a                      IN      A      10.0.0.250
+rhel7-b                      IN      A      10.0.0.251
+rhel7-c                      IN      A      10.0.0.252
+rhel7-d                      IN      A      10.0.0.253
+rhel7-e                      IN      A      10.0.0.254

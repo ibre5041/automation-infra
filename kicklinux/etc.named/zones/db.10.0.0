@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                             31         ; Serial
+                             33         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -71,6 +71,8 @@ $TTL    604800
 204 IN      PTR     pxe2.barn.vmware.haf.  ; 10.0.0.204
 205 IN      PTR     gentoo.barn.vmware.haf.; 10.0.0.205
 206 IN      PTR     dg.barn.vmware.haf.    ; 10.0.0.206
+
+219 IN      PTR     rhel7-template.barn.vmware.haf. ; 10.0.0.219
 
 221 IN      PTR     ceph1.barn.vmware.haf. ; 10.0.0.221
 222 IN      PTR     ceph2.barn.vmware.haf. ; 10.0.0.222

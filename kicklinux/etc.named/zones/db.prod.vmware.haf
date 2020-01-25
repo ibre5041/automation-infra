@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                 31     ; Serial
+                 33     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -123,6 +123,8 @@ rac-cluster-scan             IN      A      192.168.8.209
 rac-cluster-scan             IN      A      192.168.8.210
 rac1-listener                IN      A      192.168.8.211
 rac2-listener                IN      A      192.168.8.212
+
+rhel7-template               IN      A      192.168.8.219
 
 rhel7-ora-a                  IN      A      192.168.8.213
 rhel7-ora-b                  IN      A      192.168.8.214

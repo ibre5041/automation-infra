@@ -28,6 +28,10 @@ if [ -n "${IP_P}" ]; then
     nmcli networking on
 
     rm -f /root/nmcli.flag
+
+    # in case when sdb [vg01] was extended during clonning, try to extend PV too, but only once
+    parted -s /dev/sdb resizepart 1 100%
+    pvresize /dev/sdb1
 fi
 
 if [ -n "${DNS}" ]; then

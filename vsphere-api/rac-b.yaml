@@ -28,8 +28,8 @@
 
 
 - machine:
-  name: rhel7-a
-  template: 'RHEL7 Template'
+  name: rhel7-b
+  template: 'New Virtual Machine'
   scsi:
     - adapter:
         pciSlotNumber: 256
@@ -40,7 +40,3 @@
       count: 5
   vmware:
     datastore: Kingston890G
-
-
-
-

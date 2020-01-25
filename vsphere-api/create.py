@@ -33,9 +33,10 @@ def create_vm(service_instance, machine):
         nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
         nic_type = vim.vm.device.VirtualVmxnet3()
         nicspec.device = nic_type
-        if 'mac' in net_adapter:
-            nicspec.device.addressType = 'manual'
-            nicspec.device.macAddress = net_adapter['mac']
+        if machine.name != 'rhel7-template': # a machine build as teamplate should not have manualy generated MAC addresses
+            if 'mac' in net_adapter:
+                nicspec.device.addressType = 'manual'
+                nicspec.device.macAddress = net_adapter['mac']
         nicspec.device.deviceInfo = vim.Description()
         nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
         nicspec.device.backing.network = net
@@ -98,11 +99,12 @@ def create_vm(service_instance, machine):
                                , memoryMB=6 * 1024  # TODO
                                , numCPUs=machine.cpu
                                , files=vmx_file
-                               , guestId='ubuntu64Guest'
+                               , guestId='centos7_64Guest'
                                , version='vmx-13'
                                , deviceChange=devices)
 
     config.extraConfig = []
+
     opt = vim.option.OptionValue()
     opt.key = 'guestinfo.hostname'
     opt.value = machine.name
@@ -113,20 +115,21 @@ def create_vm(service_instance, machine):
     opt.value = '192.168.8.200'
     config.extraConfig.append(opt)
 
-    prod_ip = socket.gethostbyname("{host}.prod.vmware.haf".format(host=machine.name))
-    opt = vim.option.OptionValue()
-    opt.key = 'guestinfo.prod_ip'
-    opt.value = prod_ip
-    config.extraConfig.append(opt)
-
-    try:
-        barn_ip = socket.gethostbyname("{host}.barn.vmware.haf".format(host=machine.name))
+    if machine.name != 'rhel7-template': # a machine build as teamplate should not have guestinfo IP records
+        prod_ip = socket.gethostbyname("{host}.prod.vmware.haf".format(host=machine.name))
         opt = vim.option.OptionValue()
-        opt.key = 'guestinfo.barn_ip'
-        opt.value = barn_ip
+        opt.key = 'guestinfo.prod_ip'
+        opt.value = prod_ip
         config.extraConfig.append(opt)
-    except:
-        logging.warn("No IP for: {host}.barn.vmware.haf in DNS".format(host=machine.name))
+
+        try:
+            barn_ip = socket.gethostbyname("{host}.barn.vmware.haf".format(host=machine.name))
+            opt = vim.option.OptionValue()
+            opt.key = 'guestinfo.barn_ip'
+            opt.value = barn_ip
+            config.extraConfig.append(opt)
+        except:
+            logging.warn("No IP for: {host}.barn.vmware.haf in DNS".format(host=machine.name))
 
     task = vm_folder.CreateVM_Task(config=config
                                    #, host=esx_host

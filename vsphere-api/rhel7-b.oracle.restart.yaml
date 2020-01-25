@@ -2,17 +2,14 @@
 # default machine definition
 - default:
   name: "Default"
-  ram: 6G
+  ram: 12G
   cpu: 1
   scsi:
     - adapter:
         pciSlotNumber: 128
-    - adapter:
-        pciSlotNumber: 256
-
   disks:
     - disk: rootdg
-      size: 10g
+      size: 20g
       bus: 0
     - disk: appdg
       size: 20g
@@ -30,21 +27,20 @@
 
 
 - machine:
-  name: rhel7-rac-a-node-1
+  name: rhel7-b
   template: default
   network:
-
-
-- machine:
-  name: rhel7-rac-a-node-2
-  template: default
-
+  scsi:
+  # 2nd SCSI adapter for Oracle data
+    - adapter:
+        pciSlotNumber: 256
 
 - cluster:
-  name: rac-a
-  nodes: [rhel7-rac-a-node-1, rhel7-rac-a-node-2]
+  name: rhel7-b-oracle-restart
+  nodes: [rhel7-b]
   disks:
     - disk:
       size: 8
       bus: 1
-      count: 4
+      count: 5
+

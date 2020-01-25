@@ -6,6 +6,18 @@
         src: grid.rsp
         dest: /oracle/u01/gi/grid.rsp
         mode: '0644'
+
+    - name: ACFS Centos path
+      copy:
+        src: acfs.centos.patch
+        dest: /oracle/u01/gi/19.3.0.0/lib/
+
+    - name: Apply patch ACFS Centos patch
+      patch:
+        src: acfs.centos.patch
+        basedir: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
+        strip: 0
+
     - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
@@ -16,7 +28,7 @@
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
 
-    # - name: "Goldem image fixups - missing dirs"
+    # - name: "Golden image fixups - missing dirs"
     #   file:
     #     path: "/oracle/u01/gi/12.2.0.1/{{item}}"
     #     state: directory

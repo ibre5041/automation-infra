@@ -124,73 +124,82 @@
   register: crs_set_up
   when: ansible_hostname == first_rac_node
 
-# - include: setup.grid.yml
-#   when: crs_set_up.stat.exists != True
+- debug:
+    msg: "Install oraInventory exists: {{ crs_set_up }} "
+
+- include: setup.grid.yml
+  when: ansible_hostname == first_rac_node and crs_set_up.stat.exists != True
   
-# - name: orainstRoot.sh
-#   shell: /oracle/u01/oraInventory/orainstRoot.sh
-#   args:
-#     creates: /etc/oraInst.loc
+- name: orainstRoot.sh
+  shell: /oracle/u01/oraInventory/orainstRoot.sh
+  args:
+    creates: /etc/oraInst.loc
+  when: ansible_hostname == first_rac_node
 
-# - name: wait for oracle-ohasd.service
-#   systemd:
-#     name: oracle-ohasd.service
-#   register: oracle_ohasd_service
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+  register: oracle_ohasd_service
+  when: ansible_hostname == first_rac_node
 
-# - debug:
-#     msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+  when: ansible_hostname == first_rac_node
 
-# - name: root.sh   
-#   shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
-#   when: oracle_ohasd_service.status.LoadState == "not-found"
+- name: root.sh   
+  shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+  when: ansible_hostname == first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
 
-# - name: wait for oracle-ohasd.service
-#   systemd:
-#     name: oracle-ohasd.service
-#     state: started
-#     enabled: yes
-#   register: oracle_ohasd_service
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+    state: started
+    enabled: yes
+  register: oracle_ohasd_service
+  when: ansible_hostname == first_rac_node
 
-# - debug:
-#     msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+  when: ansible_hostname == first_rac_node
 
-# - name: Check asm configured
-#   command: "sh -c '/oracle/u01/gi/{{ oracle_ver_path }}/bin/crsctl status res ora.asm | grep ONLINE'"
-#   register: oracle_asm_status
-#   ignore_errors: true
+- name: Check asm configured
+  command: "sh -c '/oracle/u01/gi/{{ oracle_ver_path }}/bin/crsctl status res ora.asm | grep ONLINE'"
+  register: oracle_asm_status
+  ignore_errors: true
 
-# - debug:
-#     msg: "{{ oracle_asm_status }}"
+- debug:
+    msg: "{{ oracle_asm_status }}"
+  when: ansible_hostname == first_rac_node
 
-# - name: "ASM test"
-#   block:
-#     - debug:
-#         msg: "ASM not ONLINE"
-#     - name: install grid.rsp
-#       copy:
-#         src: grid.rsp
-#         dest: /oracle/u01/gi/grid.rsp
-#         mode: '0644'
+- name: "ASM test"
+  block:
+    - debug:
+        msg: "ASM not ONLINE"
+    - name: install grid.rsp
+      copy:
+        src: grid.rsp
+        dest: /oracle/u01/gi/grid.rsp
+        mode: '0644'
 
-#     - name: Grid Setup ASM
-#       shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
-#       args:
-#         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
+    - name: Grid Setup ASM (part II)
+      shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
+      args:
+        chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
 
-#     - name: delete install .zip package
-#       file:
-#         path: /oracle/u01/gi/grid.rsp
-#         state: absent
+  #   - name: delete install .zip package
+  #     file:
+  #       path: /oracle/u01/gi/grid.rsp
+  #       state: absent
 
-#   rescue:
-#     - name: delete install .zip package
-#       file:
-#         path: /oracle/u01/gi/grid.rsp
-#         state: absent
+  # rescue:
+  #   - name: delete install .zip package
+  #     file:
+  #       path: /oracle/u01/gi/grid.rsp
+  #       state: absent
 
-#   become: yes
-#   become_user: oracle
-#   when: oracle_asm_status.stdout is not match(".*ONLINE")
+  become: yes
+  become_user: oracle
+  #when:  ansible_hostname == first_rac_node and oracle_asm_status.stdout is not match(".*ONLINE")
 
 # # Not needed for 19c
 # # - name: file perm fixup

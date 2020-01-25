@@ -101,6 +101,41 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     except Exception:
         None
 
+    task = vm.ReconfigVM_Task(spec=spec)
+    wait_for_tasks(service_instance, [task])
+
+    devices = []
+    for i, scsi_adapter in enumerate(machine.scsiAdapters):
+        if i == 0:              # asseme 1st SCSI adapter is created, when clonning already created VM
+            continue
+        #
+        scsi_ctr = vim.vm.device.VirtualDeviceSpec()
+        scsi_ctr.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        scsi_ctr.device = vim.vm.device.ParaVirtualSCSIController()
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.slotInfo = vim.vm.device.VirtualDevice.PciBusSlotInfo()
+        scsi_ctr.device.slotInfo.pciSlotNumber = scsi_adapter['pciSlotNumber']
+        # scsi_ctr.device.controllerKey = 100
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.deviceInfo.label = 'Shared SCSI'
+        scsi_ctr.device.deviceInfo.label = 'BUS for Shared SCSI disks'
+        scsi_ctr.device.unitNumber = 3
+        scsi_ctr.device.busNumber = i
+        scsi_ctr.device.hotAddRemove = True
+        # 1st SCSI adapter for local disk, rest for shared ones
+        scsi_ctr.device.sharedBus = vim.vm.device.VirtualSCSIController.Sharing.noSharing if i == 0 else vim.vm.device.VirtualSCSIController.Sharing.virtualSharing
+        scsi_ctr.device.scsiCtlrUnitNumber = 7
+
+        devices.append(scsi_ctr)
+
+        spec = vim.vm.ConfigSpec()
+        spec.deviceChange = devices
+        
+        task = vm.ReconfigVM_Task(spec=spec)
+        wait_for_tasks(service_instance, [task])
+        logging.debug('Added SCSI adapter: {i} pciSlotNumber: {pciSlotNumber}'.format(i=i, pciSlotNumber=scsi_ctr.device.slotInfo.pciSlotNumber))
+
+
     task = vm.ReconfigVM_Task(spec)
     utils.wait_for_tasks(service_instance, [task])
     logging.debug("{machine} reconfigured.".format(machine=machine.nameVSphere))
