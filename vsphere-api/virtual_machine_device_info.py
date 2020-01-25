@@ -18,6 +18,9 @@ from __future__ import print_function
 import atexit
 import argparse
 import getpass
+import argparse
+
+from config import Config, Machine, VsCreadential
 
 from pyVim import connect
 

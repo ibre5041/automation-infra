@@ -5,6 +5,8 @@ from utils import *
 import atexit
 import sys
 import logging
+import argparse
+import humanfriendly
 
 from config import Config, VsCreadential
 
@@ -58,19 +60,21 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     clonespec.powerOn = False
     clonespec.location.pool = resource_pool
 
-    vm = vim.vm.ConfigSpec()
-    # "stolen" from: https://stackoverflow.com/questions/30765940/how-do-i-modify-an-existing-vm-templates-only-ethernet-adapters-ip-address-wit
-    vm.numCPUs = machine.cpu
-    # vm.memoryMB = deploy_settings['mem']
-    vm.cpuHotAddEnabled = True
-    vm.memoryHotAddEnabled = True
-
     task = template.Clone(folder=destfolder, name=machine.nameVSphere, spec=clonespec)
     utils.wait_for_tasks(service_instance, [task])
     logging.debug("{hostname} crated as clone of {template_name}".format(hostname=machine.nameVSphere, template_name=template_name))
 
     vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
     spec = vim.vm.ConfigSpec()
+
+    # "stolen" from: https://stackoverflow.com/questions/30765940/how-do-i-modify-an-existing-vm-templates-only-ethernet-adapters-ip-address-wit
+    spec.numCPUs = machine.cpu
+    spec.memoryMB = int(humanfriendly.parse_size(machine.ram, binary=True) / 1024 / 1024)    
+    spec.cpuHotAddEnabled = True
+    spec.memoryHotAddEnabled = True
+    logging.debug("VM CPU: {cpu}".format(cpu=spec.numCPUs))
+    logging.debug("VM CPU: {ram}".format(ram=spec.memoryMB))
+
     spec.extraConfig = []
     opt = vim.option.OptionValue()
     opt.key = 'guestinfo.hostname'
@@ -100,6 +104,33 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     task = vm.ReconfigVM_Task(spec)
     utils.wait_for_tasks(service_instance, [task])
     logging.debug("{machine} reconfigured.".format(machine=machine.nameVSphere))
+
+    for dev in vm.config.hardware.device:
+        if hasattr(dev.backing, 'fileName'):
+            logging.debug("Device label: {label}".format(label=dev.deviceInfo.label))
+            #if dev.deviceInfo.label in vm_disk.keys():
+            capacity_in_kb = dev.capacityInKB
+            #new_disk_kb = int(vm_disk[dev.deviceInfo.label]['size_gb']) * 1024 * 1024
+            new_disk_kb = 40 * 1024 * 1024
+            if new_disk_kb > capacity_in_kb:
+                dev_changes = []
+                disk_spec = vim.vm.device.VirtualDeviceSpec()
+                disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+                disk_spec.device = vim.vm.device.VirtualDisk()
+                disk_spec.device.key = dev.key
+                disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+                disk_spec.device.backing.fileName = dev.backing.fileName
+                disk_spec.device.backing.diskMode = dev.backing.diskMode
+                disk_spec.device.controllerKey = dev.controllerKey
+                disk_spec.device.unitNumber = dev.unitNumber
+                disk_spec.device.capacityInKB = new_disk_kb
+                dev_changes.append(disk_spec)
+
+                spec = vim.vm.ConfigSpec()
+                spec.deviceChange = dev_changes
+
+                task = vm.ReconfigVM_Task(spec=spec)
+                wait_for_tasks(service_instance, [task])
 
     task = vm.PowerOn()
     wait_for_tasks(service_instance, [task])
@@ -142,7 +173,8 @@ if __name__ == "__main__":
     #sys.exit(0)
 
     for machine in c.machines:
-        clone_vm(service_instance=si, machine=machine, template_name='RHEL7 Template')
+        #clone_vm(service_instance=si, machine=machine, template_name='RHEL7 Template')
+        clone_vm(service_instance=si, machine=machine, template_name='New Virtual Machine')
         for disk in machine.disks:
             if disk['bus'] == 0:
                 continue

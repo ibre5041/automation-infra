@@ -5,8 +5,9 @@ from utils import *
 import atexit
 import sys
 import logging
+import argparse
 
-from config import Config
+from config import Config, VsCreadential
 
 import ssl
 
@@ -44,6 +45,46 @@ def _create_data_file(service_instance, machine, bus, unit, size):
     return path_name
 
 
+def _add_scsi_adapter(service_instance, vm, machine):
+    devices = []
+    logging.warn("No SCSI adapter other then busNumber: 0")
+    device = None  # 1st SCSI adapter
+    for i, scsi_adapter in enumerate(machine.scsiAdapters):
+        if i == 0: # skip the 1st SCSI adapter
+            continue
+        scsi_ctr = vim.vm.device.VirtualDeviceSpec()
+        scsi_ctr.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        scsi_ctr.device = vim.vm.device.ParaVirtualSCSIController()
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.slotInfo = vim.vm.device.VirtualDevice.PciBusSlotInfo()
+        scsi_ctr.device.slotInfo.pciSlotNumber = scsi_adapter['pciSlotNumber']
+        scsi_ctr.device.controllerKey = 100
+        scsi_ctr.device.deviceInfo = vim.Description()
+        scsi_ctr.device.deviceInfo.label = 'Shared SCSI'
+        scsi_ctr.device.deviceInfo.label = 'BUS for Shared SCSI disks'
+        scsi_ctr.device.unitNumber = 3
+        scsi_ctr.device.busNumber = i
+        scsi_ctr.device.hotAddRemove = True
+        # 1st SCSI adapter for local disk, rest for shared ones
+        scsi_ctr.device.sharedBus = vim.vm.device.VirtualSCSIController.Sharing.noSharing if i == 0 else vim.vm.device.VirtualSCSIController.Sharing.virtualSharing
+        scsi_ctr.device.scsiCtlrUnitNumber = 7
+        devices.append(scsi_ctr)
+        if i != 0:
+            logging.warn("Adding SCSI adapter busNumber: {adapter}".format(adapter=i))
+            spec = vim.vm.ConfigSpec()
+            spec.deviceChange = devices
+            task = vm.ReconfigVM_Task(spec=spec)
+            wait_for_tasks(service_instance, [task])
+
+            for dev in vm.config.hardware.device:
+                if isinstance(dev, vim.vm.device.VirtualSCSIController):
+                    if dev.busNumber == 0:  # Ingnore bus 0, rootdg, appdg
+                        continue
+                    controller = dev
+            logging.debug("Returning newly created adapter: {adapter}".format(adapter=controller))
+            return controller
+
+
 def add_shared_disk(service_instance, config):
     content = service_instance.RetrieveContent()
 
@@ -56,7 +97,7 @@ def add_shared_disk(service_instance, config):
             if dev.busNumber == 0:  # Ingnore bus 0, rootdg, appdg
                 continue
             controller = dev
-
+        
     for disk in config.cluster.disks:
         if 'count' in disk:
             count = int(disk['count'])
@@ -89,6 +130,9 @@ def add_shared_disk(service_instance, config):
                             continue
                         controller = dev
 
+                if controller == None:
+                    controller = _add_scsi_adapter(service_instance, vm, machine)
+                            
                 # add disk here
                 dev_changes = []
                 disk_spec = vim.vm.device.VirtualDeviceSpec()
@@ -181,7 +225,15 @@ if __name__ == "__main__":
                         format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
 
     # parse yaml file
-    c = Config.createFromYAML('rac-a.yaml')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file',
+                        required=False,
+                        action='store',
+                        help='Config filename to process', default='rhel7-a.yaml')
+
+    args = parser.parse_args()
+    #
+    c = Config.createFromYAML(args.file)
     # Connect
     config = VsCreadential.load('.credentials.yaml')
     #
