@@ -1,21 +1,29 @@
 
 - block:
-    - name: Download install package
-      get_url:
-        url: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name }}
-        dest: /home/oracle/
-        mode: '0640'
+    # - name: Download install package
+    #   get_url:
+    #     url: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name }}
+    #     dest: /home/oracle/
+    #     mode: '0640'
 
-    - name: unzip install package
+    # - name: unzip install package
+    #   unarchive:
+    #     src: /home/oracle/{{ oracle_install_package_name }}
+    #     dest: /oracle/u01/gi/{{ oracle_ver_path }}
+    #     remote_src: yes
+
+    # - name: delete install .zip package
+    #   file:
+    #     path: /home/oracle/{{ oracle_install_package_name }}
+    #     state: absent
+    
+    # use zip2tar to convert install package to tgz format,
+    # .tar/.tgz can be unpacked from URL, while .zip have to be downloaded and then uncompressed
+    - name: Unarchive a file that needs to be downloaded (added in 2.0)
       unarchive:
-        src: /home/oracle/{{ oracle_install_package_name }}
+        src: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name }}
         dest: /oracle/u01/gi/{{ oracle_ver_path }}
         remote_src: yes
-
-    - name: delete install .zip package
-      file:
-        path: /home/oracle/{{ oracle_install_package_name }}
-        state: absent
 
   become: yes
   become_user: oracle
