@@ -87,6 +87,19 @@
     reload: yes
     sysctl_file: /etc/sysctl.d/98-oracle.conf
 
+# PRCF-2010 : All connections to the remote nodes got refused. 
+- sysctl:
+    name: net.ipv6.bindv6only
+    value: 0
+    reload: yes
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+
+- name: stop firewall
+  systemd:
+    name: firewalld.service
+    state: stopped
+    enabled: no
+
 - name: Ensure group "oinstall" exists
   group:
     name: oinstall

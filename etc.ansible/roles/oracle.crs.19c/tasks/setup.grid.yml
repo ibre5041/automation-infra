@@ -2,15 +2,15 @@
 - name: Grid Setup
   block:
     - name: install grid.rsp
-      copy:
-        src: grid.rsp
+      template:
+        src: grid.phase.0.rsp
         dest: /oracle/u01/gi/grid.rsp
         mode: '0644'
 
     - name: ACFS Centos path
       copy:
         src: acfs.centos.patch
-        dest: /oracle/u01/gi/19.3.0.0/lib/
+        dest: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
 
     - name: Apply patch ACFS Centos patch
       patch:
@@ -18,22 +18,19 @@
         basedir: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
         strip: 0
 
-    - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
+    - name: "gridSetup.sh (part I)"
+      shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
-        creates: "/oracle/u01/oraInventory"
+        creates: "/oracle/u01/oraInventory/oraInst.loc"
       ignore_errors: true
       register: grid_setup_out
     - debug: 
+        msg: "gridSetup.sh (part I) {{ grid_setup_out }}"
+      when: grid_setup_out.rc >= 2
+    - debug: 
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
-
-    # - name: "Golden image fixups - missing dirs"
-    #   file:
-    #     path: "/oracle/u01/gi/12.2.0.1/{{item}}"
-    #     state: directory
-    #     recurse: yes
-    #   with_items: ["cdata", "cdata/localhost", "crs/init", "crs/log", "evm/init", "log", "log/crs", "racg/dump", "srvm/log"]
 
   rescue:
     - debug:
@@ -45,3 +42,5 @@
 
   become: yes
   become_user: oracle
+  when: ansible_hostname == first_rac_node
+
