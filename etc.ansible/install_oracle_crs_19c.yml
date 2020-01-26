@@ -1,7 +1,7 @@
 ---
 - hosts: all
   roles:
-#  - base.host
-#  - base.oracle
+  - base.host
+  - base.oracle
   - oracle.crs.19c
 #  - oracle.database.19c

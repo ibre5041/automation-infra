@@ -1,12 +1,6 @@
 
 - name: Grid Setup
   block:
-    - name: install grid.rsp
-      template:
-        src: grid.phase.0.rsp
-        dest: /oracle/u01/gi/grid.rsp
-        mode: '0644'
-
     - name: ACFS Centos path
       copy:
         src: acfs.centos.patch
@@ -19,7 +13,7 @@
         strip: 0
 
     - name: "gridSetup.sh (part I)"
-      shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
+      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
         creates: "/oracle/u01/oraInventory/oraInst.loc"
@@ -32,13 +26,13 @@
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
 
-  rescue:
-    - debug:
-        msg: '"./gridSetup.sh failed'
-    - name: delete install .zip package
-      file:
-        path: /oracle/u01/gi/grid.rsp
-        state: absent
+  # rescue:
+  #   - debug:
+  #       msg: '"./gridSetup.sh failed'
+  #   - name: delete install grid respose file
+  #     file:
+  #       path: /home/oracle/grid.rsp
+  #       state: absent
 
   become: yes
   become_user: oracle

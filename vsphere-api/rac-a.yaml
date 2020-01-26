@@ -2,13 +2,13 @@
 # default machine definition
 - default:
   name: "Default"
-  ram: 6G
-  cpu: 1
+  ram: 16G
+  cpu: 2
   scsi:
     - adapter:
-        pciSlotNumber: 128
+        pciSlotNumber: 16
     - adapter:
-        pciSlotNumber: 256
+        pciSlotNumber: 32
 
   disks:
     - disk: rootdg
@@ -45,6 +45,7 @@
   nodes: [rhel7-rac-a-node-1, rhel7-rac-a-node-2]
   disks:
     - disk:
-      size: 8
+      size: 12
       bus: 1
-      count: 4
+      count: 3
+

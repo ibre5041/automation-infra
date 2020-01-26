@@ -1,4 +1,4 @@
-export ORACLE_SID=+ASM
+export ORACLE_SID=+ASM{{play_hosts.index(inventory_hostname) + 1 }}
 export CRS_HOME=/oracle/u01/gi/{{ oracle_ver_path }}
 export ORACLE_BASE=/oracle/u01/base
 export ORACLE_HOME=/oracle/u01/gi/{{ oracle_ver_path }}

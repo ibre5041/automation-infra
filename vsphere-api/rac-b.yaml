@@ -2,19 +2,21 @@
 # default machine definition
 - default:
   name: "Default"
-  ram: 6G
-  cpu: 1
+  ram: 16G
+  cpu: 2
   scsi:
     - adapter:
-        pciSlotNumber: 128
+        pciSlotNumber: 16
+    - adapter:
+        pciSlotNumber: 32
+
   disks:
     - disk: rootdg
-      size: 50
+      size: 10g
       bus: 0
     - disk: appdg
-      size: 50
+      size: 20g
       bus: 0
-
   network:
     - adapter:
         pciSlotNumber: 192
@@ -28,15 +30,22 @@
 
 
 - machine:
-  name: rhel7-b
-  template: 'New Virtual Machine'
-  scsi:
-    - adapter:
-        pciSlotNumber: 256
+  name: rhel7-rac-b-node-1
+  template: default
+  network:
+
+
+- machine:
+  name: rhel7-rac-b-node-2
+  template: default
+
+
+- cluster:
+  name: rac-a
+  nodes: [rhel7-rac-b-node-1, rhel7-rac-b-node-2]
   disks:
-    - disk: datadg
-      size: 8
+    - disk:
+      size: 12
       bus: 1
-      count: 5
-  vmware:
-    datastore: Kingston890G
+      count: 3
+
