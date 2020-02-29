@@ -7,3 +7,12 @@
     
     debug:
       msg: "scan: {{ dns_hosts[ansible_play_batch[0]]['scan'] }}"
+
+  - name: Build a list of all ASM partitions
+    set_fact:
+      crs_cluster : "{{ crs_cluster | default('') }}{{ dns_hosts[item]['fqdn'] }}:{{ dns_hosts[item]['vip'] }},"
+    with_items: "{{ ansible_play_batch }}"
+    
+  - name: crs_cluster
+    debug:
+      msg: "crs_cluster: {{ crs_cluster }}"

@@ -111,3 +111,17 @@ ansible_connection=ssh
 #ansible_ssh_user=root
 #ansible_ssh_pass=
 
+[rhel7-a]
+rhel7-a
+
+[racnodes]
+rhel7-rac-a-node-1
+rhel7-rac-a-node-2
+rhel7-rac-b-node-1
+rhel7-rac-b-node-2
+rhel7-rac-c-node-1
+rhel7-rac-c-node-2
+rhel7-rac-d-node-1
+rhel7-rac-d-node-2
+rhel7-rac-e-node-1
+rhel7-rac-e-node-2
