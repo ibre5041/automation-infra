@@ -73,7 +73,7 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     spec.cpuHotAddEnabled = True
     spec.memoryHotAddEnabled = True
     logging.debug("VM CPU: {cpu}".format(cpu=spec.numCPUs))
-    logging.debug("VM CPU: {ram}".format(ram=spec.memoryMB))
+    logging.debug("VM RAM: {ram}".format(ram=spec.memoryMB))
 
     spec.extraConfig = []
     opt = vim.option.OptionValue()
@@ -140,13 +140,19 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     utils.wait_for_tasks(service_instance, [task])
     logging.debug("{machine} reconfigured.".format(machine=machine.nameVSphere))
 
+    machine_disk_specs = machine.disks
     for dev in vm.config.hardware.device:
         if hasattr(dev.backing, 'fileName'):
             logging.debug("Device label: {label}".format(label=dev.deviceInfo.label))
             #if dev.deviceInfo.label in vm_disk.keys():
             capacity_in_kb = dev.capacityInKB
-            #new_disk_kb = int(vm_disk[dev.deviceInfo.label]['size_gb']) * 1024 * 1024
-            new_disk_kb = 40 * 1024 * 1024
+            new_disk_kb = capacity_in_kb
+            #new_disk_kb = 40 * 1024 * 1024
+            if machine_disk_specs:                
+                disk_spec = machine_disk_specs.pop(0)
+                new_disk_kb = int(humanfriendly.parse_size(disk_spec['size'], binary=True) / 1024 )
+            if (capacity_in_kb != new_disk_kb):
+                logging.debug("Device label: {label} new disk size: {size} MB".format(label=dev.deviceInfo.label, size=int(new_disk_kb/1024)))
             if new_disk_kb > capacity_in_kb:
                 dev_changes = []
                 disk_spec = vim.vm.device.VirtualDeviceSpec()
