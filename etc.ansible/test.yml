@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+  - name: print
+    debug:
+      msg: "{{ dns_hosts['field1'] }}"
+    
+    debug:
+      msg: "scan: {{ dns_hosts[ansible_play_batch[0]]['scan'] }}"

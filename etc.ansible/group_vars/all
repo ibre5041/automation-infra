@@ -1,1 +1,58 @@
-selinux_mode: permissive	# please chose: |   disabled | permissive | enforcing
+#selinux_mode: permissive	# please chose: |   disabled | permissive | enforcing
+
+#dns_hosts:
+field1: one
+field2: two	
+
+dns_hosts:
+  field1: one
+  field2: two	  
+  rhel7-rac-a-node-1:
+    scan: rhel7-rac-a-scan.prod.vmware.haf
+    fqdn: rhel7-rac-a-node-1.prod.vmware.haf
+    vip: rhel7-rac-a-lis-1.prod.vmware.haf
+
+  rhel7-rac-a-node-2:
+    scan: rhel7-rac-a-scan.prod.vmware.haf
+    fqdn: rhel7-rac-a-node-2.prod.vmware.haf
+    vip: rhel7-rac-a-lis-2.prod.vmware.haf
+
+  rhel7-rac-b-node-1:
+    scan: rhel7-rac-b-scan.prod.vmware.haf
+    fqdn: rhel7-rac-b-node-1.prod.vmware.haf
+    vip: rhel7-rac-b-lis-1.prod.vmware.haf
+
+  rhel7-rac-b-node-2:
+    scan: rhel7-rac-b-scan.prod.vmware.haf
+    fqdn: rhel7-rac-b-node-2.prod.vmware.haf
+    vip: rhel7-rac-b-lis-2.prod.vmware.haf
+
+  rhel7-rac-c-node-1:
+    scan: rhel7-rac-c-scan.prod.vmware.haf
+    fqdn: rhel7-rac-c-node-1.prod.vmware.haf
+    vip: rhel7-rac-c-lis-1.prod.vmware.haf
+
+  rhel7-rac-c-node-2:
+    scan: rhel7-rac-c-scan.prod.vmware.haf
+    fqdn: rhel7-rac-c-node-2.prod.vmware.haf
+    vip: rhel7-rac-c-lis-2.prod.vmware.haf
+
+  rhel7-rac-d-node-1:
+    scan: rhel7-rac-d-scan.prod.vmware.haf
+    fqdn: rhel7-rac-d-node-1.prod.vmware.haf
+    vip: rhel7-rac-d-lis-1.prod.vmware.haf
+
+  rhel7-rac-d-node-2:
+    scan: rhel7-rac-d-scan.prod.vmware.haf
+    fqdn: rhel7-rac-d-node-2.prod.vmware.haf
+    vip: rhel7-rac-d-lis-2.prod.vmware.haf
+
+  rhel7-rac-e-node-1:
+    scan: rhel7-rac-e-scan.prod.vmware.haf
+    fqdn: rhel7-rac-e-node-1.prod.vmware.haf
+    vip: rhel7-rac-e-lis-1.prod.vmware.haf
+
+  rhel7-rac-e-node-2:
+    scan: rhel7-rac-e-scan.prod.vmware.haf
+    fqdn: rhel7-rac-e-node-2.prod.vmware.haf
+    vip: rhel7-rac-e-lis-2.prod.vmware.haf
