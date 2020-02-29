@@ -30,21 +30,29 @@
 
 
 - machine:
-  name: rhel7-rac-c-node-1
+  name: rhel7-rac-a-node-1
   template: default
   network:
 
+- machine:
+  name: rhel7-rac-a-node-2
+  template: default
 
 - machine:
-  name: rhel7-rac-c-node-2
+  name: rhel7-rac-b-node-2
+  template: default
+
+- machine:
+  name: rhel7-rac-b-node-1
   template: default
 
 
 - cluster:
   name: rac-a
-  nodes: [rhel7-rac-c-node-1, rhel7-rac-c-node-2]
+  nodes: [rhel7-rac-a-node-1,rhel7-rac-a-node-2,rhel7-rac-b-node-2,rhel7-rac-b-node-1]
   disks:
     - disk:
-      size: 12
+      size: 16
       bus: 1
       count: 3
+
