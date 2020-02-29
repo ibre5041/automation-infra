@@ -62,7 +62,7 @@
 #     name: multipathd
 #     state: restarted
 
-- name: ASM paritions
+- name: ASM partitions
   parted:
     device: "/dev/{{item}}"
     label: gpt

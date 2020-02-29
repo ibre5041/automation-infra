@@ -86,7 +86,3 @@
 
 - debug:
     var: asm_disk_partitions
-
-- debug:
-    msg: "{{ item }}"
-  with_items: "{{ _asm_disk_partitions }}"

@@ -28,7 +28,7 @@
   lvol:
     vg: vg01
     lv: u01
-    size: 29G
+    size: 50G
     shrink: no
     resizefs: yes
 
@@ -93,11 +93,28 @@
 - debug:
     var: crs_nodes_fqdn
 
+# This one is done as part of golden image creatinon
+# - name: install grid.rsp
+#   template:
+#     src: grid.phase.0.no.comments.rsp
+#     dest: /home/oracle/grid.phase.0.rsp
+#     mode: '0640'
+#     owner: oracle
+
+- name: Build crs node list
+  set_fact:
+    crs_node_list : "{{ crs_node_list | default('') }}{{ dns_hosts[item]['fqdn'] }}:{{ dns_hosts[item]['vip'] }},"
+  with_items: "{{ ansible_play_batch }}"
+- name: crs node list
+  debug:
+    var: crs_node_list
+
 - name: install grid.rsp
   template:
-    src: grid.phase.0.rsp
-    dest: /home/oracle/grid.phase.0rsp
+    src: grid.phase.1.no.comments.rsp
+    dest: /home/oracle/grid.phase.1.rsp
     mode: '0640'
+    owner: oracle
 
 - name: wait for oracle-ohasd.service
   systemd:
@@ -123,3 +140,42 @@
   shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
   when: ansible_hostname != first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
 
+- name: check if ORACLE_HOME/DBA exists
+  stat: 
+    path: /oracle/u01/gi/{{ oracle_ver_path }}/DBA
+  register: dba_dir_present
+
+- name: execute config tools
+  block:
+    - name: "gridSetup.sh (part II)"
+      shell: "./gridSetup.sh -silent -executeConfigTools -responseFile /home/oracle/grid.phase.1.rsp"
+      args:
+        chdir:   "/oracle/u01/gi/{{ oracle_ver_path }}"
+        #creates: "/oracle/u01/gi/{{ oracle_ver_path }}/install/checkpoints/oui/checkpoint_null.xml"
+      ignore_errors: true
+      register: grid_setup_out2      
+    - debug: 
+        msg: "gridSetup.sh (part II) {{ grid_setup_out2 }}"
+      when: grid_setup_out2.rc >= 0
+    - debug: 
+        msg: "Return code is {{ grid_setup_out2.rc }}"
+      when: grid_setup_out2.rc >= 0
+
+    - name: Create directory DBA
+      file:
+        path: "/oracle/u01/gi/{{ oracle_ver_path }}/DBA"
+        state: directory
+
+  become: yes
+  become_user: oracle
+  when: ansible_hostname == first_rac_node and dba_dir_present.stat.exists != True
+
+- name: Create directory DBA
+  block:
+    - name: Create directory DBA (2nd node)
+      file:
+        path: "/oracle/u01/gi/{{ oracle_ver_path }}/DBA"
+        state: directory
+  become: yes
+  become_user: oracle
+  when: ansible_hostname != first_rac_node and dba_dir_present.stat.exists != True

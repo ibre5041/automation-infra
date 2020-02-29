@@ -1,5 +1,20 @@
+# TODO
+# ./etc.ansible/roles/oracle.crs.19c/files/10-scsi-asm.rules
+# https://access.redhat.com/solutions/1465913
+#
+# /lib/udev/rules.d/13-dm-disk.rules
+# Add inotify watch to track changes on this device.
+# Using the watch rule is not optimal - it generates a lot of spurious
+# and useless events whenever the device opened for read-write is closed.
+# The best would be to generete the event directly in the tool changing
+# relevant information so only relevant events will be processed
+# (like creating a filesystem, changing filesystem label etc.).
+#
+
 # Skip other actions other than add/change
 ACTION!="add|change", GOTO="asm_end"
+
+#ACTION=="add|change", KERNEL=="sd*", OPTIONS:="nowatch"
 
 # If this is a block device, call udevasm.sh and possibly set ASMNAME variable
 SUBSYSTEM=="block", IMPORT{program}="/etc/udev/udevasm.sh"

@@ -1,0 +1,50 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 6G
+  cpu: 1
+  scsi:
+    - adapter:
+        pciSlotNumber: 32
+    - adapter:
+        pciSlotNumber: 128
+  disks:
+    - disk: rootdg
+      size: 20g
+      bus: 0
+    - disk: appdg
+      size: 20g
+      bus: 0
+  network:
+    # https://kb.vmware.com/s/article/2047927
+    # - adapter:
+    #     pciSlotNumber: 192
+    #     network: "VM network inerconnect"
+    # - adapter:
+    #     pciSlotNumber: 160
+    #     network: "VM Network"
+    # - adapter:
+    #     pciSlotNumber: 224
+    #     network: "VM Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+
+- machine:
+  name: rhel7-c
+  template: default
+#  scsi:
+  # 2nd SCSI adapter for Oracle data
+#    - adapter:
+#        pciSlotNumber: 64
+
+# - cluster:
+#   name: rhel7-a-oracle-restart
+#   nodes: [rhel7-a]
+#   disks:
+#     - disk:
+#       size: 8
+#       bus: 1
+#       count: 5

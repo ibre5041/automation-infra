@@ -13,7 +13,7 @@
         strip: 0
 
     - name: "gridSetup.sh (part I)"
-      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
+      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.phase.1.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
         creates: "/oracle/u01/oraInventory/oraInst.loc"
