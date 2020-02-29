@@ -33,6 +33,9 @@ def create_vm(service_instance, machine):
         nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
         nic_type = vim.vm.device.VirtualVmxnet3()
         nicspec.device = nic_type
+        # https://kb.vmware.com/s/article/2047927
+        nicspec.device.slotInfo = vim.vm.device.VirtualDevice.PciBusSlotInfo()
+        nicspec.device.slotInfo.pciSlotNumber = net_adapter['pciSlotNumber']
         if machine.name != 'rhel7-template': # a machine build as teamplate should not have manualy generated MAC addresses
             if 'mac' in net_adapter:
                 nicspec.device.addressType = 'manual'
