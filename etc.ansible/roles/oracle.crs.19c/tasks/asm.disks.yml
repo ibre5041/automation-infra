@@ -72,3 +72,21 @@
     state: present
   with_items: "{{ asm_disks }}"
 
+- name: list files
+  find:
+    paths: /dev/
+    patterns: "asmshared[0-9][0-9][0-9]p1"
+    file_type: link
+  register: _asm_disk_partitions
+
+- name: Build a list of all ASM partitions
+  set_fact:
+    asm_disk_partitions : "{{ asm_disk_partitions }} + [ '{{ item.path }}' ]"
+  with_items: "{{ _asm_disk_partitions.files }}"
+
+- debug:
+    var: asm_disk_partitions
+
+- debug:
+    msg: "{{ item }}"
+  with_items: "{{ _asm_disk_partitions }}"
