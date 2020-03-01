@@ -86,3 +86,8 @@
 
 - debug:
     var: asm_disk_partitions
+
+- name: "ora_1_env file"
+  template:
+    src: ora_1_env.ASM
+    dest: "/home/oracle/.ora_1_env"

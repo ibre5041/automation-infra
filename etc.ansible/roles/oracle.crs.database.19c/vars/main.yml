@@ -1,0 +1,12 @@
+---
+# vars file for oraclerestart
+
+oracle_major_version: "19.5"
+
+oracle_install_package_name: "db_home_2020-02-29_11-53-10PM.zip"
+
+oracle_ver_path: "19.5.0.0"
+
+oracle_sid: "TEST19C"
+
+first_rac_node: "{{ ansible_play_batch[0] }}"

@@ -25,11 +25,17 @@
     disable_gpg_check: yes 
   tags: packages
 
+- name: Create a directory /oinstall
+  file:
+    path: /oinstall
+    state: directory
+    mode: '0755'
+
 - name: Mount NFS
   mount:
-    path: /oinstall
-    src: kicklinux:/var/www/html/oracle
-    fstype: nfs4
+    path: "/oinstall"
+    src: "kicklinux:/var/www/html/oracle"
+    fstype: nfs
     opts: ro
     state: mounted
 

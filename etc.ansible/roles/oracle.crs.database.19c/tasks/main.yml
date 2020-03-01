@@ -1,0 +1,37 @@
+---
+# tasks file for oracledatabase
+
+- include: os.setup.yml
+
+- name: install db.rsp
+  template:
+    src: db.no.comments.rsp
+    dest: /home/oracle/db.rsp
+    mode: '0644'
+    owner: oracle
+    group: oinstall
+
+- name: check if install package exists
+  stat: 
+    path: /oracle/u01/db/{{ oracle_ver_path }}/bin
+  register: install_package
+  
+- debug:
+    msg: "Install package exists: {{ install_package.stat.exists }}"
+
+- include: download.package.yml
+  when: ansible_hostname == first_rac_node and install_package.stat.exists != True
+
+- include: setup.db.yml
+  when: ansible_hostname == first_rac_node
+
+- name: check if database was created
+  stat:
+    path: /oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log
+  register: dcdba_log
+
+- debug:
+    msg: "Database exists: {{ dcdba_log.stat.exists }}"
+
+- include: create_database.yml
+  when: ansible_hostname == first_rac_node and dcdba_log.stat.exists != True

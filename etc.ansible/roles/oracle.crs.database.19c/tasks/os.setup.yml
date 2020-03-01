@@ -1,0 +1,27 @@
+---
+# tasks file for oracledatabase
+
+- name: "ora_2_env file"
+  template:
+    src: ora_2_env
+    dest: "/home/oracle/.ora_2_env"
+    owner: oracle
+    group: oinstall
+
+- name: "DB fome"
+  file:
+    path: "/oracle/u01/db"
+    state: directory
+    owner: oracle
+    group: oinstall
+#    recurse: yes
+#    mode: '0755'
+
+- name: "DB fome"
+  file:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+#    recurse: yes
+#    mode: '0755'

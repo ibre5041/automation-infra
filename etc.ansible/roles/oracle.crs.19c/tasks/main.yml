@@ -1,70 +1,15 @@
 ---
 # tasks file for oraclerestart
 
-- name: Set authorized key took from file
-  authorized_key:
-    user: oracle
-    state: present
-    key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+- name: check if ~oracle/.crsbuild exists
+  stat: 
+    path: /home/oracle/.crsbuild
+  register: crsbuild_present
 
-- name: ensure private key and public one are present
-  copy: 
-    src: keys/
-    dest: "/home/oracle/.ssh/"
-    mode: 0400
-    owner: oracle
-    group: oinstall
-  with_items:
-    - id_rsa
-
-- name: Accept ssh keys from all other cluster nodes
-  shell: "ssh -oStrictHostKeyChecking=no {{ item }} hostname"
-  become: yes
-  become_user: oracle
-  with_items:
-    - "{{ ansible_play_batch }}"
-      
-- name: 'Extend the u01'
-  lvol:
-    vg: vg01
-    lv: u01
-    size: 50G
-    shrink: no
-    resizefs: yes
-
-- name: Oracle CRS required packages
-  yum: 
-    name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++,net-tools
-    state=latest
-
-- name: Oracle CRS required packages
-  yum: 
-    name=cvuqdisk
-    state=latest
-    disable_gpg_check=yes 
-
+- include: os.setup.yml
+  when: crsbuild_present.stat.exists != True
 - include: asm.disks.yml
-
-- name: "ora_1_env file"
-  template:
-    src: ora_1_env.ASM
-    dest: "/home/oracle/.ora_1_env"
-
-- name: "Gi fome"
-  file:
-    path: "/oracle/u01/gi/{{ oracle_ver_path }}"
-    state: directory
-    owner: oracle
-    group: oinstall
-    recurse: yes
-    mode: '0755'
-
-- name: "Oracle KB"
-  file:
-    path: "/home/oracle/.ORACLE_KB"
-    state: directory
-    owner: oracle
-    group: oinstall
+  when: crsbuild_present.stat.exists != True
 
 - name: check if Oracle CRS unpacked
   stat: 
@@ -151,7 +96,6 @@
       shell: "./gridSetup.sh -silent -executeConfigTools -responseFile /home/oracle/grid.phase.1.rsp"
       args:
         chdir:   "/oracle/u01/gi/{{ oracle_ver_path }}"
-        #creates: "/oracle/u01/gi/{{ oracle_ver_path }}/install/checkpoints/oui/checkpoint_null.xml"
       ignore_errors: true
       register: grid_setup_out2      
     - debug: 
@@ -161,21 +105,23 @@
         msg: "Return code is {{ grid_setup_out2.rc }}"
       when: grid_setup_out2.rc >= 0
 
-    - name: Create directory DBA
-      file:
-        path: "/oracle/u01/gi/{{ oracle_ver_path }}/DBA"
-        state: directory
+    - name: Create ~oracle/.crsbuild
+      copy: content="{{ ansible_date_time.iso8601 }}" dest="/home/oracle/.crsbuild"
 
   become: yes
   become_user: oracle
-  when: ansible_hostname == first_rac_node and dba_dir_present.stat.exists != True
+  when: ansible_hostname == first_rac_node and crsbuild_present.stat.exists != True
 
-- name: Create directory DBA
+- name: Create ~oracle/.crsbuild
   block:
-    - name: Create directory DBA (2nd node)
-      file:
-        path: "/oracle/u01/gi/{{ oracle_ver_path }}/DBA"
-        state: directory
+    - name: Create ~oracle/.crsbuild (2nd node)
+      copy: content="{{ ansible_date_time.iso8601 }}" dest="/home/oracle/.crsbuild"
   become: yes
   become_user: oracle
-  when: ansible_hostname != first_rac_node and dba_dir_present.stat.exists != True
+  when: ansible_hostname != first_rac_node and crsbuild_present.stat.exists != True
+
+- name: crsstat
+  template:
+    src: crsstat.py
+    dest: "/oracle/u01/gi/{{ oracle_ver_path }}/bin/"
+    mode: '0755'

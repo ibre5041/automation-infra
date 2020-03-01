@@ -41,10 +41,10 @@
 
 
 - cluster:
-  name: rac-a
+  name: rac-c
   nodes: [rhel7-rac-c-node-1, rhel7-rac-c-node-2]
   disks:
     - disk:
-      size: 12
+      size: 16
       bus: 1
       count: 3

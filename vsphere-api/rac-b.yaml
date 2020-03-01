@@ -15,7 +15,7 @@
       size: 10g
       bus: 0
     - disk: appdg
-      size: 20g
+      size: 60g
       bus: 0
   network:
     - adapter:
@@ -45,7 +45,7 @@
   nodes: [rhel7-rac-b-node-1, rhel7-rac-b-node-2]
   disks:
     - disk:
-      size: 12
+      size: 16
       bus: 1
       count: 3
 
