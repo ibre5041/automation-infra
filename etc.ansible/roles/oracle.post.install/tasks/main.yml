@@ -1,0 +1,8 @@
+---
+# post instalation tasks 
+
+- name: Oracle profile
+  yum:
+    name=haf-oracle-profile,haf-oracle-rlwrap
+    state=latest
+    disable_gpg_check=yes
