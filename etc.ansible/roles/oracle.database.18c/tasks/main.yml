@@ -44,3 +44,14 @@
     chdir: "/"
     creates: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
   ignore_errors: true
+
+- name: check if database was created
+  stat:
+    path: /oracle/u01/base/cfgtoollogs/dbca/TEST18C/TEST18C.log
+  register: dcdba_log
+
+- debug:
+    msg: "Database exists: {{ dcdba_log.stat.exists }}"
+
+- include: create_database.yml
+  when: dcdba_log.stat.exists != True

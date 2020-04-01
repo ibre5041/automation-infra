@@ -51,17 +51,6 @@
     timeout: 30
     state: present
 
-# - name: multipath.conf
-#   copy:
-#     src: multipath.conf
-#     dest: /etc/multipath.conf
-#     mode: '0644'
-# - command: mpathconf --enable
-# - name: start multipath
-#   systemd:
-#     name: multipathd
-#     state: restarted
-
 - name: ASM paritions
   parted:
     device: "/dev/{{item}}"

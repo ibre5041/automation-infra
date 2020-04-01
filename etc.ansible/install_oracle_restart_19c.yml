@@ -5,3 +5,4 @@
   - base.oracle
   - oracle.restart.19c
   - oracle.database.19c
+  - oracle.post.install
