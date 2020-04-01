@@ -1,7 +1,7 @@
 ---
 # vars file for oraclerestart
 
-oracle_major_version: "19.3"
+oracle_major_version: "19"
 
 # Note: there is dependecy between this and grid.rsp
 # Base install package does not support

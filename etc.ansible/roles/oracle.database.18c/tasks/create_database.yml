@@ -2,7 +2,7 @@
 - name: Create Database
   block:
     - name: install dbca.rsp
-      copy:
+      template:
         src: dbca.rsp
         dest: /home/oracle/dbca.rsp
         mode: '0644'

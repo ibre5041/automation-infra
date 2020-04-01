@@ -48,7 +48,7 @@
 
 - name: check if database was created
   stat:
-    path: /oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log
+    path: /oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log
   register: dcdba_log
 
 - debug:

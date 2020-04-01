@@ -29,7 +29,7 @@ responseFileVersion=/oracle/assistants/rspfmt_dbca_response_schema_v12.2.0
 # Default value : None
 # Mandatory     : Yes
 #-----------------------------------------------------------------------------
-gdbName=TEST19C
+gdbName={{ oracle_sid }}
 
 #-----------------------------------------------------------------------------
 # Name          : sid
@@ -39,7 +39,7 @@ gdbName=TEST19C
 # Default value : <db_name> specified in GDBNAME
 # Mandatory     : No
 #-----------------------------------------------------------------------------
-sid=TEST19C
+sid={{ oracle_sid }}
 
 #-----------------------------------------------------------------------------
 # Name          : databaseConfigType
@@ -220,7 +220,7 @@ nodelist=
 # Default value : None
 # Mandatory     : Yes
 #-----------------------------------------------------------------------------
-templateName=/oracle/u01/db/19.3.0.0/assistants/dbca/templates/New_Database.dbt
+templateName={{ oracle_home }}/assistants/dbca/templates/New_Database.dbt
 
 #-----------------------------------------------------------------------------
 # Name          : sysPassword
@@ -543,7 +543,7 @@ variablesFile=
 # Default value : None
 # Mandatory     : NO
 #-----------------------------------------------------------------------------
-variables=ORACLE_BASE_HOME=/oracle/u01/db/19.3.0.0,DB_UNIQUE_NAME=TEST19C,ORACLE_BASE=/oracle/u01/base,PDB_NAME=,DB_NAME=TEST19C,ORACLE_HOME=/oracle/u01/db/19.3.0.0,SID=TEST19C
+variables=ORACLE_BASE_HOME={{ oracle_home }},DB_UNIQUE_NAME={{ oracle_sid }},ORACLE_BASE=/oracle/u01/base,PDB_NAME=,DB_NAME={{ oracle_sid }},ORACLE_HOME={{ oracle_home }},SID={{ oracle_sid }}
 
 #-----------------------------------------------------------------------------
 # Name          : initParams
@@ -552,7 +552,7 @@ variables=ORACLE_BASE_HOME=/oracle/u01/db/19.3.0.0,DB_UNIQUE_NAME=TEST19C,ORACLE
 # Default value : None
 # Mandatory     : NO
 #-----------------------------------------------------------------------------
-initParams=undo_tablespace=UNDOTBS1,sga_target=5GB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE=TEST19CXDB),diagnostic_dest={ORACLE_BASE},remote_login_passwordfile=EXCLUSIVE,db_create_file_dest=+XDATA/{DB_UNIQUE_NAME}/,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=782MB,nls_territory=AMERICA,local_listener=LISTENER_TEST19C,db_recovery_file_dest_size=4GB,open_cursors=300,compatible=19.0.0,db_name=TEST19C,db_recovery_file_dest=+XDATA,audit_trail=db
+initParams=undo_tablespace=UNDOTBS1,sga_target=5GB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE={{ oracle_sid }}XDB),diagnostic_dest={ORACLE_BASE},remote_login_passwordfile=EXCLUSIVE,db_create_file_dest=+XDATA/{DB_UNIQUE_NAME}/,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=782MB,nls_territory=AMERICA,local_listener=LISTENER_{{ oracle_sid }},db_recovery_file_dest_size=4GB,open_cursors=300,compatible=19.0.0,db_name={{ oracle_sid }},db_recovery_file_dest=+XDATA,audit_trail=db
 
 #-----------------------------------------------------------------------------
 # Name          : sampleSchema

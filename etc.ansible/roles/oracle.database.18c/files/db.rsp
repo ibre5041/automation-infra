@@ -285,7 +285,7 @@ oracle.install.db.config.starterdb.enableRecovery=false
 #   - FILE_SYSTEM_STORAGE
 #   - ASM_STORAGE
 #-------------------------------------------------------------------------------
-oracle.install.db.config.starterdb.storageType=
+oracle.install.db.config.starterdb.storageType=ASM_STORAGE
 
 #-------------------------------------------------------------------------------
 # Specify the database file location which is a directory for datafiles, control
@@ -293,7 +293,7 @@ oracle.install.db.config.starterdb.storageType=
 #
 # Applicable only when oracle.install.db.config.starterdb.storage=FILE_SYSTEM_STORAGE 
 #-------------------------------------------------------------------------------
-oracle.install.db.config.starterdb.fileSystemStorage.dataLocation=
+oracle.install.db.config.starterdb.fileSystemStorage.dataLocation=ASM_STORAGE
 
 #-------------------------------------------------------------------------------
 # Specify the recovery location.
@@ -307,7 +307,7 @@ oracle.install.db.config.starterdb.fileSystemStorage.recoveryLocation=
 #
 # Applicable only when oracle.install.db.config.starterdb.storageType=ASM_STORAGE
 #-------------------------------------------------------------------------------
-oracle.install.db.config.asm.diskGroup=
+oracle.install.db.config.asm.diskGroup=XDATA
 
 #-------------------------------------------------------------------------------
 # Specify the password for ASMSNMP user of the ASM instance.                 

@@ -1,5 +1,5 @@
 
-- name: Create Database TEST19C
+- name: Create Database
   block:
     - name: install dbca.rsp
       template:
@@ -10,13 +10,13 @@
       shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
       args:
         chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
-        creates: "/oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log"
+        creates: "/oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log"
       ignore_errors: true
       register: db_create_out
     # - shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
     #   args:
     #     chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
-    #     creates: "/oracle/u01/base/cfgtoollogs/dbca/TEST19C/TEST19C.log"
+    #     creates: "/oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log"
     #   ignore_errors: true
     #   register: db_create_out
     - debug: 

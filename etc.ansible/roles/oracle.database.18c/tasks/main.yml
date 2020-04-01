@@ -1,5 +1,5 @@
 ---
-# tasks file for oracledatabase 18c
+# tasks file for oracledatabase
 
 - name: "ora_2_env file"
   template:
@@ -47,7 +47,7 @@
 
 - name: check if database was created
   stat:
-    path: /oracle/u01/base/cfgtoollogs/dbca/TEST18C/TEST18C.log
+    path: /oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log
   register: dcdba_log
 
 - debug:
