@@ -1,6 +1,6 @@
 responseFileVersion=/oracle/assistants/rspfmt_dbca_response_schema_v19.0.0
-gdbName=TEST19C
-sid=TEST19C
+gdbName={{ oracle_sid }}
+sid={{ oracle_sid }}
 databaseConfigType=RAC
 policyManaged=false
 createServerPool=false
@@ -9,7 +9,7 @@ createAsContainerDatabase=false
 numberOfPDBs=0
 useLocalUndoForPDBs=true
 nodelist={{ ansible_play_batch|join(',') }}
-templateName=/oracle/u01/db/{{ oracle_ver_path }}/assistants/dbca/templates/New_Database.dbt
+templateName={{ oracle_home }}/assistants/dbca/templates/New_Database.dbt
 sysPassword=acror
 systemPassword=acror
 emExpressPort=5500
@@ -27,8 +27,8 @@ characterSet=AL32UTF8
 nationalCharacterSet=AL16UTF16
 registerWithDirService=false
 listeners=LISTENER
-variables=ORACLE_BASE_HOME=/oracle/u01/db/{{ oracle_ver_path }},DB_UNIQUE_NAME=TEST19C,ORACLE_BASE=/oracle/u01/base,PDB_NAME=,DB_NAME=TEST19C,ORACLE_HOME=/oracle/u01/db/{{ oracle_ver_path }},SID=TEST19C
-initParams=undo_tablespace=UNDOTBS1,sga_target=5GB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE=TEST19CXDB),diagnostic_dest={ORACLE_BASE},remote_login_passwordfile=EXCLUSIVE,db_create_file_dest=+XDATA_RHEL/{DB_UNIQUE_NAME}/,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=782MB,nls_territory=AMERICA,local_listener=LISTENER_TEST19C,db_recovery_file_dest_size=4GB,open_cursors=300,compatible=19.0.0,db_name=TEST19C,db_recovery_file_dest=+XDATA_RHEL,audit_trail=db
+variables=ORACLE_BASE_HOME={{ oracle_home }},DB_UNIQUE_NAME={{ oracle_sid }},ORACLE_BASE=/oracle/u01/base,PDB_NAME=,DB_NAME={{ oracle_sid }},ORACLE_HOME={{ oracle_home }},SID={{ oracle_sid }}
+initParams=undo_tablespace=UNDOTBS1,sga_target=5GB,db_block_size=8192BYTES,nls_language=AMERICAN,dispatchers=(PROTOCOL=TCP) (SERVICE={{ oracle_sid }}XDB),diagnostic_dest={ORACLE_BASE},remote_login_passwordfile=EXCLUSIVE,db_create_file_dest=+XDATA_RHEL/{DB_UNIQUE_NAME}/,audit_file_dest={ORACLE_BASE}/admin/{DB_UNIQUE_NAME}/adump,processes=300,pga_aggregate_target=782MB,nls_territory=AMERICA,local_listener=LISTENER_{{ oracle_sid }},db_recovery_file_dest_size=4GB,open_cursors=300,compatible=19.0.0,db_name={{ oracle_sid }},db_recovery_file_dest=+XDATA_RHEL,audit_trail=db
 sampleSchema=true
 memoryPercentage=40
 databaseType=MULTIPURPOSE
