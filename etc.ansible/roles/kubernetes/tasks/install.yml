@@ -1,0 +1,186 @@
+- name: 'Extend root fs'
+  lvol:
+    vg: vg00
+    lv: lv_root
+    size: 15G
+    shrink: no
+    resizefs: yes
+
+- copy:
+    src: yum-key.gpg
+    dest: /etc/pki/rpm-gpg/
+
+- copy:
+    src: rpm-package-key.gpg
+    dest: /etc/pki/rpm-gpg/
+
+- name: Kube GPG key (I)
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/yum-key.gpg
+
+- name: Kube GPG key (II)
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+# - name: rpmkeys hack RHEL bug 1768206
+#   shell: rpmkeys --import /etc/pki/rpm-gpg/yum-key.gpg
+
+# - name: rpmkeys hack RHEL bug 1768206
+#   shell: rpmkeys --import /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+- copy:
+    src: docker.gpg
+    dest: /etc/pki/rpm-gpg/
+
+- name: Docker GPG key
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/docker.gpg
+
+- name: Kube .repo
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/
+
+- name: Kubernetes rpm
+  yum:
+    name: kubelet,kubeadm,kubectl,kubernetes-cni,containernetworking-plugins,flannel
+  register: kubernetes_installed
+
+- name: Disable SWAP since kubernetes cant work with swap enabled (1/2)
+  shell: "swapoff -a"
+  when: kubernetes_installed.changed
+
+- name: Disable SWAP in fstab since kubernetes cant work with swap enabled (2/2)
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*swap.*)$'
+    replace: '# \1'
+  when: kubernetes_installed.changed
+
+- name: Docker .repo
+  copy:
+    src: docker-ce.repo
+    dest: /etc/yum.repos.d/
+
+- name: Dockerm rpm
+  yum:
+    name: device-mapper-persistent-data,lvm2,docker-ce
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Configure Firewall 1/6
+  firewalld:
+    port: 6443/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall 2/6
+  firewalld:
+    port: 2379-2380/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall 3/6
+  firewalld:
+    port: 10250/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall 4/6
+  firewalld:
+    port: 10251/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall 5/6
+  firewalld:
+    port: 10252/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall 6/6
+  firewalld:
+    port: 10255/tcp
+    permanent: yes
+    state: enabled
+
+- name: Configure Firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Add the 802.1q module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Make br_netfilter is loaded after rebooot
+  lineinfile:
+    path: /etc/modules-load.d/br_netfilter.conf
+    state: present
+    line: "br_netfilter"
+    create: yes
+  
+- name: bridge-nf-call 1/2
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    sysctl_file: /etc/sysctl.d/master_node_name
+
+- name: bridge-nf-call 2/2
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_file: /etc/sysctl.d/master_node_name
+
+- name: directory /etc/docker
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: configure docker 1/2
+  copy:
+    src: docker.daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: create docker storagefs 1/3
+  lvol:
+    vg: vg01
+    lv: docker
+    size: 20g
+    shrink: no
+
+- name: Create /dev/vg01/u01 2/3
+  filesystem:
+    fstype: ext4
+    dev: /dev/vg01/docker
+
+- name: Create /dev/vg01/u01 3/3
+  mount:
+    path: /var/lib/docker
+    src: /dev/vg01/docker
+    state: mounted
+    fstype: auto
+
+- name: directory /etc/systemd/system/docker.service.d
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+  
+- name: enable and start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: enable and start kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes

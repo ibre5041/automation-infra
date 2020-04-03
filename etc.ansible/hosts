@@ -125,3 +125,12 @@ rhel7-rac-d-node-1
 rhel7-rac-d-node-2
 rhel7-rac-e-node-1
 rhel7-rac-e-node-2
+
+[kube]
+rhel7-a
+rhel7-b
+rhel7-c
+rhel7-d
+rhel7-e
+
+

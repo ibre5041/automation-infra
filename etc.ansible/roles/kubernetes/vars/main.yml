@@ -1,0 +1,4 @@
+---
+# vars file for kafka
+
+first_node: "{{ ansible_play_batch[0] }}"

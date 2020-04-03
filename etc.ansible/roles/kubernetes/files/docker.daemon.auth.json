@@ -1,0 +1,26 @@
+{
+    "exec-opts": ["native.cgroupdriver=systemd"],
+    "log-driver": "json-file",
+    "log-opts": {
+	"max-size": "100m"
+    },
+    "storage-driver": "overlay2",
+    "storage-opts": [
+	"overlay2.override_kernel_check=true"
+    ],
+    "insecure-registries": [
+	"192.168.8.200:8082",
+	"192.168.8.200:8083"
+    ],
+    "auths": {
+        "192.168.8.200:8082": {
+            "auth": "YWRtaW46a29saWttbg=="
+        },
+        "192.168.8.200:8083": {
+            "auth": "YWRtaW46a29saWttbg=="
+        }
+    },
+    "HttpHeaders": {
+        "User-Agent": "Docker-Client/19.03.8 (linux)"
+    }
+}
