@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                 33     ; Serial
+                 40     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -110,6 +110,38 @@ dhcp-192-168-8-102.prod.vmware.haf. IN A    192.168.8.102
 esxi-1.prod.vmware.haf.             IN A    192.168.8.103
 dhcp-192-168-8-104.prod.vmware.haf. IN A    192.168.8.104
 
+rh110.prod.vmware.haf.       IN      A      192.168.8.110
+rh111.prod.vmware.haf.       IN      A      192.168.8.111
+rh112.prod.vmware.haf.       IN      A      192.168.8.112
+rh113.prod.vmware.haf.       IN      A      192.168.8.113
+rh114.prod.vmware.haf.       IN      A      192.168.8.114
+rh115.prod.vmware.haf.       IN      A      192.168.8.115
+rh116.prod.vmware.haf.       IN      A      192.168.8.116
+rh117.prod.vmware.haf.       IN      A      192.168.8.117
+rh118.prod.vmware.haf.       IN      A      192.168.8.118
+rh119.prod.vmware.haf.       IN      A      192.168.8.119
+rh120.prod.vmware.haf.       IN      A      192.168.8.120
+rh121.prod.vmware.haf.       IN      A      192.168.8.121
+rh122.prod.vmware.haf.       IN      A      192.168.8.122
+rh123.prod.vmware.haf.       IN      A      192.168.8.123
+rh124.prod.vmware.haf.       IN      A      192.168.8.124
+rh125.prod.vmware.haf.       IN      A      192.168.8.125
+rh126.prod.vmware.haf.       IN      A      192.168.8.126
+rh127.prod.vmware.haf.       IN      A      192.168.8.127
+rh128.prod.vmware.haf.       IN      A      192.168.8.128
+rh129.prod.vmware.haf.       IN      A      192.168.8.129
+rh130.prod.vmware.haf.       IN      A      192.168.8.130
+rh131.prod.vmware.haf.       IN      A      192.168.8.131
+rh132.prod.vmware.haf.       IN      A      192.168.8.132
+rh133.prod.vmware.haf.       IN      A      192.168.8.133
+rh134.prod.vmware.haf.       IN      A      192.168.8.134
+rh135.prod.vmware.haf.       IN      A      192.168.8.135
+rh136.prod.vmware.haf.       IN      A      192.168.8.136
+rh137.prod.vmware.haf.       IN      A      192.168.8.137
+rh138.prod.vmware.haf.       IN      A      192.168.8.138
+rh139.prod.vmware.haf.       IN      A      192.168.8.139
+rh140.prod.vmware.haf.       IN      A      192.168.8.140
+
 ; 192.168.8.0/24 - A records
 rac1.prod.vmware.haf.        IN      A      192.168.8.201
 rac2.prod.vmware.haf.        IN      A      192.168.8.202
@@ -117,6 +149,7 @@ pxe1.prod.vmware.haf.        IN      A      192.168.8.203
 pxe2.prod.vmware.haf.        IN      A      192.168.8.204
 gentoo.prod.vmware.haf.      IN      A      192.168.8.205
 dg.prod.vmware.haf.          IN      A      192.168.8.206
+kube-ext-ip.prod.vmware.haf. IN      A      192.168.8.207
 
 rac-cluster-scan             IN      A      192.168.8.208
 rac-cluster-scan             IN      A      192.168.8.209
@@ -146,6 +179,10 @@ vm-pc-installer              IN      A      192.168.8.232
 vm-lightwave                 IN      A      192.168.8.233
 vm-pc-1                      IN      A      192.168.8.234
 vm-lb-1                      IN      A      192.168.8.235
+vro                          IN      A      192.168.8.236
+vra                          IN      A      192.168.8.237
+win7                         IN      A      192.168.8.238
+win2008                      IN      A      192.168.8.239
 
 rhel5                        IN      A      192.168.8.240
 rhel6                        IN      A      192.168.8.241
