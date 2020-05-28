@@ -14,8 +14,8 @@ else
 PART=""
 fi
 
-[[ $DEVPATH =~ /target([1-9]):[0-9]:([0-9]) ]] && printf "ASMNAME=asmshared%02d%02d%s" ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} "${PART}" >> /tmp/udevtest2.out
-[[ $DEVPATH =~ /target([1-9]):[0-9]:([0-9]) ]] && printf "ASMNAME=asmshared%02d%02d%s" ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} "${PART}"
+[[ $DEVPATH =~ /target([1-9]):[0-9]:([0-9]) ]] && printf '%s => ASMNAME=asmshared%02d%02d%s \n' ${DEVPATH} ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} "${PART}" >> /tmp/udevtest2.out
+[[ $DEVPATH =~ /target([1-9]):[0-9]:([0-9]) ]] && printf 'ASMNAME=asmshared%02d%02d%s \n' ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} "${PART}"
 
 
 exit 0
