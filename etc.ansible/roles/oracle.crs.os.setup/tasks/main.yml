@@ -1,0 +1,11 @@
+---
+# tasks file for oracle.crs.os.setup
+
+- include: os.setup.yml
+
+- name: fqdn
+  include_tasks: fqdn.yml
+  loop: "{{ ansible_play_batch }}"
+
+- debug:
+    var: crs_nodes_fqdn
