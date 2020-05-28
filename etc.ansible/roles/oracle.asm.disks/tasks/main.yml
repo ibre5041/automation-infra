@@ -1,0 +1,5 @@
+---
+# tasks file for oracle.asm.disks
+
+- include: udev.yaml
+- include: disks.yaml
