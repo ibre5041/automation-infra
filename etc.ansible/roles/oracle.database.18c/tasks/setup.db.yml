@@ -2,10 +2,13 @@
 - name: DB Home Setup
   block:
     - name: install db.rsp
-      copy:
-        src: db.rsp
+      template:
+        src: db.no.comments.rsp
         dest: /oracle/u01/db/db.rsp
-        mode: '0644'
+        mode: '0640'
+        owner: oracle
+        group: oinstall
+
     - shell: "./runInstaller -responseFile /oracle/u01/db/db.rsp -silent"
       args:
         chdir: "/oracle/u01/db/{{ oracle_ver_path }}"

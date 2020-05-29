@@ -3,7 +3,7 @@
 
 oracle_major_version: "19"
 
-oracle_install_package_name: "LINUX.X64_193000_db_home.zip"
+oracle_install_package_names: ["LINUX.X64_193000_db_home.zip"]
 
 oracle_ver_path: "19.3.0.0"
 

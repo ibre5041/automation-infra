@@ -3,9 +3,10 @@
   block:
     - name: install dbca.rsp
       template:
-        src: dbca.rsp
+        src: dbca.no.comments.rsp
         dest: /home/oracle/dbca.rsp
-        mode: '0644'
+        mode: '0640'
+
     - name: "Create database"
       shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
       args:
@@ -29,6 +30,7 @@
   rescue:
     - debug:
         msg: './dcba failed'
+
     - name: delete install dbca.rsp
       file:
         path: /home/oracle/dbca.rsp

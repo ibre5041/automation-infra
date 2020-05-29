@@ -1,5 +1,18 @@
 ---
-# tasks file for oracledatabase
+# tasks file for oracledatabase 18c
+
+- name: delete response file
+  file:
+    path: /oracle/u01/db/db.rsp
+    state: absent
+
+- name: check if oracle home installed
+  stat:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
+  register: oracle_home_installed
+
+- debug:
+    msg: "Oracle home installed: {{ oracle_home_installed.stat.exists }}"
 
 - name: "ora_2_env file"
   template:
@@ -8,7 +21,7 @@
     owner: oracle
     group: oinstall
 
-- name: "DB fome"
+- name: "DB home (ORACLE_HOME directory)"
   file:
     path: "/oracle/u01/db/{{ oracle_ver_path }}"
     state: directory
@@ -16,14 +29,7 @@
     group: oinstall
     recurse: yes
     mode: '0755'
-
-- name: install db.rsp
-  copy:
-    src: db.rsp
-    dest: /oracle/u01/db/db.rsp
-    mode: '0644'
-    owner: oracle
-    group: oinstall
+  when: oracle_home_installed.stat.exists != True
 
 - name: check if install package exists
   stat: 
@@ -33,10 +39,15 @@
 - debug:
     msg: "Install package exists: {{ install_package.stat.exists }}"
 
-- include: download.package.yml
-  when: install_package.stat.exists != True
+- name: Include Role oracle.download.package
+  include_role:
+    name: oracle.download.package
+  vars:
+    oracle_home: "/oracle/u01/db/{{ oracle_ver_path }}"
+  when: oracle_home_installed.stat.exists != True and install_package.stat.exists != True
 
 - include: setup.db.yml
+  when: oracle_home_installed.stat.exists != True
 
 - name: db root.sh
   shell: "/oracle/u01/db/{{ oracle_ver_path }}/root.sh"
