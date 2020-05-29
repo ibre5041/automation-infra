@@ -19,10 +19,10 @@
   network:
     - adapter:
         pciSlotNumber: 128
-        network: "VM network inerconnect"
+        network: "Management Network"
     - adapter:
         pciSlotNumber: 136
-        network: "VM Network"
+        network: "Public Network"
   vmware:
     vm_folder: VmFolder
     datastore: Kingston890G

@@ -12,15 +12,15 @@
       size: 20g
       bus: 0
     - disk: appdg
-      size: 20g
+      size: 60g
       bus: 0
   network:
     - adapter:
         pciSlotNumber: 192
-        network: "VM network inerconnect"
+        network: "Management Network"
     - adapter:
         pciSlotNumber: 224
-        network: "VM Network"
+        network: "Public Network"
   vmware:
     vm_folder: VmFolder
     datastore: Kingston890G
@@ -42,5 +42,5 @@
     - disk:
       size: 8
       bus: 1
-      count: 5
+      count: 4
 
