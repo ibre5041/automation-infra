@@ -9,3 +9,5 @@ oracle_install_package_name2: "linuxamd64_12102_database_2of2.zip"
 oracle_ver_path: "12.1.0.2"
 
 oracle_sid: "TEST12R1"
+
+oracle_home: "/oracle/u01/db/{{ oracle_ver_path }}"

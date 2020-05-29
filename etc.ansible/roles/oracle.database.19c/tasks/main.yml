@@ -56,6 +56,14 @@
     creates: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
   ignore_errors: true
 
+- name: "DBA home"
+  file:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/DBA"
+    state: directory
+    owner: oracle
+    group: oinstall
+    mode: '0755'
+
 - name: check if database was created
   stat:
     path: /oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log

@@ -59,3 +59,14 @@
     owner: oracle
     group: oinstall
     mode: '0755'
+
+- name: check if database was created
+  stat:
+    path: /oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log
+  register: dcdba_log
+
+- debug:
+    msg: "Database exists: {{ dcdba_log.stat.exists }}"
+
+- include: create_database.yml
+  when: dcdba_log.stat.exists != True

@@ -27,7 +27,7 @@
     path: /home/oracle/db.rsp
     state: absent
 
-- name: delete install dbca.rsp
-  file:
-    path: /home/oracle/dbca.rsp
-    state: absent
+# - name: delete install dbca.rsp
+#   file:
+#     path: /home/oracle/dbca.rsp
+#     state: absent
