@@ -129,3 +129,11 @@
     owner: oracle
     group: oinstall
     mode: '0600'
+
+- name: Create ~oracle/.crsbuild
+  block:
+    - name: Create ~oracle/.crsbuild
+      copy: content="{{ ansible_date_time.iso8601 }}" dest="/home/oracle/.crsbuild"
+  become: yes
+  become_user: oracle
+  when: crsbuild_present.stat.exists != True
