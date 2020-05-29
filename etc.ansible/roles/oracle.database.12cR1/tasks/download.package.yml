@@ -1,23 +1,43 @@
 
 - block:
-    - name: Download install package
+    - name: delete install directory (12R1 specific)
+      file:
+        path: /home/oracle/grid
+        state: absent
+
+    - name: Download install package(1)
       get_url:
-        url: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name }}
+        url: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name1 }}
+        dest: /home/oracle/
+        mode: '0640'
+
+    - name: Download install package(2)
+      get_url:
+        url: http://192.168.8.200/oracle/{{ oracle_major_version }}/{{ oracle_install_package_name2 }}
         dest: /home/oracle/
         mode: '0640'
 
     - name: unzip install package
       unarchive:
-        src: /home/oracle/{{ oracle_install_package_name }}
-        dest: /home/oracle/
+        src: /home/oracle/{{ oracle_install_package_name1 }}
+        dest: /home/oracle
+        remote_src: yes
+
+    - name: unzip install package
+      unarchive:
+        src: /home/oracle/{{ oracle_install_package_name2 }}
+        dest: /home/oracle
         remote_src: yes
 
     - name: delete install .zip package
       file:
-        path: /home/oracle/{{ oracle_install_package_name }}
+        path: /home/oracle/{{ oracle_install_package_name1 }}
+        state: absent
+
+    - name: delete install .zip package
+      file:
+        path: /home/oracle/{{ oracle_install_package_name2 }}
         state: absent
 
   become: yes
   become_user: oracle
-
-

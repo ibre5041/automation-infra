@@ -1,12 +1,16 @@
 
 - name: DB Home Setup
   block:
+
     - name: install db.rsp
-      copy:
-        src: db.rsp
+      template:
+        src: db.no.comments.rsp
         dest: /oracle/u01/db/db.rsp
-        mode: '0644'
-    - shell: "./runInstaller -responseFile /oracle/u01/db/db.rsp -waitForCompletion  -silent -ignorePrereqFailure"
+        mode: '0640'
+        owner: oracle
+        group: oinstall
+
+    - shell: "./runInstaller -responseFile /oracle/u01/db/db.rsp -waitForCompletion -silent -ignorePrereq"
       args:
         chdir: "/home/oracle/database"
         creates: "/oracle/u01/db/{{ oracle_ver_path }}/bin/oracle"
@@ -26,10 +30,12 @@
   rescue:
     - debug:
         msg: './runInstaller failed'
+
     - name: delete install db.rsp
       file:
         path: /oracle/u01/db/db.rsp
         state: absent
+
     - name: delete install directory
       file:
         path: "/home/oracle/database"
