@@ -2,10 +2,11 @@
 - name: Grid Setup
   block:
     - name: install grid.rsp
-      copy:
-        src: grid.rsp
+      template:
+        src: grid.no.comments.rsp
         dest: /oracle/u01/gi/grid.rsp
         mode: '0644'
+
     - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
@@ -16,12 +17,12 @@
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
 
-    # - name: "Goldem image fixups - missing dirs"
-    #   file:
-    #     path: "/oracle/u01/gi/12.2.0.1/{{item}}"
-    #     state: directory
-    #     recurse: yes
-    #   with_items: ["cdata", "cdata/localhost", "crs/init", "crs/log", "evm/init", "log", "log/crs", "racg/dump", "srvm/log"]
+    - name: "Goldem image fixups - missing dirs"
+      file:
+        path: "/oracle/u01/gi/12.2.0.1/{{item}}"
+        state: directory
+        recurse: yes
+      with_items: ["cdata", "cdata/localhost", "crs/init", "crs/log", "evm/init", "log", "log/crs", "racg/dump", "srvm/log"]
 
   rescue:
     - debug:

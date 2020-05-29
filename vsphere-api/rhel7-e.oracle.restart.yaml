@@ -27,7 +27,7 @@
 
 
 - machine:
-  name: rhel7-b
+  name: rhel7-e
   template: default
   network:
   scsi:
@@ -36,11 +36,10 @@
         pciSlotNumber: 256
 
 - cluster:
-  name: rhel7-b-oracle-restart
-  nodes: [rhel7-b]
+  name: rhel7-e-oracle-restart
+  nodes: [rhel7-e]
   disks:
     - disk:
       size: 12
       bus: 1
       count: 4
-

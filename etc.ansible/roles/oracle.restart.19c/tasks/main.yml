@@ -1,68 +1,33 @@
 ---
-# tasks file for oraclerestart
+# tasks file for oraclerestart 19c
 
-- name: 'Extend the u01'
-  lvol:
-    vg: vg01
-    lv: u01
-    size: 29G
-    shrink: no
-    resizefs: yes
 
-- name: Oracle CRS required packages
-  yum: 
-    name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++,net-tools
-    state=latest
+- name: delete response file
+  file:
+    path: /oracle/u01/gi/grid.rsp
+    state: absent
 
-- name: Oracle CRS required packages
-  yum: 
-    name=cvuqdisk
-    state=latest
-    disable_gpg_check=yes 
+- name: check if ~oracle/.crsbuild exists
+  stat:
+    path: /home/oracle/.crsbuild
+  register: crsbuild_present
 
-- name: udev 55
-  copy:
-    src: 55-usm.rules
-    dest: /etc/udev/rules.d/55-usm.rules
-
-- name: udev 12
-  copy:
-    src: 12-dm-permissions.rules
-    dest: /etc/udev/rules.d/12-dm-permissions.rules
-
-- name: udev 10
-  copy:
-    src: 10-scsi-asm.rules
-    dest: /etc/udev/rules.d/10-scsi-asm.rules
-
-- name: install udevasm.sh
-  copy:
-    src: udevasm.sh
-    dest: /etc/udev/udevasm.sh
-    mode: '0750'
-
-- name: reload udev
-  command: udevadm trigger
-
-- name: Wait for ASM DISK detection
-  wait_for:
-    path: /dev/asmshared0103      
-    delay: 0
-    timeout: 30
-    state: present
-
-- name: ASM paritions
-  parted:
-    device: "/dev/{{item}}"
-    label: gpt
-    number: 1
-    state: present    
-  with_items: ["asmshared0100", "asmshared0101", "asmshared0102", "asmshared0103"]
+- include_role:
+    name: oracle.asm.disks
+    public: yes
+  when: crsbuild_present.stat.exists != True
 
 - name: "ora_1_env file"
   template:
     src: ora_1_env.ASM
     dest: "/home/oracle/.ora_1_env"
+
+- name: "Oracle KB"
+  file:
+    path: "/home/oracle/.ORACLE_KB"
+    state: directory
+    owner: oracle
+    group: oinstall
 
 - name: "Gi fome"
   file:
@@ -73,12 +38,13 @@
     recurse: yes
     mode: '0755'
 
-- name: "Oracle KB"
-  file:
-    path: "/home/oracle/.ORACLE_KB"
-    state: directory
-    owner: oracle
-    group: oinstall
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+  register: oracle_ohasd_service
+
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
 
 - name: check if Oracle CRS unpacked
   stat: 
@@ -88,9 +54,12 @@
 - debug:
     msg: "Install package exists: {{ crs_unpacked.stat.exists }}"
 
-- include: download.package.yml
-  when: crs_unpacked.stat.exists != True
-
+- name: Include Role oracle.download.package
+  include_role:
+    name: oracle.download.package
+  vars:
+    oracle_home: "/oracle/u01/gi/{{ oracle_ver_path }}"
+  when: crs_unpacked.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"
 
 - name: check if Oracle CRS set up
   stat: 
@@ -98,20 +67,12 @@
   register: crs_set_up
 
 - include: setup.grid.yml
-  when: crs_set_up.stat.exists != True
+  when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"
   
 - name: orainstRoot.sh
   shell: /oracle/u01/oraInventory/orainstRoot.sh
   args:
     creates: /etc/oraInst.loc
-
-- name: wait for oracle-ohasd.service
-  systemd:
-    name: oracle-ohasd.service
-  register: oracle_ohasd_service
-
-- debug:
-    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
 
 - name: root.sh   
   shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
@@ -135,35 +96,33 @@
 - debug:
     msg: "{{ oracle_asm_status }}"
 
-- name: "ASM test"
+- name: "ASM test and fixups"
   block:
     - debug:
         msg: "ASM not ONLINE"
-    - name: install grid.rsp
-      copy:
-        src: grid.rsp
-        dest: /oracle/u01/gi/grid.rsp
-        mode: '0644'
 
     - name: Grid Setup ASM
       shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
 
-    - name: delete install .zip package
-      file:
-        path: /oracle/u01/gi/grid.rsp
-        state: absent
-
-  rescue:
-    - name: delete install .zip package
-      file:
-        path: /oracle/u01/gi/grid.rsp
-        state: absent
-
   become: yes
   become_user: oracle
   when: oracle_asm_status.stdout is not match(".*ONLINE")
+
+- name: file perm fixup
+  file:
+    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
+    owner: oracle
+    group: oinstall
+    mode: '6755'
+
+- name: file perm fixup
+  file:
+    path: /oracle/u01/gi/{{ oracle_ver_path }}
+    owner: root
+    group: oinstall
+    mode: '0755'
 
 # Not needed for 19c
 # - name: file perm fixup

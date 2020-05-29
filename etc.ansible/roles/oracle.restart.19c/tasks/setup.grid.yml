@@ -2,8 +2,8 @@
 - name: Grid Setup
   block:
     - name: install grid.rsp
-      copy:
-        src: grid.rsp
+      template:
+        src: grid.no.comments.rsp
         dest: /oracle/u01/gi/grid.rsp
         mode: '0644'
     - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
@@ -26,7 +26,7 @@
   rescue:
     - debug:
         msg: '"./gridSetup.sh failed'
-    - name: delete install .zip package
+    - name: delete response file
       file:
         path: /oracle/u01/gi/grid.rsp
         state: absent
