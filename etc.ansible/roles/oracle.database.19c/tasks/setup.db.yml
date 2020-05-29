@@ -2,7 +2,7 @@
 - name: DB Home Setup
   block:
     - name: install db.rsp
-      copy:
+      template:
         src: db.rsp
         dest: /oracle/u01/db/db.rsp
         mode: '0644'
