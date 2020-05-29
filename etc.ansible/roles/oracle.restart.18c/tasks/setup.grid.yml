@@ -16,17 +16,10 @@
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
 
-    # - name: "Goldem image fixups - missing dirs"
-    #   file:
-    #     path: "/oracle/u01/gi/12.2.0.1/{{item}}"
-    #     state: directory
-    #     recurse: yes
-    #   with_items: ["cdata", "cdata/localhost", "crs/init", "crs/log", "evm/init", "log", "log/crs", "racg/dump", "srvm/log"]
-
   rescue:
     - debug:
         msg: '"./gridSetup.sh failed'
-    - name: delete install .zip package
+    - name: delete response file
       file:
         path: /oracle/u01/gi/grid.rsp
         state: absent

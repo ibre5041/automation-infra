@@ -6,3 +6,13 @@
     name=haf-oracle-profile,haf-oracle-rlwrap
     state=latest
     disable_gpg_check=yes
+
+- name: delete install grid.rsp
+  file:
+    path: /oracle/u01/gi/grid.rsp
+    state: absent
+
+- name: delete install directory
+  file:
+    path: /home/oracle/grid
+    state: absent

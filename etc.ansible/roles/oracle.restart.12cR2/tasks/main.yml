@@ -118,6 +118,13 @@
 
 - name: file perm fixup
   file:
+    path: /oracle/u01/gi/{{ oracle_ver_path }}
+    owner: root
+    group: oinstall
+    mode: '0755'
+
+- name: file perm fixup
+  file:
     path: /oracle/u01/gi/{{ oracle_ver_path }}/cdata/localhost/{{ansible_hostname}}.olr
     owner: oracle
     group: oinstall

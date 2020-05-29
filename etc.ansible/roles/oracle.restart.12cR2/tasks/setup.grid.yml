@@ -26,7 +26,7 @@
   rescue:
     - debug:
         msg: '"./gridSetup.sh failed'
-    - name: delete install .zip package
+    - name: delete response file
       file:
         path: /oracle/u01/gi/grid.rsp
         state: absent
