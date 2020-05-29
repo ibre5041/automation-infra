@@ -1,0 +1,4 @@
+---
+# tasks file for kubernetes
+- import_tasks: install.yml
+#- import_tasks: setup.yml

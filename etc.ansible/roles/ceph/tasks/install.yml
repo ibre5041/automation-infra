@@ -1,0 +1,277 @@
+# Base host install
+################################################################################
+
+- name: 'Extend root fs'
+  lvol:
+    vg: vg00
+    lv: lv_root
+    size: 16G
+    shrink: no
+    resizefs: yes
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Configure Firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Add the user "cephuser"
+  user:
+    name: cephuser
+    shell: /bin/bash
+    uid: 800
+    comment: "cephuser admin user"
+    system: yes
+    password: '$6$a5MJYlNAPSevwLhh$m1EJvszxPAMkwumqCQcHS07fLyLPYTWUyPFR7K58hghtDyiSL0GF.svFSA8f7MxkBXUx8uTczpPIJKrb1O14h'
+
+- user: 
+    name: cephuser
+    # python -c 'import crypt; print crypt.crypt("acror", "$1$SomeSalt$")'
+    password: "$1$SomeSalt$V2yJBnrIRWQytrgM9BB2Y1"
+
+- name: Add the user "cephuser" keys (1)
+  authorized_key:
+    user: cephuser
+    key: '{{ item }}'
+  with_file:
+    - autorized_keys
+
+- name: ensure private key and public one are present
+  copy:
+    src: keys/
+    dest: "/home/cephuser/.ssh/"
+    mode: 0400
+    owner: cephuser
+    group: cephuser
+  with_items:
+    - id_rsa
+
+- name: Accept ssh keys from all other cluster nodes
+  shell: "ssh -oStrictHostKeyChecking=no {{ item }} hostname"
+  become: yes
+  become_user: cephuser
+  with_items:
+    - "{{ ansible_play_batch }}"
+
+- name: cephuser sudo
+  copy:
+    src: sudoers.cephuser
+    dest: /etc/sudoers.d/cephuser
+    mode: 0440
+
+- name: create ceph storage 1/2
+  lvol:
+    vg: vg01
+    lv: ceph
+    size: 15g
+    shrink: no
+
+- name: Create /dev/vg01/ceph 2/2
+  filesystem:
+    fstype: xfs
+    dev: /dev/vg01/ceph
+
+# ceph actual installation
+################################################################################
+
+- name: epel repo
+  yum:
+    name: epel-release.noarch
+
+- name: ceph.repo
+  copy:
+    src: ceph.repo
+    dest: /etc/yum.repos.d/
+
+- name: ceph rpms prerequisities
+  yum:
+    name: snappy,leveldb,gdisk,python-argparse,gperftools-libs
+
+- name: ceph rpms
+  yum:
+    name: ceph-deploy,ceph,ceph-release
+
+# https://www.howtoforge.com/tutorial/how-to-build-a-ceph-cluster-on-centos-7/
+
+# - copy:
+#     src: yum-key.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - copy:
+#     src: rpm-package-key.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - name: Kube GPG key (I)
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/yum-key.gpg
+
+# - name: Kube GPG key (II)
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+# # - name: rpmkeys hack RHEL bug 1768206
+# #   shell: rpmkeys --import /etc/pki/rpm-gpg/yum-key.gpg
+
+# # - name: rpmkeys hack RHEL bug 1768206
+# #   shell: rpmkeys --import /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+# - copy:
+#     src: docker.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - name: Docker GPG key
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/docker.gpg
+
+# - name: Kube .repo
+#   copy:
+#     src: kubernetes.repo
+#     dest: /etc/yum.repos.d/
+
+# - name: Kubernetes rpm
+#   yum:
+#     name: kubelet,kubeadm,kubectl,kubernetes-cni,containernetworking-plugins,flannel
+#   register: kubernetes_installed
+
+# - name: Disable SWAP since kubernetes cant work with swap enabled (1/2)
+#   shell: "swapoff -a"
+#   when: kubernetes_installed.changed
+
+# - name: Disable SWAP in fstab since kubernetes cant work with swap enabled (2/2)
+#   replace:
+#     path: /etc/fstab
+#     regexp: '^([^#].*swap.*)$'
+#     replace: '# \1'
+#   when: kubernetes_installed.changed
+
+# - name: Docker .repo
+#   copy:
+#     src: docker-ce.repo
+#     dest: /etc/yum.repos.d/
+
+# - name: Dockerm rpm
+#   yum:
+#     name: device-mapper-persistent-data,lvm2,docker-ce
+
+# - name: Disable SELinux
+#   selinux:
+#     state: disabled
+
+# - name: Configure Firewall 1/6
+#   firewalld:
+#     port: 6443/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 2/6
+#   firewalld:
+#     port: 2379-2380/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 3/6
+#   firewalld:
+#     port: 10250/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 4/6
+#   firewalld:
+#     port: 10251/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 5/6
+#   firewalld:
+#     port: 10252/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 6/6
+#   firewalld:
+#     port: 10255/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall
+#   systemd:
+#     name: firewalld
+#     state: stopped
+#     enabled: no
+
+# - name: Add the 802.1q module
+#   modprobe:
+#     name: br_netfilter
+#     state: present
+
+# - name: Make br_netfilter is loaded after rebooot
+#   lineinfile:
+#     path: /etc/modules-load.d/br_netfilter.conf
+#     state: present
+#     line: "br_netfilter"
+#     create: yes
+  
+# - name: bridge-nf-call 1/2
+#   sysctl:
+#     name: net.bridge.bridge-nf-call-ip6tables
+#     value: 1
+#     sysctl_file: /etc/sysctl.d/master_node_name
+
+# - name: bridge-nf-call 2/2
+#   sysctl:
+#     name: net.bridge.bridge-nf-call-iptables
+#     value: 1
+#     sysctl_file: /etc/sysctl.d/master_node_name
+
+# - name: directory /etc/docker
+#   file:
+#     path: /etc/docker
+#     state: directory
+
+# - name: configure docker 1/2
+#   copy:
+#     src: docker.daemon.json
+#     dest: /etc/docker/daemon.json
+
+# - name: create docker storagefs 1/3
+#   lvol:
+#     vg: vg01
+#     lv: docker
+#     size: 45g
+#     shrink: no
+
+# - name: Create /dev/vg01/docker 2/3
+#   filesystem:
+#     fstype: ext4
+#     dev: /dev/vg01/docker
+
+# - name: Create /dev/vg01/docker 3/3
+#   mount:
+#     path: /var/lib/docker
+#     src: /dev/vg01/docker
+#     state: mounted
+#     fstype: auto
+
+# - name: directory /etc/systemd/system/docker.service.d
+#   file:
+#     path: /etc/systemd/system/docker.service.d
+#     state: directory
+  
+# - name: enable and start docker
+#   systemd:
+#     name: docker
+#     state: started
+#     enabled: yes
+
+# - name: enable and start kubelet
+#   systemd:
+#     name: kubelet
+#     state: started
+#     enabled: yes
