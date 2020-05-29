@@ -16,3 +16,8 @@
   file:
     path: /home/oracle/grid
     state: absent
+
+- name: delete install directory
+  file:
+    path: /home/oracle/database
+    state: absent

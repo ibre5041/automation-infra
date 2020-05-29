@@ -4,5 +4,5 @@
   - base.host
   - base.oracle
   - oracle.restart.12cR1
-#  - oracle.database.12cR1
+  - oracle.database.12cR1
   - oracle.post.install
