@@ -1,7 +1,8 @@
 ---
- - hosts: db
-   roles:
-   - base.host
-   - base.oracle
-   - oracle.restart.12cR2
-   - oracle.database.12cR2
+- hosts: all
+  roles:
+  - base.host
+  - base.oracle
+  - oracle.restart.12cR2
+#  - oracle.database.12cR2
+  - oracle.post.install

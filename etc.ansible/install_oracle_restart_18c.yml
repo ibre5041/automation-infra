@@ -4,5 +4,5 @@
   - base.host
   - base.oracle
   - oracle.restart.18c
-  - oracle.database.18c
+#  - oracle.database.18c
   - oracle.post.install
