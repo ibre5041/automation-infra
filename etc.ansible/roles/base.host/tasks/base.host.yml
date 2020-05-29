@@ -1,5 +1,8 @@
 ---
 # tasks file for basehost
+- name: Clean yum repos
+  shell: "yum clean all"
+
 - name: DNS search
   copy:
     src: resolv.conf
@@ -43,3 +46,23 @@
   authorized_key:
     user: root
     key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/authorized_keys') }}"
+
+- name: 'Extend /var fs'
+  lvol:
+    vg: vg00
+    lv: lv_var
+    size: 2G
+    shrink: no
+    resizefs: yes
+
+- name: 'Extend /var fs'
+  lvol:
+    vg: vg00
+    lv: lv_tmp
+    size: 2G
+    shrink: no
+    resizefs: yes
+
+- name: Clean yum repos
+  shell: "yum clean all"
+

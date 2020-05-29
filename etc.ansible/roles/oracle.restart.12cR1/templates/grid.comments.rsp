@@ -372,7 +372,7 @@ oracle.install.asm.diskGroup.AUSize=4
 #     oracle.install.asm.diskGroup.disks=\\.\ORCLDISKDATA0,\\.\ORCLDISKDATA1
 #
 #-------------------------------------------------------------------------------
-oracle.install.asm.diskGroup.disks=/dev/asmshared0100p1,/dev/asmshared0101p1,/dev/asmshared0102p1,/dev/asmshared0103p1
+oracle.install.asm.diskGroup.disks={{ asm_disk_partitions|join(',') }}
 
 #-------------------------------------------------------------------------------
 # The disk discovery string to be used to discover the disks used create a ASM DiskGroup

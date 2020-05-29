@@ -94,6 +94,17 @@
     dest: /etc/sudoers.d/oracle
     mode: '0440'
 
+- name: Oracle CRS/Restart required packages
+  yum: 
+    name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++
+    state=latest
+
+- name: Oracle CRS/Restart required packages
+  yum: 
+    name=cvuqdisk
+    state=latest
+    disable_gpg_check=yes 
+
 - name: Create a logical volume u01
   lvol:
     vg: vg01
@@ -133,10 +144,26 @@
     src: 99-oracle-limits.conf
     dest: /etc/security/limits.d/99-oracle-limits.conf
 
+- name: 'Extend the / (root)'
+  lvol:
+    vg: vg00
+    lv: lv_root
+    size: 10g
+    shrink: no
+    resizefs: yes
+
 - name: 'Extend the /tmp'
   lvol:
     vg: vg00
     lv: lv_tmp
     size: 2g
+    shrink: no
+    resizefs: yes
+
+- name: 'Extend the u01'
+  lvol:
+    vg: vg01
+    lv: u01
+    size: 29G
     shrink: no
     resizefs: yes
