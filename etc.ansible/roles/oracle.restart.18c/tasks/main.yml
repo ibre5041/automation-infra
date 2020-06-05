@@ -21,13 +21,6 @@
     src: ora_1_env.ASM
     dest: "/home/oracle/.ora_1_env"
 
-- name: "Oracle KB"
-  file:
-    path: "/home/oracle/.ORACLE_KB"
-    state: directory
-    owner: oracle
-    group: oinstall
-
 - name: "Gi fome"
   file:
     path: "/oracle/u01/gi/{{ oracle_ver_path }}"
@@ -97,6 +90,14 @@
 
 - name: "ASM test and fixups"
   block:
+    - name: install grid.rsp
+      template:
+        src: grid.no.comments.rsp
+        dest: /oracle/u01/gi/grid.rsp
+        mode: '0640'
+        owner: oracle
+        group: oinstall
+        
     - debug:
         msg: "ASM not ONLINE"
 
@@ -104,6 +105,14 @@
       shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
+
+  rescue:
+    - name: delete response file
+      file:
+        path: /oracle/u01/gi/grid.rsp
+        state: absent
+    - fail:
+        msg: '"./gridSetup.sh failed'
 
   become: yes
   become_user: oracle

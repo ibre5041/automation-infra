@@ -1,7 +1,6 @@
 ---
 # tasks file for oraclerestart 19c
 
-
 - name: delete response file
   file:
     path: /oracle/u01/gi/grid.rsp
@@ -21,13 +20,6 @@
   template:
     src: ora_1_env.ASM
     dest: "/home/oracle/.ora_1_env"
-
-- name: "Oracle KB"
-  file:
-    path: "/home/oracle/.ORACLE_KB"
-    state: directory
-    owner: oracle
-    group: oinstall
 
 - name: "Gi fome"
   file:

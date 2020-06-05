@@ -1,6 +1,13 @@
 ---
 # post instalation tasks 
 
+- name: "Oracle KB"
+  file:
+    path: "/home/oracle/.ORACLE_KB"
+    state: directory
+    owner: oracle
+    group: oinstall
+
 - name: Oracle profile
   yum:
     name=haf-oracle-profile,haf-oracle-rlwrap

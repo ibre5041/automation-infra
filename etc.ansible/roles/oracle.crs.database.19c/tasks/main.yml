@@ -1,7 +1,32 @@
 ---
-# tasks file for oracledatabase
+# tasks file for oracledatabase 19c
 
 - include: os.setup.yml
+
+- name: "ora_2_env file"
+  template:
+    src: ora_2_env
+    dest: "/home/oracle/.ora_2_env"
+    owner: oracle
+    group: oinstall
+
+- name: "DB fome"
+  file:
+    path: "/oracle/u01/db"
+    state: directory
+    owner: oracle
+    group: oinstall
+#    recurse: yes
+#    mode: '0755'
+
+- name: "DB fome"
+  file:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+#    recurse: yes
+#    mode: '0755'
 
 - name: install db.rsp
   template:
@@ -24,6 +49,13 @@
 
 - include: setup.db.yml
   when: ansible_hostname == first_rac_node
+
+- name: db root.sh
+  shell: "/oracle/u01/db/{{ oracle_ver_path }}/root.sh"
+  args:
+    chdir: "/"
+    creates: "/opt/ORCLfmap/prot1_64/bin/fmputl"
+  ignore_errors: true
 
 - name: check if database was created
   stat:
