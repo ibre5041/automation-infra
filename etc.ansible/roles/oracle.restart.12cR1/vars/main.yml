@@ -8,5 +8,4 @@ oracle_install_package_name2: "linuxamd64_12102_grid_2of2.zip"
 
 oracle_ver_path: "12.1.0.2"
 
-asm_disks: []
-asm_disk_partitions: []
+

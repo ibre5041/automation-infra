@@ -12,5 +12,4 @@ oracle_install_package_names: ["LINUX.X64_193000_grid_home.zip"]
 
 oracle_ver_path: "19.3.0.0"
 
-asm_disks: []
-asm_disk_partitions: []
+

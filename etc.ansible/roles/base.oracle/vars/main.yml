@@ -6,3 +6,7 @@ mem: "{{ ansible_memory_mb.real.total * 1024 * 1024 }}"
 shma: "{{ ((mem | int) / 4096) | round | int }}"
 shmm: "{{ ((mem | int) * 0.8)  | round | int }}"
 
+# Empty global variables to be used by further roles
+asm_disks: []
+asm_disk_partitions: []
+

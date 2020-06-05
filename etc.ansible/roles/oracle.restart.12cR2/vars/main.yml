@@ -12,5 +12,3 @@ oracle_install_package_names: ["grid_home_2019-06-24_08-33-38PM.zip"]
 
 oracle_ver_path: "12.2.0.1"
 
-asm_disks: []
-asm_disk_partitions: []

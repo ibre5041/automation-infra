@@ -132,13 +132,6 @@
     mode: '0775'
     state: directory
 
-# - name: Base packages
-#   yum: 
-#     name=haf-oracle-profile,haf-oracle-rlwrap
-#     state=latest 
-#     disable_gpg_check=yes 
-#     state=latest
-
 - name: Limits
   copy:
     src: 99-oracle-limits.conf

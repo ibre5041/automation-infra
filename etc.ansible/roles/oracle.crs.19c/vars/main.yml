@@ -8,13 +8,8 @@ oracle_major_version: "19"
 #  oracle.install.crs.configureGIMR=true
 # While pathed Golden image does
 #oracle_install_package_name: "LINUX.X64_193000_grid_home.zip"
-oracle_install_package_name: "grid_home_2020-02-29_03-04-07PM.zip"
+oracle_install_package_names: ["grid_home_2020-02-29_03-04-07PM.zip"]
 
 oracle_ver_path: "19.5.0.0"
 
 first_rac_node: "{{  ansible_play_batch[0] }}"
-
-asm_disks: []
-asm_disk_partitions: []
-
-crs_nodes_fqdn: []
