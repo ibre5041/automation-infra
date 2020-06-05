@@ -1,0 +1,84 @@
+- name: kubeadm init
+  shell: "kubeadm init --pod-network-cidr=10.244.0.0/16"
+  args:
+    chdir: "/root"
+    creates: "/etc/kubernetes/admin.conf"
+  when: ansible_hostname == first_node
+
+- name: directory $HOME/.kube 1/2
+  file:
+    path: /root/.kube
+    state: directory
+  when: ansible_hostname == first_node
+
+- name: directory $HOME/.kube 2/2
+  shell: "cp -i /etc/kubernetes/admin.conf /root/.kube/config"
+  args:
+    creates: "/root/.kube/config"
+  when: ansible_hostname == first_node
+
+#  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: flannel 1/2
+  copy:
+    src: kube-flannel.yml
+    dest: /root/
+  when: ansible_hostname == first_node
+
+- name: flannel 2/2
+  shell: "kubectl apply -f kube-flannel.yml"
+  args:
+    chdir: "/root"
+  when: ansible_hostname == first_node
+
+- name: Generate join token
+  shell: kubeadm token create --print-join-command
+  register: kubeadm_join_cmd
+  # delegate_to: "{{ groups['k8s-masters'][0] }}"
+  when: ansible_hostname == first_node
+
+# get stdout outout in 1st node and set it as fact for all nodes
+- set_fact:
+    kubeadm_join: "{{ hostvars[first_node]['kubeadm_join_cmd'].stdout }}"
+  delegate_to: "{{ item }}"
+  with_items: "{{ play_hosts }}"
+
+- debug: var=kubeadm_join
+
+# - name: Store join command
+#   action: copy content="{{ kubeadm_join_cmd }}" dest="/etc/kubernetes/kubeadm-join.command"
+#   when: ansible_hostname != first_node
+
+- name: Run kubeadm join
+  shell: "{{ kubeadm_join }} --ignore-preflight-errors=swap"
+  args:
+    creates: "/var/lib/kubelet/config.yaml"
+  when: ansible_hostname != first_node
+
+- name: Ceph repo
+  copy:
+    src: ceph.repo
+    dest: /etc/yum.repos.d/
+
+- name: Epel
+  yum:
+    name: epel-release
+
+- name: Ceph client packages
+  yum:
+    name: ceph-common,ceph-fuse
+
+- name: ceph client config 1
+  copy:
+    src: ceph.conf
+    dest: /etc/ceph/
+
+- name: ceph client config 2
+  copy:
+    src: ceph.client.kube.keyring
+    dest: /etc/ceph/
+
+- name: ceph client config 3
+  copy:
+    src: ceph.client.admin.keyring
+    dest: /etc/ceph/

@@ -1,0 +1,363 @@
+- name: 'Extend root fs'
+  lvol:
+    vg: vg00
+    lv: lv_root
+    size: 10G
+    shrink: no
+    resizefs: yes
+
+- name: 'Extend /var fs'
+  lvol:
+    vg: vg00
+    lv: lv_var
+    size: 3G
+    shrink: no
+    resizefs: yes
+
+- name: 'Extend /tmp fs'
+  lvol:
+    vg: vg00
+    lv: lv_tmp
+    size: 2G
+    shrink: no
+    resizefs: yes
+
+# - name: 'mapr lv'
+#   lvol:
+#     vg: vg01
+#     lv: lv_mapr
+#     size: 10G
+#     shrink: no
+#     resizefs: yes
+
+- name: "Mapr prerequisities"
+  yum:
+    name: curl,device-mapper,iputils,libsysfs,lvm2,nc,nfs-utils,ntp,nss,openssl,python-devel,sdparm,sudo,syslinux,sysstat,wget,which,yum-utils,java-1.8.0-openjdk
+
+- name: Configure Firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Group mapr
+  group:
+    name: mapr
+    gid: 5000
+    system: yes
+
+- name: User mapr
+  user:
+    name: mapr
+    uid: 5000
+    group: mapr
+    comment: "mapr admin user"
+    system: yes
+    password: '$6$a5MJYlNAPSevwLhh$m1EJvszxPAMkwumqCQcHS07fLyLPYTWUyPFR7K58hghtDyiSL0GF.svFSA8f7MxkBXUx8uTczpPIJKrb1O14h'
+
+
+- name: Add the user "mapr" keys (1)
+  authorized_key:
+    user: mapr
+    key: '{{ item }}'
+  with_file:
+    - autorized_keys
+
+- name: ensure private key and public one are present (2)
+  copy:
+    src: keys/
+    dest: "/home/mapr/.ssh/"
+    mode: 0400
+    owner: mapr
+    group: mapr
+  with_items:
+    - id_rsa
+
+- name: Accept ssh keys from all other cluster nodes (3)
+  shell: "ssh -oStrictHostKeyChecking=no {{ item }} hostname"
+  become: yes
+  become_user: mapr
+  with_items:
+    - "{{ ansible_play_batch }}"
+
+- name: Add the user "root" keys (1)
+  authorized_key:
+    user: root
+    key: '{{ item }}'
+  with_file:
+    - autorized_keys
+
+- name: ensure private key and public one are present (2)
+  copy:
+    src: keys/
+    dest: "/root/.ssh/"
+    mode: 0400
+    owner: root
+    group: root
+  with_items:
+    - id_rsa
+
+- name: Accept ssh keys from all other cluster nodes (3)
+  shell: "ssh -oStrictHostKeyChecking=no {{ item }} hostname"
+  become: yes
+  with_items:
+    - "{{ ansible_play_batch }}"
+
+- name: mapr sudo
+  copy:
+    src: sudoers.mapruser
+    dest: /etc/sudoers.d/mapruser
+    mode: 0440
+
+- name: gnu GPG key (1)
+  copy:
+    src: gnugpg.key
+    dest: /etc/pki/rpm-gpg/
+
+- name: gnu GPG key (2)
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/gnugpg.key
+
+- name: mapr GPG key (1)
+  copy:
+    src: maprgpg.key
+    dest: /etc/pki/rpm-gpg/
+
+- name: mapr .repo
+  copy:
+    src: mapr.repo
+    dest: /etc/yum.repos.d/
+
+- name: mapr GPG key (1)
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/maprgpg.key
+
+#
+# - name: mapr node packages (1/2)
+#   yum:
+#     name: mapr-fileserver
+
+# - name: clear yum cache
+#   shell: "yum clean all"
+
+# - name: mapr cluster packages
+#   yum:
+#     name: mapr-cldb,mapr-zookeeper,mapr-mastgateway,mapr-nfs,mapr-webserver,mapr-apiserver,mapr-gateway,mapr-resourcemanager,mapr-nodemanager,mapr-historyserver,mapr-timelineserver
+#   when: ansible_hostname in (first_node,second_node)
+
+# - name: run configure.sh
+#   shell: "./configure.sh -C {{ first_node }},{{ second_node }} -Z {{ first_node }},{{ second_node }} -D /dev/mapper/vg01-lv_mapr -no-autostart"
+#   args:
+#     chdir: "/opt/mapr/server"
+#     creates: "/opt/mapr/logs/configure.log"
+#   register: configure
+#   when: ansible_hostname in (first_node,second_node)
+
+# - name: run configure.sh
+#   shell: "./configure.sh -C {{ first_node }},{{ second_node }} -Z {{ first_node }},{{ second_node }} -D /dev/mapper/vg01-lv_mapr -no-autostart"
+#   args:
+#     chdir: "/opt/mapr/server"
+#     creates: "/opt/mapr/logs/configure.log"
+#   register: configure
+#   when: ansible_hostname not in (first_node,second_node)
+
+# - name: mapr-zookeeper.service (patched systemctl file)
+#   copy:
+#     src: mapr-zookeeper.service
+#     dest: /etc/systemd/system/mapr-zookeeper.service
+
+# # scp  /opt/mapr/conf/mapr-clusters.conf rhel7-b:/opt/mapr/conf/mapr-clusters.conf
+
+# - name: mapr post-instaltion
+#   yum:
+#     name: mapr-grafana,mapr-elasticsearch,mapr-kibana
+#   when: ansible_hostname == first_node
+
+# - name: mapr post-instaltion
+#   yum:
+#     name: mapr-collectd,mapr-opentsdb,mapr-fluentd
+
+# - name: mapr mep
+#   yum:
+#     name: mapr-kafka,mapr-asynchbase,mapr-flume,
+
+# - copy:
+#     src: yum-key.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - copy:
+#     src: rpm-package-key.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - name: Kube GPG key (I)
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/yum-key.gpg
+
+# - name: Kube GPG key (II)
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+# # - name: rpmkeys hack RHEL bug 1768206
+# #   shell: rpmkeys --import /etc/pki/rpm-gpg/yum-key.gpg
+
+# # - name: rpmkeys hack RHEL bug 1768206
+# #   shell: rpmkeys --import /etc/pki/rpm-gpg/rpm-package-key.gpg
+
+# - copy:
+#     src: docker.gpg
+#     dest: /etc/pki/rpm-gpg/
+
+# - name: Docker GPG key
+#   rpm_key:
+#     state: present
+#     key: /etc/pki/rpm-gpg/docker.gpg
+
+# - name: Kube .repo
+#   copy:
+#     src: kubernetes.repo
+#     dest: /etc/yum.repos.d/
+
+# - name: Kubernetes rpm
+#   yum:
+#     name: kubelet,kubeadm,kubectl,kubernetes-cni,containernetworking-plugins,flannel
+#   register: kubernetes_installed
+
+# - name: Disable SWAP since kubernetes cant work with swap enabled (1/2)
+#   shell: "swapoff -a"
+#   when: kubernetes_installed.changed
+
+# - name: Disable SWAP in fstab since kubernetes cant work with swap enabled (2/2)
+#   replace:
+#     path: /etc/fstab
+#     regexp: '^([^#].*swap.*)$'
+#     replace: '# \1'
+#   when: kubernetes_installed.changed
+
+# - name: Docker .repo
+#   copy:
+#     src: docker-ce.repo
+#     dest: /etc/yum.repos.d/
+
+# - name: Dockerm rpm
+#   yum:
+#     name: device-mapper-persistent-data,lvm2,docker-ce
+
+# - name: Disable SELinux
+#   selinux:
+#     state: disabled
+
+# - name: Configure Firewall 1/6
+#   firewalld:
+#     port: 6443/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 2/6
+#   firewalld:
+#     port: 2379-2380/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 3/6
+#   firewalld:
+#     port: 10250/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 4/6
+#   firewalld:
+#     port: 10251/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 5/6
+#   firewalld:
+#     port: 10252/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall 6/6
+#   firewalld:
+#     port: 10255/tcp
+#     permanent: yes
+#     state: enabled
+
+# - name: Configure Firewall
+#   systemd:
+#     name: firewalld
+#     state: stopped
+#     enabled: no
+
+# - name: Add the 802.1q module
+#   modprobe:
+#     name: br_netfilter
+#     state: present
+
+# - name: Make br_netfilter is loaded after rebooot
+#   lineinfile:
+#     path: /etc/modules-load.d/br_netfilter.conf
+#     state: present
+#     line: "br_netfilter"
+#     create: yes
+  
+# - name: bridge-nf-call 1/2
+#   sysctl:
+#     name: net.bridge.bridge-nf-call-ip6tables
+#     value: 1
+#     sysctl_file: /etc/sysctl.d/master_node_name
+
+# - name: bridge-nf-call 2/2
+#   sysctl:
+#     name: net.bridge.bridge-nf-call-iptables
+#     value: 1
+#     sysctl_file: /etc/sysctl.d/master_node_name
+
+# - name: directory /etc/docker
+#   file:
+#     path: /etc/docker
+#     state: directory
+
+# - name: configure docker 1/2
+#   copy:
+#     src: docker.daemon.json
+#     dest: /etc/docker/daemon.json
+
+# - name: create docker storagefs 1/3
+#   lvol:
+#     vg: vg01
+#     lv: docker
+#     size: 45g
+#     shrink: no
+
+# - name: Create /dev/vg01/docker 2/3
+#   filesystem:
+#     fstype: ext4
+#     dev: /dev/vg01/docker
+
+# - name: Create /dev/vg01/docker 3/3
+#   mount:
+#     path: /var/lib/docker
+#     src: /dev/vg01/docker
+#     state: mounted
+#     fstype: auto
+
+# - name: directory /etc/systemd/system/docker.service.d
+#   file:
+#     path: /etc/systemd/system/docker.service.d
+#     state: directory
+  
+# - name: enable and start docker
+#   systemd:
+#     name: docker
+#     state: started
+#     enabled: yes
+
+# - name: enable and start kubelet
+#   systemd:
+#     name: kubelet
+#     state: started
+#     enabled: yes

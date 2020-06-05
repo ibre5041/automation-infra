@@ -1,0 +1,25 @@
+[mapr_installer]
+name=mapr_installer
+enabled=1
+baseurl=http://package.mapr.com/releases/installer/redhat/
+
+# [mapr_610]
+# name=mapr_610
+# enabled=1
+# baseurl=http://package.mapr.com/releases/v6.1.0/redhat/
+
+[maprtech]
+name=MapR Technologies
+#baseurl=https://package.mapr.com/releases/v6.1.0/redhat/
+baseurl=http://192.168.8.200:8081/repository/mapr-base/
+enabled=1
+gpgcheck=1
+protect=1
+
+[maprecosystem]
+name=MapR Technologies
+#baseurl=https://package.mapr.com/releases/MEP/MEP-6.3/redhat/
+baseurl=http://192.168.8.200:8081/repository/mapr-mep/
+enabled=1
+gpgcheck=1
+protect=1
