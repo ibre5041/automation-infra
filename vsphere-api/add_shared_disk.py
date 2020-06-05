@@ -106,18 +106,22 @@ def add_shared_disk(service_instance, config):
 
         for i in range(0, count):
             spec = vim.vm.ConfigSpec()
-            # get all disks on a VM, set unit_number to the next available
-            unit_number = 0
+            # get all disks on a VM, set unit_number to the next available (start from LUN 15,14,..)
+            unit_number = 15
             for dev in vm.config.hardware.device:
                 if hasattr(dev.backing, 'fileName') and controller:  # Note assuming this will skip disks on SCSI BUS: 0
                     if dev.controllerKey != controller.key:
                         continue
-                    unit_number = int(dev.unitNumber) + 1
+                    unit_number = int(dev.unitNumber) - 1
                     # unit_number 7 reserved for scsi controller
                     if unit_number == 7:
-                        unit_number += 1
+                        unit_number -= 1
                     if unit_number >= 16:
-                        logging.debug("we don't support this many disks")
+                        logging.error("we don't support this many disks")
+                        return
+                    if unit_number < 3 :
+                        logging.error("LUNs 0-2 are reserved for OS")
+                        return
 
             path_name = _create_data_file(service_instance, first_machine, 1, unit_number, disk['size'])
 
