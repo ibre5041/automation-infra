@@ -2,7 +2,7 @@
   lvol:
     vg: vg00
     lv: lv_root
-    size: 15G
+    size: 16G
     shrink: no
     resizefs: yes
 
@@ -153,15 +153,15 @@
   lvol:
     vg: vg01
     lv: docker
-    size: 20g
+    size: 45g
     shrink: no
 
-- name: Create /dev/vg01/u01 2/3
+- name: Create /dev/vg01/docker 2/3
   filesystem:
     fstype: ext4
     dev: /dev/vg01/docker
 
-- name: Create /dev/vg01/u01 3/3
+- name: Create /dev/vg01/docker 3/3
   mount:
     path: /var/lib/docker
     src: /dev/vg01/docker

@@ -54,3 +54,31 @@
   args:
     creates: "/var/lib/kubelet/config.yaml"
   when: ansible_hostname != first_node
+
+- name: Ceph repo
+  copy:
+    src: ceph.repo
+    dest: /etc/yum.repos.d/
+
+- name: Epel
+  yum:
+    name: epel-release
+
+- name: Ceph client packages
+  yum:
+    name: ceph-common,ceph-fuse
+
+- name: ceph client config 1
+  copy:
+    src: ceph.conf
+    dest: /etc/ceph/
+
+- name: ceph client config 2
+  copy:
+    src: ceph.client.kube.keyring
+    dest: /etc/ceph/
+
+- name: ceph client config 3
+  copy:
+    src: ceph.client.admin.keyring
+    dest: /etc/ceph/
