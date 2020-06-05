@@ -1,0 +1,8 @@
+---
+- hosts: all
+  roles:
+  - base.host
+  - base.oracle
+  - oracle.crs.18c
+#  - oracle.crs.database.18c
+  - oracle.post.install
