@@ -2,5 +2,7 @@
 # vars file for oracle.crs.os.setup
 
 # Global variables to be used by further roles
-first_rac_node: "{{ ansible_play_batch[0] }}"
+
+first_rac_node: "{{ ansible_play_batch | sort() | [0] }}"
+
 crs_node_list: []

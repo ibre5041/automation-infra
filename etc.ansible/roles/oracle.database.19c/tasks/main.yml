@@ -3,7 +3,7 @@
 
 - name: delete response file
   file:
-    path: /oracle/u01/db/db.rsp
+    path: /home/oracle/db.rsp
     state: absent
 
 - name: check if oracle home installed

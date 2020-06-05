@@ -4,10 +4,10 @@
     - name: install grid.rsp
       template:
         src: grid.no.comments.rsp
-        dest: /oracle/u01/gi/grid.rsp
+        dest: /home/oracle/grid.rsp
         mode: '0644'
 
-    - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
+    - shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
         creates: "/oracle/u01/oraInventory"
@@ -29,7 +29,7 @@
         msg: '"./gridSetup.sh failed'
     - name: delete response file
       file:
-        path: /oracle/u01/gi/grid.rsp
+        path: /home/oracle/grid.rsp
         state: absent
 
   become: yes

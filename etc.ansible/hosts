@@ -133,4 +133,9 @@ rhel7-c
 rhel7-d
 rhel7-e
 
-
+[ceph]
+ceph1
+ceph2
+ceph3
+ceph4
+ceph5

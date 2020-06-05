@@ -12,8 +12,15 @@
         basedir: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
         strip: 0
 
+    - name: install grid.rsp
+      template:
+        src: grid.no.comments.rsp
+        dest: /home/oracle/grid.rsp
+        mode: '0640'
+        owner: oracle
+
     - name: "gridSetup.sh (part I)"
-      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.phase.1.rsp"
+      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
         creates: "/oracle/u01/oraInventory/oraInst.loc"
@@ -26,15 +33,15 @@
         msg: "Return code is {{ grid_setup_out.rc }}"
       when: grid_setup_out.rc >= 2
 
-  # rescue:
-  #   - debug:
-  #       msg: '"./gridSetup.sh failed'
-  #   - name: delete install grid respose file
-  #     file:
-  #       path: /home/oracle/grid.rsp
-  #       state: absent
+  rescue:
+    - name: delete response file
+      file:
+        path: /home/oracle/grid.rsp
+        state: absent
+
+    - fail:
+        msg: '"./gridSetup.sh failed'
 
   become: yes
   become_user: oracle
   when: ansible_hostname == first_rac_node
-

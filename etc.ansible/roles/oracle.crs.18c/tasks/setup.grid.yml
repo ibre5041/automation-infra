@@ -34,7 +34,7 @@
       when: grid_setup_out.rc >= 2
 
   rescue:
-    - name: delete install grid respose file
+    - name: delete install grid response file
       file:
         path: /home/oracle/grid.rsp
         state: absent

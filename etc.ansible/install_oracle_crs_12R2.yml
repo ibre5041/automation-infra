@@ -4,5 +4,5 @@
   - base.host
   - base.oracle
   - oracle.crs.12R2
-#  - oracle.crs.database.12R1
-#  - oracle.post.install
+#  - oracle.crs.database.12R2
+  - oracle.post.install

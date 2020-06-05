@@ -1,15 +1,16 @@
+# oracle database 18c
 
 - name: DB Home Setup
   block:
     - name: install db.rsp
       template:
         src: db.no.comments.rsp
-        dest: /oracle/u01/db/db.rsp
+        dest: /home/oracle/db.rsp
         mode: '0640'
         owner: oracle
         group: oinstall
 
-    - shell: "./runInstaller -responseFile /oracle/u01/db/db.rsp -silent"
+    - shell: "./runInstaller -responseFile /home/oracle/db.rsp -silent"
       args:
         chdir: "/oracle/u01/db/{{ oracle_ver_path }}"
         creates: "/oracle/u01/db/{{ oracle_ver_path }}/oraInst.loc"
@@ -22,12 +23,18 @@
       when: db_setup_out.rc >= 0
 
   rescue:
-    - debug:
-        msg: './runInstaller failed'
     - name: delete install db.rsp
       file:
-        path: /oracle/u01/db/db.rsp
+        path: /home/oracle/db.rsp
         state: absent
+
+    - fail:
+        msg: './runInstaller failed'
 
   become: yes
   become_user: oracle
+
+- name: delete install db.rsp
+  file:
+    path: /home/oracle/db.rsp
+    state: absent

@@ -3,9 +3,23 @@
 
 - include: os.setup.yml
 
-- name: fqdn
-  include_tasks: fqdn.yml
-  loop: "{{ ansible_play_batch }}"
+- shell: "hostname -d"
+  register: domain
+- debug: var=domain.stdout_lines
+- set_fact:
+    domain_name : "{{ domain.stdout_lines[0] }}"
+- debug: var=domain_name
 
-- debug:
-    var: crs_nodes_fqdn
+- name: Build crs node list
+  set_fact:
+    crs_node_list : "{{ crs_node_list + [ item + '.' + domain_name + ':' + hostvars[item].listener + '.' +  domain_name] }}"
+  with_items: "{{ ansible_play_batch }}"
+- name: crs node list
+  debug:
+    var: crs_node_list
+
+- name: CRS node list
+  debug:
+    msg: "{{ crs_node_list|join(',') }}"
+
+

@@ -3,7 +3,7 @@
 
 - name: delete response file
   file:
-    path: /oracle/u01/gi/grid.rsp
+    path: /home/oracle/grid.rsp
     state: absent
 
 - name: check if ~oracle/.crsbuild exists

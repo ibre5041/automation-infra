@@ -4,12 +4,15 @@
     - name: install grid.rsp
       template:
         src: grid.no.comments.rsp
-        dest: /oracle/u01/gi/grid.rsp
-        mode: '0644'
-    - shell: "./gridSetup.sh -silent -responseFile /oracle/u01/gi/grid.rsp"
+        dest: /home/oracle/grid.rsp
+        mode: '0640'
+        owner: oracle
+
+    - name: "gridSetup.sh (part I)"
+      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
-        creates: "/oracle/u01/oraInventory"
+        creates: "/oracle/u01/oraInventory/oraInst.loc"
       ignore_errors: true
       register: grid_setup_out
     - debug: 
@@ -17,12 +20,13 @@
       when: grid_setup_out.rc >= 2
 
   rescue:
-    - debug:
-        msg: '"./gridSetup.sh failed'
     - name: delete response file
       file:
-        path: /oracle/u01/gi/grid.rsp
+        path: /home/oracle/grid.rsp
         state: absent
+
+    - fail:
+        msg: '"./gridSetup.sh failed'
 
   become: yes
   become_user: oracle

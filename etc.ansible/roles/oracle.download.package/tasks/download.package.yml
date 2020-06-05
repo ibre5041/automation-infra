@@ -8,6 +8,15 @@
         dest: /oracle/u01/
         mode: '0640'
 
+    - name: "ORACLE_HOME gi/db"
+      file:
+        path: "{{ oracle_home }}"
+        state: directory
+        owner: oracle
+        group: oinstall
+        recurse: yes
+        mode: '0755'
+
     - name: unzip install package {{ item }}
       unarchive:
         src: /oracle/u01/{{ item }}

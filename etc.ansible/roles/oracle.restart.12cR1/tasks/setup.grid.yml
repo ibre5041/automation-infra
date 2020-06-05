@@ -5,10 +5,10 @@
     - name: install grid.rsp
       template:
         src: grid.no.comments.rsp
-        dest: /oracle/u01/gi/grid.rsp
+        dest: /home/oracle/grid.rsp
         mode: '0644'
 
-    - shell: "./runInstaller -silent -responseFile /oracle/u01/gi/grid.rsp -ignoreSysPrereqs -waitforcompletion"
+    - shell: "./runInstaller -silent -responseFile /home/oracle/grid.rsp -ignoreSysPrereqs -waitforcompletion"
       args:
         chdir: "/home/oracle/grid/"
         creates: "/oracle/u01/oraInventory"
@@ -24,7 +24,7 @@
 
     - name: delete response file
       file:
-        path: /oracle/u01/gi/grid.rsp
+        path: /home/oracle/grid.rsp
         state: absent
 
     - name: delete install directory

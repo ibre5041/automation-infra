@@ -12,4 +12,4 @@ oracle_install_package_names: ["grid_home_2020-02-29_03-04-07PM.zip"]
 
 oracle_ver_path: "19.5.0.0"
 
-first_rac_node: "{{  ansible_play_batch[0] }}"
+first_rac_node: "{{ ansible_play_batch[0] }}"

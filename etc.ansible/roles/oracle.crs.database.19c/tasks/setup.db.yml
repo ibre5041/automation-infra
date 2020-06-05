@@ -1,11 +1,14 @@
 
 - name: DB Home Setup
   block:
-    # - name: install db.rsp
-    #   copy:
-    #     src: db.rsp
-    #     dest: /home/oracle/db.rsp
-    #     mode: '0644'
+    - name: install db.rsp
+      template:
+        src: db.no.comments.rsp
+        dest: /home/oracle/db.rsp
+        mode: '0640'
+        owner: oracle
+        group: oinstall
+
     - shell: "./runInstaller -responseFile /home/oracle/db.rsp -silent"
       args:
         chdir: "/oracle/u01/db/{{ oracle_ver_path }}"
@@ -19,27 +22,14 @@
         msg: "Return code is {{ db_setup_out.rc }}"
       when: db_setup_out.rc >= 0
 
-    # - name: "Goldem image fixups - missing dirs"
-    #   file:
-    #     path: "/oracle/u01/gi/12.2.0.1/{{item}}"
-    #     state: directory
-    #     recurse: yes
-    #   with_items: ["cdata", "cdata/localhost", "crs/init", "crs/log", "evm/init", "log", "log/crs", "racg/dump", "srvm/log"]
-
   rescue:
-    - debug:
+    - name: delete install db.rsp
+      file:
+        path: /home/oracle/db.rsp
+        state: absent
+
+    - fail:
         msg: './runInstaller failed'
-    # - name: delete install db.rsp
-    #   file:
-    #     path: /home/oracle/db.rsp
-    #     state: absent
 
   become: yes
   become_user: oracle
-
-- name: db root.sh
-  shell: "/oracle/u01/db/{{ oracle_ver_path }}/root.sh"
-  args:
-    chdir: "/"
-    creates: "/opt/ORCLfmap/prot1_64/bin/fmputl"
-  ignore_errors: true

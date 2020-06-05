@@ -4,5 +4,5 @@
   - base.host
   - base.oracle
   - oracle.crs.19c
-  - oracle.crs.database.19c
+#  - oracle.crs.database.19c
   - oracle.post.install

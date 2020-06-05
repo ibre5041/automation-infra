@@ -16,7 +16,7 @@
 
 - name: delete install grid.rsp
   file:
-    path: /oracle/u01/gi/grid.rsp
+    path: /home/oracle/grid.rsp
     state: absent
 
 - name: delete install directory

@@ -3,7 +3,7 @@
 
 - name: delete response file
   file:
-    path: /oracle/u01/gi/grid.rsp
+    path: /home/oracle/grid.rsp
     state: absent
 
 - name: check if ~oracle/.crsbuild exists
@@ -20,15 +20,6 @@
   template:
     src: ora_1_env.ASM
     dest: "/home/oracle/.ora_1_env"
-
-- name: "Gi fome"
-  file:
-    path: "/oracle/u01/gi/{{ oracle_ver_path }}"
-    state: directory
-    owner: oracle
-    group: oinstall
-    recurse: yes
-    mode: '0755'
 
 - name: wait for oracle-ohasd.service
   systemd:
@@ -55,10 +46,14 @@
 
 - name: check if Oracle CRS set up
   stat: 
-    path: /oracle/u01/oraInventory
+    path: /oracle/u01/oraInventory/ContentsXML
   register: crs_set_up
 
-- include: setup.grid.yml
+- debug:
+    msg: "Install oraInventory exists: {{ crs_set_up }} "
+
+- name: setup.grid.yml
+  include: setup.grid.yml
   when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"
   
 - name: orainstRoot.sh
@@ -88,41 +83,27 @@
 - debug:
     msg: "{{ oracle_asm_status }}"
 
-- name: "ASM test and fixups"
+- name: "Execute Config Tools gridSetup.sh (part II)"
   block:
-    - debug:
-        msg: "ASM not ONLINE"
-
     - name: Grid Setup ASM
-      shell: "./gridSetup.sh -executeConfigTools -responseFile /oracle/u01/gi/grid.rsp -silent"
+      shell: "./gridSetup.sh -executeConfigTools -responseFile /home/oracle/grid.rsp -silent"
       args:
         chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
+      ignore_errors: true
+      register: grid_setup_out2
+    - debug:
+        msg: "gridSetup.sh (part II) {{ grid_setup_out2 }}"
+      when: grid_setup_out2.rc >= 0
+    - debug:
+        msg: "Return code is {{ grid_setup_out2.rc }}"
+      when: grid_setup_out2.rc >= 0
+    - fail:
+        msg: "./gridSetup.sh -executeConfigTools failed"
+      when: grid_setup_out2.rc > 6
 
   become: yes
   become_user: oracle
   when: oracle_asm_status.stdout is not match(".*ONLINE")
-
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
-    owner: oracle
-    group: oinstall
-    mode: '6755'
-
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}
-    owner: root
-    group: oinstall
-    mode: '0755'
-
-# Not needed for 19c
-# - name: file perm fixup
-#   file:
-#     path: /oracle/u01/gi/{{ oracle_ver_path }}/cdata/localhost/{{ansible_hostname}}.olr
-#     owner: oracle
-#     group: oinstall
-#     mode: '0600'
 
 - name: file perm fixup
   file:
