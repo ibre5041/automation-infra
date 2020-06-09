@@ -1,4 +1,4 @@
-export ORACLE_SID={{ oracle_sid }}
+export ORACLE_SID={{ oracle_sid }}{{crs_node_index | default('') }}
 export CRS_HOME=/oracle/u01/db/{{ oracle_ver_path }}
 export ORACLE_BASE=/oracle/u01/base
 export ORACLE_HOME=/oracle/u01/db/{{ oracle_ver_path }}
