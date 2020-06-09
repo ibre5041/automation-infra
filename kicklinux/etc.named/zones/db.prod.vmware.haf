@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                 40     ; Serial
+                 41     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -14,6 +14,9 @@ ns1.prod.vmware.haf.          IN      CNAME  kicklinux.prod.vmware.haf.
 kicklinux.prod.vmware.haf.    IN      A      192.168.8.200
 
 ;
+gw.prod.vmware.haf.             IN A    192.168.8.1
+esxi-1.prod.vmware.haf.             IN A    192.168.8.2
+
 dhcp-192-168-8-10.prod.vmware.haf.  IN A    192.168.8.10
 dhcp-192-168-8-11.prod.vmware.haf.  IN A    192.168.8.11
 dhcp-192-168-8-12.prod.vmware.haf.  IN A    192.168.8.12
@@ -107,7 +110,6 @@ rhel7-rac-e-vip-3.prod.vmware.haf.  IN A 192.168.8.99
 dhcp-192-168-8-100.prod.vmware.haf. IN A    192.168.8.100
 dhcp-192-168-8-101.prod.vmware.haf. IN A    192.168.8.101
 dhcp-192-168-8-102.prod.vmware.haf. IN A    192.168.8.102
-esxi-1.prod.vmware.haf.             IN A    192.168.8.103
 dhcp-192-168-8-104.prod.vmware.haf. IN A    192.168.8.104
 
 rh110.prod.vmware.haf.       IN      A      192.168.8.110

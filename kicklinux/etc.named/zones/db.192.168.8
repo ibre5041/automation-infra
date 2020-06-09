@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     prod.vmware.haf. admin.prod.vmware.haf. (
-                             40         ; Serial
+                             41         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -9,6 +9,9 @@ $TTL    604800
     IN      NS      kicklinux.prod.vmware.haf.
 
 ; PTR Records
+1  IN      PTR     gw.prod.vmware.haf.     ;
+2  IN      PTR     esxi-1.prod.vmware.haf.     ;
+
 10 IN      PTR     dhcp-192-168-8-10.prod.vmware.haf.     ;
 11 IN      PTR     dhcp-192-168-8-11.prod.vmware.haf.     ;
 12 IN      PTR     dhcp-192-168-8-12.prod.vmware.haf.     ;
@@ -100,7 +103,6 @@ $TTL    604800
 100 IN      PTR     dhcp-192-168-8-100.prod.vmware.haf.     ;
 101 IN      PTR     dhcp-192-168-8-101.prod.vmware.haf.     ;
 102 IN      PTR     dhcp-192-168-8-102.prod.vmware.haf.     ;
-103 IN      PTR     esxi-1.prod.vmware.haf.     ;
 104 IN      PTR     dhcp-192-168-8-104.prod.vmware.haf.     ;
 
 110 IN      PTR     rh110.prod.vmware.haf.    ;
