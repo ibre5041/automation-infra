@@ -1,0 +1,49 @@
+
+- name: Create Database
+  block:
+
+    - name: Build a list of all ASM disks
+      set_fact:
+        init_undo_list: "{{ init_undo_list + [ {{ oracle_sid }} + '.undo_tablespace=UNDOTBS' + ( play_hosts.index(item) + 1 ) ] }}"
+      with_items: "{{ ansible_play_batch }}"
+
+      #crs_node_index: "{{play_hosts.index(inventory_hostname) + 1 }}"
+
+#     - name: install dbca.rsp
+#       template:
+#         src: dbca.no.comments.rsp
+#         dest: /home/oracle/dbca.rsp
+#         mode: '0640'
+#         owner: oracle
+#         group: oinstall
+
+#     - name: "Create database"
+#       shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
+#       args:
+#         chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
+#         creates: "/oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log"
+#       ignore_errors: true
+#       register: db_create_out
+#     - debug: 
+#         msg: "Return code is {{ db_create_out }}"
+#       when: db_create_out.rc >= 0
+#     - fail: 
+#         msg: "Return code is {{ db_create_out.rc }}"
+#       when: db_create_out.rc >= 0
+
+#   rescue:
+#     - name: delete install dbca.rsp
+#       file:
+#         path: /home/oracle/dbca.rsp
+#         state: absent
+
+#     - fail:
+#         msg: './dcba failed'
+
+#   become: yes
+#   become_user: oracle
+
+# - name: delete install dbca.rsp
+#   file:
+#     path: /home/oracle/dbca.rsp
+#     state: absent

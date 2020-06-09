@@ -3,10 +3,14 @@
 
 oracle_major_version: "19"
 
-oracle_install_package_names: ["LINUX.X64_193000_db_home.zip"]
+oracle_install_package_name: "LINUX.X64_193000_db_home.zip"
 
 oracle_ver_path: "19.3.0.0"
 
 oracle_sid: "TEST19C"
 
 oracle_home: "/oracle/u01/db/{{ oracle_ver_path }}"
+
+init_undo_list: []
+init_thread_list: []
+init_instance_list: []
