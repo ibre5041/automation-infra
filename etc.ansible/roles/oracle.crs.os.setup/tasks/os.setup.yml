@@ -1,4 +1,14 @@
 
+- name: "CRS prerequisities"
+  yum:
+    name: ntp
+
+- name: "Enable/start ntpd"
+  systemd:
+    name: ntpd
+    enabled: yes
+    state: started
+
 - name: Set authorized key took from file
   authorized_key:
     user: oracle

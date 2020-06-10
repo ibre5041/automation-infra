@@ -127,10 +127,28 @@
 - name: u01 directory
   file:
     path: /oracle/u01
-    owner: oracle
+    owner: root
     group: oinstall
     mode: '0775'
     state: directory
+
+- name: "ORACLE_HOME /oracle/u01/gi"
+  file:
+    path: "/oracle/u01/gi"
+    state: directory
+    owner: oracle
+    group: oinstall
+    recurse: yes
+    mode: '0775'
+
+- name: "ORACLE_HOME /oracle/u01/db"
+  file:
+    path: "/oracle/u01/db"
+    state: directory
+    owner: oracle
+    group: oinstall
+    recurse: yes
+    mode: '0775'
 
 - name: Limits
   copy:

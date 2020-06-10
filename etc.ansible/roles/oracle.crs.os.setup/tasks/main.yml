@@ -1,3 +1,4 @@
+
 ---
 # tasks file for oracle.crs.os.setup
 
@@ -9,6 +10,7 @@
 - set_fact:
     domain_name : "{{ domain.stdout_lines[0] }}"
 - debug: var=domain_name
+
 
 - name: Build crs node list
   set_fact:
@@ -23,3 +25,14 @@
     msg: "{{ crs_node_list|join(',') }}"
 
 
+- name: Build db node list
+  set_fact:
+    db_node_list : "{{ db_node_list + [ item ] }}"
+  with_items: "{{ ansible_play_batch }}"
+- name: dbnode list
+  debug:
+    var: db_node_list
+
+- name: DB node list
+  debug:
+    msg: "{{ db_node_list|join(',') }}"

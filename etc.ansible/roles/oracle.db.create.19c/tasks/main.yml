@@ -1,0 +1,13 @@
+---
+# tasks file for oracle.db.create.19c
+
+- name: check if database was created
+  stat:
+    path: /oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log
+  register: dcdba_log
+
+- debug:
+    msg: "Database exists: {{ dcdba_log.stat.exists }}"
+
+- include: create.database.yml
+  when: dcdba_log.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)

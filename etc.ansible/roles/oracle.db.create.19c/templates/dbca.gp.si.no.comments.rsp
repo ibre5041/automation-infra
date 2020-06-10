@@ -3,8 +3,8 @@ gdbName={{ oracle_sid }}
 sid={{ oracle_sid }}
 
 # 
-#databaseConfigType=SI
-databaseConfigType=RAC
+databaseConfigType=SI
+#databaseConfigType=RAC
 
 policyManaged=false
 createServerPool=false
@@ -14,7 +14,7 @@ numberOfPDBs=0
 useLocalUndoForPDBs=true
 
 # uncomment for RAC
-nodelist={{ db_node_list | default([]) | join(',') }}
+#nodelist={{ db_node_list | default([]) | join(',') }}
 
 templateName={{ oracle_home }}/assistants/dbca/templates/General_Purpose.dbc
 sysPassword={{ password }}

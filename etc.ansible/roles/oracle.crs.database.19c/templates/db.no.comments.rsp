@@ -11,7 +11,10 @@ oracle.install.db.OSDGDBA_GROUP=dba
 oracle.install.db.OSKMDBA_GROUP=dba
 oracle.install.db.OSRACDBA_GROUP=dba
 oracle.install.db.rootconfig.executeRootScript=false
-oracle.install.db.CLUSTER_NODES=rhel7-rac-b-node-1,rhel7-rac-b-node-2
+
+# Uncomment this line for CRS
+#oracle.install.db.CLUSTER_NODES={{ db_node_list | default([]) | join(',') }}
+
 oracle.install.db.config.starterdb.type=GENERAL_PURPOSE
 oracle.install.db.ConfigureAsContainerDB=false
 oracle.install.db.config.starterdb.memoryOption=false

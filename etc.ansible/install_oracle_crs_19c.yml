@@ -1,8 +1,10 @@
 ---
 - hosts: all
+  any_errors_fatal: true
   roles:
   - base.host
   - base.oracle
   - oracle.crs.19c
-#  - oracle.crs.database.19c
+  - oracle.db.home.19c
+  - oracle.db.create.19c
   - oracle.post.install

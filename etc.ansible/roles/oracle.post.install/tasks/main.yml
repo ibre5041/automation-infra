@@ -8,6 +8,14 @@
     owner: oracle
     group: oinstall
 
+- name: "DBA home"
+  file:
+    path: "/oracle/u01/db/DBA"
+    state: directory
+    owner: oracle
+    group: oinstall
+    mode: '0755'
+
 - name: Oracle profile
   yum:
     name=haf-oracle-profile,haf-oracle-rlwrap
@@ -29,12 +37,12 @@
     path: /home/oracle/database
     state: absent
 
-- name: delete install db.rsp
-  file:
-    path: /home/oracle/db.rsp
-    state: absent
-
-# - name: delete install dbca.rsp
+# - name: delete install db.rsp
 #   file:
-#     path: /home/oracle/dbca.rsp
+#     path: /home/oracle/db.rsp
 #     state: absent
+
+- name: delete install dbca.rsp
+  file:
+    path: /home/oracle/dbca.rsp
+    state: absent

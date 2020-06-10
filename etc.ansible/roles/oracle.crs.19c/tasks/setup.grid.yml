@@ -1,5 +1,5 @@
 
-- name: Grid Setup
+- name: "Grid Setup gridSetup.sh (part I)"
   block:
     - name: ACFS Centos path
       copy:
@@ -28,10 +28,13 @@
       register: grid_setup_out
     - debug: 
         msg: "gridSetup.sh (part I) {{ grid_setup_out }}"
-      when: grid_setup_out.rc >= 2
+      when: grid_setup_out.rc >= 0
     - debug: 
         msg: "Return code is {{ grid_setup_out.rc }}"
-      when: grid_setup_out.rc >= 2
+      when: grid_setup_out.rc >= 0
+    - fail:
+        msg: "./gridSetup.sh -executeConfigTools failed"
+      when: grid_setup_out.rc > 6
 
   rescue:
     - name: delete response file
@@ -44,4 +47,11 @@
 
   become: yes
   become_user: oracle
-  when: ansible_hostname == first_rac_node
+  # Condition to be set on caller level
+  # when: ansible_hostname == first_rac_node
+
+
+- name: delete install grid.rsp
+  file:
+    path: /home/oracle/grid.rsp
+    state: absent

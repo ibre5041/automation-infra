@@ -3,43 +3,6 @@
 - name: DB Home Setup
   block:
 
-    - name: DB init parameter undo_tablespace (RAC mode)
-      set_fact:
-        init_undo_list: "{{ init_undo_list + [ oracle_sid + ((play_hosts.index(item) + 1)|string) + '.undo_tablespace=UNDOTBS' + ((play_hosts.index(item) + 1)|string) ] }}"
-      with_items: "{{ ansible_play_batch }}"
-      when: first_rac_node is defined
-
-    - name: DB init parameter undo_tablespace (Standalone mode)
-      set_fact:
-        init_undo_list: "{{ [ oracle_sid + '.undo_tablespace=UNDOTBS1' ] }}"
-      when: first_rac_node is not defined
-
-    - name: Init Parameter undo_tablespace
-      debug:
-        msg: "{{ init_undo_list | join(',') }}"
-
-
-    - name: DB init parameter thread (RAC mode)
-      set_fact:
-        init_thread_list: "{{ init_thread_list + [ oracle_sid + ((play_hosts.index(item) + 1)|string) + '.thread=' + ((play_hosts.index(item) + 1)|string) ] }}"
-      with_items: "{{ ansible_play_batch }}"
-      when: first_rac_node is defined
-
-    - name: Init Parameter undo_tablespace
-      debug:
-        msg: "{{ init_thread_list | join(',') }}"
-
-
-    - name: DB init parameter instance_number (RAC mode)
-      set_fact:
-        init_instance_list: "{{ init_instance_list + [ oracle_sid + ((play_hosts.index(item) + 1)|string) + '.instance_number=' + ((play_hosts.index(item) + 1)|string) ] }}"
-      with_items: "{{ ansible_play_batch }}"
-      when: first_rac_node is defined
-
-    - name: Init Parameter undo_tablespace
-      debug:
-        msg: "{{ init_instance_list | join(',') }}"
-
     - name: install db.rsp
       template:
         src: db.no.comments.rsp
