@@ -45,7 +45,8 @@
   nodes: [rhel7-rac-e-node-1, rhel7-rac-e-node-2]
   disks:
     - disk:
-      size: 12
+      size: 16
       bus: 1
-      count: 4
+      count: 3
+
 

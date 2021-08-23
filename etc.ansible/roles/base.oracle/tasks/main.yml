@@ -109,7 +109,7 @@
   lvol:
     vg: vg01
     lv: u01
-    size: 20g
+    size: 80%VG
     shrink: no
 
 - name: Create /dev/vg01/u01

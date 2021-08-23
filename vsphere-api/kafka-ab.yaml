@@ -2,20 +2,17 @@
 # default machine definition
 - default:
   name: "Default"
-  ram: 16G
-  cpu: 2
+  ram: 6G
+  cpu: 1
   scsi:
     - adapter:
-        pciSlotNumber: 16
-    - adapter:
-        pciSlotNumber: 32
-
+        pciSlotNumber: 128
   disks:
     - disk: rootdg
-      size: 10g
+      size: 20g
       bus: 0
     - disk: appdg
-      size: 60g
+      size: 20g
       bus: 0
   network:
     - adapter:
@@ -26,25 +23,15 @@
         network: "Public Network"
   vmware:
     vm_folder: VmFolder
-    datastore: WD1T
+    datastore: Kingston890G
 
 
 - machine:
-  name: rhel7-rac-c-node-1
+  name: rhel7-a
   template: default
   network:
 
-
 - machine:
-  name: rhel7-rac-c-node-2
+  name: rhel7-b
   template: default
-
-
-- cluster:
-  name: rac-c
-  nodes: [rhel7-rac-c-node-1, rhel7-rac-c-node-2]
-  disks:
-    - disk:
-      size: 16
-      bus: 1
-      count: 3
+  network:

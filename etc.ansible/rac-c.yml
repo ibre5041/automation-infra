@@ -1,0 +1,10 @@
+all:
+  hosts:
+    rhel7-rac-c-node-1:
+      listener: rhel7-rac-c-lis-1
+    rhel7-rac-c-node-2:
+      listener: rhel7-rac-c-lis-2
+  vars:
+    scan: rhel7-rac-c-scan
+    password: Xb6a5ed2ff29f98d
+    cluster_name: rac-c

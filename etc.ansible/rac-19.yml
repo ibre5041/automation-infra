@@ -1,0 +1,12 @@
+all:
+  hosts:
+    rac19-node-1:
+      listener: rac19-lis-1
+    rac19-node-2:
+      listener: rac19-lis-2
+    rac19-node-3:
+      listener: rac19-lis-3
+  vars:
+    scan: rac19-scan
+    password: Xb6a5ed2ff29f98d
+    cluster_name: rac-19

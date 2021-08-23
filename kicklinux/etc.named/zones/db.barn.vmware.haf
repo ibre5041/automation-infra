@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     ns1.barn.vmware.haf. admin.barn.vmware.haf. (
-                 42     ; Serial
+                 44     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -74,8 +74,7 @@ rhel7-rac-e-vip-3.barn.vmware.haf.  IN A 10.0.0.99
 rac121-node-1.barn.vmware.haf.      IN A 10.0.0.150
 rac121-node-2.barn.vmware.haf.      IN A 10.0.0.151
 rac121-node-3.barn.vmware.haf.      IN A 10.0.0.152
-rac121-node-4.barn.vmware.haf.      IN A 10.0.0.153
-rac121-node-5.barn.vmware.haf.      IN A 10.0.0.154
+rac121-lis-3.barn.vmware.haf.      IN A 10.0.0.153
 rac121-scan.barn.vmware.haf.        IN A 10.0.0.155
 rac121-scan.barn.vmware.haf.        IN A 10.0.0.156
 rac121-scan.barn.vmware.haf.        IN A 10.0.0.157
@@ -85,8 +84,7 @@ rac121-lis-2.barn.vmware.haf.       IN A 10.0.0.159
 rac122-node-1.barn.vmware.haf.      IN A 10.0.0.160
 rac122-node-2.barn.vmware.haf.      IN A 10.0.0.161
 rac122-node-3.barn.vmware.haf.      IN A 10.0.0.162
-rac122-node-4.barn.vmware.haf.      IN A 10.0.0.163
-rac122-node-5.barn.vmware.haf.      IN A 10.0.0.164
+rac122-lis-3.barn.vmware.haf.      IN A 10.0.0.163
 rac122-scan.barn.vmware.haf.        IN A 10.0.0.165
 rac122-scan.barn.vmware.haf.        IN A 10.0.0.166
 rac122-scan.barn.vmware.haf.        IN A 10.0.0.167
@@ -96,8 +94,7 @@ rac122-lis-2.barn.vmware.haf.       IN A 10.0.0.169
 rac18-node-1.barn.vmware.haf.       IN A 10.0.0.170
 rac18-node-2.barn.vmware.haf.       IN A 10.0.0.171
 rac18-node-3.barn.vmware.haf.       IN A 10.0.0.172
-rac18-node-4.barn.vmware.haf.       IN A 10.0.0.173
-rac18-node-5.barn.vmware.haf.       IN A 10.0.0.174
+rac18-lis-3.barn.vmware.haf.       IN A 10.0.0.173
 rac18-scan.barn.vmware.haf.         IN A 10.0.0.175
 rac18-scan.barn.vmware.haf.         IN A 10.0.0.176
 rac18-scan.barn.vmware.haf.         IN A 10.0.0.177
@@ -107,8 +104,7 @@ rac18-lis-2.barn.vmware.haf.        IN A 10.0.0.179
 rac19-node-1.barn.vmware.haf.       IN A 10.0.0.180
 rac19-node-2.barn.vmware.haf.       IN A 10.0.0.181
 rac19-node-3.barn.vmware.haf.       IN A 10.0.0.182
-rac19-node-4.barn.vmware.haf.       IN A 10.0.0.183
-rac19-node-5.barn.vmware.haf.       IN A 10.0.0.184
+rac19-lis-3.barn.vmware.haf.       IN A 10.0.0.183
 rac19-scan.barn.vmware.haf.         IN A 10.0.0.185
 rac19-scan.barn.vmware.haf.         IN A 10.0.0.186
 rac19-scan.barn.vmware.haf.         IN A 10.0.0.187

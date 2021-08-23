@@ -26,7 +26,7 @@
         network: "Public Network"
   vmware:
     vm_folder: VmFolder
-    datastore: Kingston890G
+    datastore: WD1T
 
 
 - machine:
@@ -45,7 +45,6 @@
   nodes: [rhel7-rac-a-node-1, rhel7-rac-a-node-2]
   disks:
     - disk:
-      size: 16
+      size: 8
       bus: 1
-      count: 3
-
+      count: 4

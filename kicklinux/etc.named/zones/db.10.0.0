@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                             42         ; Serial
+                             44         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -67,8 +67,7 @@ $TTL    604800
 150 IN      PTR     rac121-node-1.barn.vmware.haf.   ;
 151 IN      PTR     rac121-node-2.barn.vmware.haf.   ;
 152 IN      PTR     rac121-node-3.barn.vmware.haf.   ;
-153 IN      PTR     rac121-node-4.barn.vmware.haf.   ;
-154 IN      PTR     rac121-node-5.barn.vmware.haf.   ;
+153 IN      PTR     rac121-lis-3.barn.vmware.haf.   ;
 155 IN      PTR     rac121-scan.barn.vmware.haf.     ;
 156 IN      PTR     rac121-scan.barn.vmware.haf.     ;
 157 IN      PTR     rac121-scan.barn.vmware.haf.     ;
@@ -78,8 +77,7 @@ $TTL    604800
 160 IN      PTR     rac122-node-1.barn.vmware.haf.   ;
 161 IN      PTR     rac122-node-2.barn.vmware.haf.   ;
 162 IN      PTR     rac122-node-3.barn.vmware.haf.   ;
-163 IN      PTR     rac122-node-4.barn.vmware.haf.   ;
-164 IN      PTR     rac122-node-5.barn.vmware.haf.   ;
+163 IN      PTR     rac122-lis-3.barn.vmware.haf.   ;
 165 IN      PTR     rac122-scan.barn.vmware.haf.     ;
 166 IN      PTR     rac122-scan.barn.vmware.haf.     ;
 167 IN      PTR     rac122-scan.barn.vmware.haf.     ;
@@ -89,8 +87,7 @@ $TTL    604800
 170 IN      PTR     rac18-node-1.barn.vmware.haf.    ;
 171 IN      PTR     rac18-node-2.barn.vmware.haf.    ;
 172 IN      PTR     rac18-node-3.barn.vmware.haf.    ;
-173 IN      PTR     rac18-node-4.barn.vmware.haf.    ;
-174 IN      PTR     rac18-node-5.barn.vmware.haf.    ;
+173 IN      PTR     rac18-lis-3.barn.vmware.haf.    ;
 175 IN      PTR     rac18-scan.barn.vmware.haf.      ;
 176 IN      PTR     rac18-scan.barn.vmware.haf.      ;
 177 IN      PTR     rac18-scan.barn.vmware.haf.      ;
@@ -100,8 +97,7 @@ $TTL    604800
 180 IN      PTR     rac19-node-1.barn.vmware.haf.    ;
 181 IN      PTR     rac19-node-2.barn.vmware.haf.    ;
 182 IN      PTR     rac19-node-3.barn.vmware.haf.    ;
-183 IN      PTR     rac19-node-4.barn.vmware.haf.    ;
-184 IN      PTR     rac19-node-5.barn.vmware.haf.    ;
+183 IN      PTR     rac19-lis-3.barn.vmware.haf.    ;
 185 IN      PTR     rac19-scan.barn.vmware.haf.      ;
 186 IN      PTR     rac19-scan.barn.vmware.haf.      ;
 187 IN      PTR     rac19-scan.barn.vmware.haf.      ;

@@ -14,7 +14,6 @@
 - include_role: 
     name: oracle.crs.os.setup
     public: yes
-  when: crsbuild_present.stat.exists != True
 
 - include_role:
     name: oracle.asm.disks
@@ -93,27 +92,9 @@
 - debug:
     msg: "{{ oracle_asm_status }}"
 
-- name: "Execute Config Tools gridSetup.sh (part II)"
-  block:
-    - name: Grid Setup ASM
-      shell: "./gridSetup.sh -executeConfigTools -responseFile /home/oracle/grid.rsp -silent"
-      args:
-        chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
-      ignore_errors: true
-      register: grid_setup_out2 
-    - debug: 
-        msg: "gridSetup.sh (part II) {{ grid_setup_out2 }}"
-      when: grid_setup_out2.rc >= 0
-    - debug: 
-        msg: "Return code is {{ grid_setup_out2.rc }}"
-      when: grid_setup_out2.rc >= 0
-    - fail:
-        msg: "./gridSetup.sh -executeConfigTools failed"
-      when: grid_setup_out2.rc > 6
-      
-  become: yes
-  become_user: oracle
-  when: ansible_hostname == first_rac_node and crsbuild_present.stat.exists != True
+- name: config.grid.yml
+  include: config.grid.yml
+  when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found" and ansible_hostname == first_rac_node
 
 - name: file perm fixup
   file:

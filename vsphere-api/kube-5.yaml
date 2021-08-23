@@ -2,7 +2,7 @@
 # default machine definition
 - default:
   name: "Default"
-  ram: 16G
+  ram: 12G
   cpu: 2
   scsi:
     - adapter:
@@ -15,7 +15,7 @@
       size: 10g
       bus: 0
     - disk: appdg
-      size: 60g
+      size: 50g
       bus: 0
   network:
     - adapter:
@@ -28,23 +28,23 @@
     vm_folder: VmFolder
     datastore: WD1T
 
-
 - machine:
-  name: rhel7-rac-c-node-1
-  template: default
-  network:
-
-
-- machine:
-  name: rhel7-rac-c-node-2
+  name: rhel7-a
   template: default
 
+- machine:
+  name: rhel7-b
+  template: default
 
-- cluster:
-  name: rac-c
-  nodes: [rhel7-rac-c-node-1, rhel7-rac-c-node-2]
-  disks:
-    - disk:
-      size: 16
-      bus: 1
-      count: 3
+- machine:
+  name: rhel7-c
+  template: default
+
+- machine:
+  name: rhel7-d
+  template: default
+
+- machine:
+  name: rhel7-e
+  template: default
+

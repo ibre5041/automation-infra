@@ -1,0 +1,11 @@
+all:
+  hosts:
+    rac121-node-1:
+      listener: rac121-lis-1
+    rac121-node-2:
+      listener: rac121-lis-2
+  vars:
+    scan: rac121-scan
+    password: Xb6a5ed2ff29f98d
+    cluster_name: rac-121
+
