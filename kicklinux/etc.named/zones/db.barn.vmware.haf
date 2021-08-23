@@ -71,6 +71,12 @@ rhel7-rac-e-vip-1.barn.vmware.haf.  IN A 10.0.0.97
 rhel7-rac-e-vip-2.barn.vmware.haf.  IN A 10.0.0.98
 rhel7-rac-e-vip-3.barn.vmware.haf.  IN A 10.0.0.99
 
+rhel8-a                      IN      A      10.0.0.141
+rhel8-b                      IN      A      10.0.0.142
+rhel8-c                      IN      A      10.0.0.143
+rhel8-d                      IN      A      10.0.0.144
+rhel8-e                      IN      A      10.0.0.145
+
 rac121-node-1.barn.vmware.haf.      IN A 10.0.0.150
 rac121-node-2.barn.vmware.haf.      IN A 10.0.0.151
 rac121-node-3.barn.vmware.haf.      IN A 10.0.0.152

@@ -215,7 +215,8 @@ if __name__ == "__main__":
 
     for machine in c.machines:
         #clone_vm(service_instance=si, machine=machine, template_name='RHEL7 Template')
-        clone_vm(service_instance=si, machine=machine, template_name='New Virtual Machine')
+        clone_vm(service_instance=si, machine=machine, template_name='RHEL8 Template')
+        #clone_vm(service_instance=si, machine=machine, template_name='New Virtual Machine')
         for disk in machine.disks:
             if disk['bus'] == 0:
                 continue

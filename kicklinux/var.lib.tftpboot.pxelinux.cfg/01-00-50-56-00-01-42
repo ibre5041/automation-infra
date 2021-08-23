@@ -1,13 +1,13 @@
 DEFAULT menu.c32
 PROMPT 0
 TIMEOUT 60
-ONTIMEOUT CentOS7
+ONTIMEOUT CentOS8
 
 MENU TITLE PXE Menu
 
 LABEL CentOS7
 KERNEL vmlinuz7
-APPEND initrd=initrd7.img inst.ks=http://10.0.0.200/centos/rhel7-a-ks.cfg id=dhcp
+APPEND initrd=initrd7.img inst.ks=http://10.0.0.200/centos/rhel7-ks.cfg id=dhcp
 
 LABEL CentOS8
 KERNEL vmlinuz8

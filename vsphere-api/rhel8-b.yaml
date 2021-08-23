@@ -1,0 +1,32 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 6G
+  cpu: 1
+  scsi:
+    - adapter:
+        pciSlotNumber: 128
+  disks:
+    - disk: rootdg
+      size: 20g
+      bus: 0
+    - disk: appdg
+      size: 20g
+      bus: 0
+  network:
+    - adapter:
+        pciSlotNumber: 192
+        network: "Management Network"
+    - adapter:
+        pciSlotNumber: 224
+        network: "Public Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+
+- machine:
+  name: rhel8-b
+  template: default
+  network:

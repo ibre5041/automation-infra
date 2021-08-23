@@ -9,6 +9,10 @@ LABEL CentOS7
 KERNEL vmlinuz7
 APPEND initrd=initrd7.img inst.ks=http://10.0.0.200/centos/rhel7-ks.cfg id=dhcp
 
+LABEL CentOS8
+KERNEL vmlinuz8
+APPEND initrd=initrd8.img inst.ks=http://10.0.0.200/centos/rhel8-ks.cfg id=dhcp
+
 #MENU seperator
 LABEL Local
 LOCALBOOT 0Here two things which you need to change

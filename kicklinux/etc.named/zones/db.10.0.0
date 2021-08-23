@@ -64,6 +64,12 @@ $TTL    604800
 98 IN      PTR     rhel7-rac-e-vip-2.barn.vmware.haf.   ; 10.0.0.98
 99 IN      PTR     rhel7-rac-e-vip-3.barn.vmware.haf.   ; 10.0.0.99
 
+141 IN      PTR     rhel8-a.barn.vmware.haf. ; 10.0.0.141
+142 IN      PTR     rhel8-b.barn.vmware.haf. ; 10.0.0.142
+143 IN      PTR     rhel8-c.barn.vmware.haf. ; 10.0.0.143
+144 IN      PTR     rhel8-d.barn.vmware.haf. ; 10.0.0.144
+145 IN      PTR     rhel8-e.barn.vmware.haf. ; 10.0.0.145
+
 150 IN      PTR     rac121-node-1.barn.vmware.haf.   ;
 151 IN      PTR     rac121-node-2.barn.vmware.haf.   ;
 152 IN      PTR     rac121-node-3.barn.vmware.haf.   ;
