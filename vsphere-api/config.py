@@ -75,6 +75,7 @@ class Machine:
         self.disks = []  # assume all disks are local, attached to 1st scsi adapter
         self.datastore = 'Datastore'
         self.folder = 'Datacenter'
+        self.template = 'RHEL7 Template'
 
     @classmethod
     def createFromDict(cls, dictionary, name=None):
@@ -96,6 +97,8 @@ class Machine:
     def _dictUpdate(instance, dictionary):
         if "name" in dictionary:
             instance.name = dictionary['name']
+        if "template" in dictionary:
+            instance.template = dictionary['template']
         if "ram" in dictionary:
             instance.ram = dictionary['ram']
         if "cpu" in dictionary:

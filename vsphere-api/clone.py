@@ -60,9 +60,10 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     clonespec.powerOn = False
     clonespec.location.pool = resource_pool
 
+    logging.debug("cloning template {template_name} into {hostname}...".format(hostname=machine.nameVSphere, template_name=template_name))
     task = template.Clone(folder=destfolder, name=machine.nameVSphere, spec=clonespec)
     utils.wait_for_tasks(service_instance, [task])
-    logging.debug("{hostname} crated as clone of {template_name}".format(hostname=machine.nameVSphere, template_name=template_name))
+    logging.debug("{hostname} created as clone of {template_name}".format(hostname=machine.nameVSphere, template_name=template_name))
 
     vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
     spec = vim.vm.ConfigSpec()
@@ -173,9 +174,25 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
                 task = vm.ReconfigVM_Task(spec=spec)
                 wait_for_tasks(service_instance, [task])
 
+    spec = vim.vm.ConfigSpec()
+    for dev in vm.config.hardware.device:
+        if hasattr(dev, 'macAddress'):
+            vm_slot_number = dev.slotInfo.pciSlotNumber
+            adapter = next(a for a in machine.netAdapters if a['pciSlotNumber'] == vm_slot_number)
+            net_adapter_spec = vim.vm.device.VirtualDeviceSpec()
+            net_adapter_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+            net_adapter_spec.device = dev
+            if adapter:
+                net_adapter_spec.device.macAddress = adapter['mac']
+                spec.deviceChange.append(net_adapter_spec)
+                logging.debug('Net Adapter PCI: {} assigning new MAC Address: {}'.format(vm_slot_number, dev.macAddress))
+
+    task = vm.ReconfigVM_Task(spec=spec)
+    wait_for_tasks(service_instance, [task])
+
     task = vm.PowerOn()
     wait_for_tasks(service_instance, [task])
-    logging.debug("{machine} booting.".format(machine=machine.nameVSphere))
+    logging.debug("{machine} booting...".format(machine=machine.nameVSphere))
 
 
 # Start program
