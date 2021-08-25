@@ -11,10 +11,11 @@ import humanfriendly
 from config import Config, VsCreadential
 
 import ssl
-
+import time
 import utils
 import socket
 from add_shared_disk import add_data_disk, add_shared_disk
+import requests
 
 
 def clone_vm(service_instance, machine, template_name, resource_pool=None):
@@ -194,6 +195,26 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     wait_for_tasks(service_instance, [task])
     logging.debug("{machine} booting...".format(machine=machine.nameVSphere))
 
+    for i in range(1,60):
+        time.sleep(1)
+        vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
+        _columns_four = "{0!s:<20} {1!s:<30} {2!s:<30} {3!s:<20}"
+        logging.debug(_columns_four.format(vm.name,
+                                        vm.guest.toolsRunningStatus,
+                                        vm.guest.toolsVersion,
+                                        vm.guest.toolsVersionStatus2))
+        if vm.guest.toolsRunningStatus == 'guestToolsRunning':
+            break
+
+    creds = vim.vm.guest.NamePasswordAuthentication(username='root', password='kolikmn')
+    pm = service_instance.content.guestOperationsManager.processManager
+    ps = vim.vm.guest.ProcessManager.ProgramSpec(programPath='/usr/bin/nmcli', arguments='con show  &> sample.txt')
+    res = pm.StartProgramInGuest(vm, creds, ps)
+
+    src = "/root/sample.txt"  # Server's directory
+    fti = content.guestOperationsManager.fileManager.InitiateFileTransferFromGuest(vm, creds, src)
+    resp = requests.get(fti.url, verify=False)
+    logging.debug("Content: {}".format(resp.content))
 
 # Start program
 if __name__ == "__main__":
