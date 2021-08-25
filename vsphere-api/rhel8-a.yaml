@@ -28,5 +28,5 @@
 
 - machine:
   name: rhel8-a
-  template: default
+  template: "RHEL8 Template"
   network:
