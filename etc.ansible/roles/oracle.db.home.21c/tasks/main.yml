@@ -1,0 +1,63 @@
+---
+# tasks file for oracledatabase 21c
+
+- name: "ORACLE_HOME parent /oracle/u01/db"
+  file:
+    path: "/oracle/u01/db"
+    state: directory
+    owner: oracle
+    group: oinstall
+    mode: '0775'
+
+- name: delete response file
+  file:
+    path: /home/oracle/db.rsp
+    state: absent
+
+- name: check if oracle home installed
+  stat:
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
+  register: oracle_home_installed
+
+- debug:
+    msg: "Oracle home installed: {{ oracle_home_installed.stat.exists }}"
+
+- name: "ora_2_env file"
+  template:
+    src: ora_2_env
+    dest: "/home/oracle/.ora_2_env"
+    owner: oracle
+    group: oinstall
+
+- name: check if install package exists
+  stat: 
+    path: /oracle/u01/db/{{ oracle_ver_path }}/bin
+  register: install_package
+  
+- debug:
+    msg: "Install package exists: {{ install_package.stat.exists }}"
+
+- name: Include Role oracle.download.package
+  include_role:
+    name: oracle.download.package
+  vars:
+    oracle_home: "/oracle/u01/db/{{ oracle_ver_path }}"
+  when: oracle_home_installed.stat.exists != True and install_package.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)
+
+- include: setup.db.yml
+  when: oracle_home_installed.stat.exists != True
+  when: oracle_home_installed.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)
+
+- name: "Check ownership of /oracle/u01/db/{{ oracle_ver_path }}/bin/oradism"
+  stat: 
+    path: "/oracle/u01/db/{{ oracle_ver_path }}/bin/oradism"
+  register: oradism_permissions
+
+- debug:
+    msg: "oradism {{ oradism_permissions.stat.uid }}"
+
+- name: db root.sh
+  shell: "/oracle/u01/db/{{ oracle_ver_path }}/root.sh"
+  args:
+    chdir: "/"
+  when: oradism_permissions.stat.uid != 0
