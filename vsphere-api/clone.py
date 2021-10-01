@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 from utils import *
@@ -16,6 +18,9 @@ import utils
 import socket
 from add_shared_disk import add_data_disk, add_shared_disk
 import requests
+
+import urllib3
+urllib3.disable_warnings()
 
 
 def clone_vm(service_instance, machine, template_name, resource_pool=None):
@@ -108,7 +113,7 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
 
     devices = []
     for i, scsi_adapter in enumerate(machine.scsiAdapters):
-        if i == 0:              # asseme 1st SCSI adapter is created, when clonning already created VM
+        if i == 0:              # assume 1st SCSI adapter is created, when clonning already created VM
             continue
         #
         scsi_ctr = vim.vm.device.VirtualDeviceSpec()
@@ -184,9 +189,18 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
             net_adapter_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             net_adapter_spec.device = dev
             if adapter:
+                net_adapter_spec.device.addressType = "generated"
                 net_adapter_spec.device.macAddress = adapter['mac']
+                net_adapter_spec.device.macAddress = None
                 spec.deviceChange.append(net_adapter_spec)
                 logging.debug('Net Adapter PCI: {} assigning new MAC Address: {}'.format(vm_slot_number, dev.macAddress))
+            try:    
+                net = get_obj(content, [vim.Network], adapter['network'])
+                net_adapter_spec.device.backing.network = net
+                net_adapter_spec.device.backing.deviceName = net.name
+                logging.debug('Net Adapter PCI: {} assigning new network: {}'.format(vm_slot_number, net.name))
+            except Exception as e:
+                logging.warn('Net Adapter PCI: {}'.format(str(e)))
 
     task = vm.ReconfigVM_Task(spec=spec)
     wait_for_tasks(service_instance, [task])
@@ -194,18 +208,20 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     task = vm.PowerOn()
     wait_for_tasks(service_instance, [task])
     logging.debug("{machine} booting...".format(machine=machine.nameVSphere))
+    logging.debug("Waiting for vmware tools...")
 
     for i in range(1,60):
         time.sleep(1)
         vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
-        _columns_four = "{0!s:<20} {1!s:<30} {2!s:<30} {3!s:<20}"
+        _columns_four = "{0!s:<20} {1!s:<20}/{3!s:<20} {2!s:<30}"
         logging.debug(_columns_four.format(vm.name,
                                         vm.guest.toolsRunningStatus,
-                                        vm.guest.toolsVersion,
-                                        vm.guest.toolsVersionStatus2))
+                                        vm.guest.toolsVersionStatus2,
+                                        vm.guest.toolsVersion))
         if vm.guest.toolsRunningStatus == 'guestToolsRunning':
             break
 
+    logging.debug("Executing mncli :")
     creds = vim.vm.guest.NamePasswordAuthentication(username='root', password='kolikmn')
     pm = service_instance.content.guestOperationsManager.processManager
     ps = vim.vm.guest.ProcessManager.ProgramSpec(programPath='/usr/bin/nmcli', arguments='con show  &> sample.txt')
@@ -249,12 +265,8 @@ if __name__ == "__main__":
 
     c.validate(content)
 
-    #sys.exit(0)
-
     for machine in c.machines:
-        #clone_vm(service_instance=si, machine=machine, template_name='RHEL7 Template')
-        clone_vm(service_instance=si, machine=machine, template_name='RHEL8 Template')
-        #clone_vm(service_instance=si, machine=machine, template_name='New Virtual Machine')
+        clone_vm(service_instance=si, machine=machine, template_name=(machine.template or 'RHEL8 Template'))
         for disk in machine.disks:
             if disk['bus'] == 0:
                 continue
