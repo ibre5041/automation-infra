@@ -23,12 +23,12 @@
         network: "Barn Network"
   vmware:
     vm_folder: VmFolder
-    datastore: WD1T
+    datastore: Kingston890G
 
 
 - machine:
   name: rhel7-c
-  template: default
+  template: "RHEL7 Template"
   network:
   scsi:
   # 2nd SCSI adapter for Oracle data

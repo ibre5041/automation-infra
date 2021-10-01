@@ -45,9 +45,14 @@
         init_cluster_database: "cluster_database=true"
       when: first_rac_node is defined
 
-    - name: Init Parameter undo_tablespace
+    - name: DB init parameter cluster_database (RAC mode)
+      set_fact:
+        init_cluster_database: "cluster_database=false"
+      when: first_rac_node is not defined
+
+    - name: Init Parameter cluster_database 
       debug:
-        msg: "{{ init_cluster_database }}"
+        msg: "init_cluster_database: {{ init_cluster_database }}"
 
     - name: install dbca.rsp
       template:

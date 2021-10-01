@@ -30,5 +30,5 @@
 
 - machine:
   name: rhel7-b
-  template: default
+  template: "RHEL7 Template"
   network:

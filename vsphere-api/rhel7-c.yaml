@@ -34,7 +34,7 @@
 
 - machine:
   name: rhel7-c
-  template: default
+  template: "RHEL7 Template"
 #  scsi:
   # 2nd SCSI adapter for Oracle data
 #    - adapter:

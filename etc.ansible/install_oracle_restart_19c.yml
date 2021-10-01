@@ -4,5 +4,6 @@
   - base.host
   - base.oracle
   - oracle.restart.19c
-  - oracle.database.19c
+  - oracle.db.home.19c
+  - oracle.db.create.19c
   - oracle.post.install

@@ -7,7 +7,10 @@ oracle_major_version: "19"
 # Base install package does not support
 #  oracle.install.crs.configureGIMR=true
 # While pathed Golden image does
-#oracle_install_package_name: "linuxx64_12201_grid_home.zip"
-oracle_install_package_names: ["LINUX.X64_193000_grid_home.zip"]
+oracle_install_package_name: "LINUX.X64_193000_grid_home.zip"
+#oracle_install_package_names: ["LINUX.X64_193000_grid_home.zip"]
 
 oracle_ver_path: "19.3.0.0"
+
+password: Xb6a5ed2ff29f98d
+cluster_name: c19

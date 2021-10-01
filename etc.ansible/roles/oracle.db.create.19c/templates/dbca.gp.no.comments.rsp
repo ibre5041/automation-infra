@@ -4,7 +4,7 @@ sid={{ oracle_sid }}
 
 # 
 #databaseConfigType=SI
-databaseConfigType=RAC
+databaseConfigType={{ 'RAC' if first_rac_node is defined else 'SINGLE' }}
 
 policyManaged=false
 createServerPool=false
