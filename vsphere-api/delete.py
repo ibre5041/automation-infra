@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 from utils import *
