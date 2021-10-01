@@ -54,8 +54,6 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     else:
         resource_pool = content.rootFolder.childEntity[0].hostFolder.childEntity[0].resourcePool
 
-
-
     # set relospec
     relospec = vim.vm.RelocateSpec()
     relospec.datastore = datastore
@@ -145,7 +143,7 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
 
     task = vm.ReconfigVM_Task(spec)
     utils.wait_for_tasks(service_instance, [task])
-    logging.debug("{machine} reconfigured.".format(machine=machine.nameVSphere))
+    logging.debug("{machine} reconfigured".format(machine=machine.nameVSphere))
 
     machine_disk_specs = machine.disks
     for dev in vm.config.hardware.device:
@@ -221,16 +219,38 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
         if vm.guest.toolsRunningStatus == 'guestToolsRunning':
             break
 
-    logging.debug("Executing mncli :")
+    logging.debug("Uploading mncli.sh:")
     creds = vim.vm.guest.NamePasswordAuthentication(username='root', password='kolikmn')
+    with open('nmcli.sh') as x:
+        f = x.read()
+        attrs = vim.vm.guest.FileManager.PosixFileAttributes(ownerId = 0, groupId = 0, permissions = 0o0700)
+        #src = "nmcli.sh"  # Server's directory
+        #fti = content.guestOperationsManager.fileManager.InitiateFileTransferToGuest(vm, creds, guestFilePath='/root/nmcli.sh', )
+        url = content.guestOperationsManager.fileManager.InitiateFileTransferToGuest(vm, creds, guestFilePath='/root/nmcli.sh', fileAttributes=attrs, fileSize=len(f), overwrite=True)
+        resp = requests.put(url, data=f, verify=False)
+
     pm = service_instance.content.guestOperationsManager.processManager
-    ps = vim.vm.guest.ProcessManager.ProgramSpec(programPath='/usr/bin/nmcli', arguments='con show  &> sample.txt')
+
+    ps = vim.vm.guest.ProcessManager.ProgramSpec(programPath='/root/nmcli.sh')
     res = pm.StartProgramInGuest(vm, creds, ps)
 
-    src = "/root/sample.txt"  # Server's directory
+    # Wait for command to finish:
+    for i in range(1,60):
+        process_info = pm.ListProcessesInGuest(vm, auth=creds, pids=[res])
+        time.sleep(1)
+        if process_info[0].endTime:
+            break
+    logging.debug("Command {} exited with code: {}".format(process_info[0].cmdLine, process_info[0].exitCode))
+
+    # Fetch command log
+    src = "/root/nmcli.log"  # Server's directory
     fti = content.guestOperationsManager.fileManager.InitiateFileTransferFromGuest(vm, creds, src)
     resp = requests.get(fti.url, verify=False)
-    logging.debug("Content: {}".format(resp.content))
+    logging.debug("Content of /root/nmcli.log:")
+    for line in resp.content.splitlines():
+        writemessage = "  " + line.decode('ascii')
+        logging.debug(writemessage)
+
 
 # Start program
 if __name__ == "__main__":
