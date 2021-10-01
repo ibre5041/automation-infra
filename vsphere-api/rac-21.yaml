@@ -1,0 +1,47 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 16G
+  cpu: 2
+  scsi:
+    - adapter:
+        pciSlotNumber: 16
+    - adapter:
+        pciSlotNumber: 32
+
+  disks:
+    - disk: rootdg
+      size: 10g
+      bus: 0
+    - disk: appdg
+      size: 60g
+      bus: 0
+  network:
+    - adapter:
+        pciSlotNumber: 192
+        network: "Barn Network"
+    - adapter:
+        pciSlotNumber: 224
+        network: "Barn Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+
+- machine:
+  name: rhel8-rac-e-node-1
+  template: "RHEL8 Template"
+
+- machine:
+  name: rhel8-rac-e-node-2
+  template: "RHEL8 Template"
+
+- cluster:
+  name: rac21
+  nodes: [rhel8-rac-e-node-1,rhel8-rac-e-node-2]
+  disks:
+    - disk:
+      size: 8
+      bus: 1
+      count: 4
