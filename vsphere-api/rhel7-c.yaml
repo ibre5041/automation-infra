@@ -20,13 +20,13 @@
     # https://kb.vmware.com/s/article/2047927
     # - adapter:
     #     pciSlotNumber: 192
-    #     network: "Management Network"
+    #     network: "Public Network"
     # - adapter:
     #     pciSlotNumber: 160
-    #     network: "Public Network"
+    #     network: "Barn Network"
     # - adapter:
     #     pciSlotNumber: 224
-    #     network: "Public Network"
+    #     network: "Barn Network"
   vmware:
     vm_folder: VmFolder
     datastore: Kingston890G

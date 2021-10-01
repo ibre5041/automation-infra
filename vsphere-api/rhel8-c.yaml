@@ -17,10 +17,10 @@
   network:
     - adapter:
         pciSlotNumber: 192
-        network: "Management Network"
+        network: "Public Network"
     - adapter:
         pciSlotNumber: 224
-        network: "Public Network"
+        network: "Barn Network"
   vmware:
     vm_folder: VmFolder
     datastore: Kingston890G
@@ -28,5 +28,5 @@
 
 - machine:
   name: rhel8-c
-  template: default
+  template: "RHEL8 Template"
   network:

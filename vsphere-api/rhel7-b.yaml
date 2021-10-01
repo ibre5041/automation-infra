@@ -18,11 +18,11 @@
       bus: 0
   network:
     - adapter:
-        pciSlotNumber: 128
-        network: "Management Network"
-    - adapter:
-        pciSlotNumber: 136
+        pciSlotNumber: 192
         network: "Public Network"
+    - adapter:
+        pciSlotNumber: 224
+        network: "Barn Network"
   vmware:
     vm_folder: VmFolder
     datastore: Kingston890G
