@@ -31,6 +31,8 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
         return
 
     template = get_obj(content, [vim.VirtualMachine], template_name)
+    if not template:
+        raise ValueError("Template not found: {}".format(template_name))
 
     datacenter = get_obj(content, [vim.Datacenter], 'Datacenter')
     if machine.folder:
