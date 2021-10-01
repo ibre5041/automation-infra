@@ -5,7 +5,9 @@
 
 first_rac_node: "{{ ansible_play_batch | sort() | first }}"
 
-crs_node_index: "{{play_hosts.index(inventory_hostname) + 1 }}"
+play_hosts_sorted: "{{ play_hosts | sort() }}"
+
+crs_node_index: "{{play_hosts_sorted.index(inventory_hostname) + 1 }}"
 
 crs_node_list: []
 db_node_list: []
