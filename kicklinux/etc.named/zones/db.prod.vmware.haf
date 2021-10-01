@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                 44     ; Serial
+                 51     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -17,9 +17,13 @@ kicklinux.prod.vmware.haf.    IN      A      192.168.8.200
 ;
 gw.prod.vmware.haf.                 IN A    192.168.8.1
 esxi-1.prod.vmware.haf.             IN A    192.168.8.2
-k8s.prod.vmware.haf.                IN A    192.168.8.3
-lb.prod.vmware.haf.                 IN A    192.168.8.3
-*.k8s.prod.vmware.haf.              IN A    192.168.8.3
+esxi-2.prod.vmware.haf.             IN A    192.168.8.3
+esxi-3.prod.vmware.haf.             IN A    192.168.8.4
+esxi-4.prod.vmware.haf.             IN A    192.168.8.5
+
+k8s.prod.vmware.haf.                IN A    192.168.8.6
+*.k8s.prod.vmware.haf.              IN A    192.168.8.6
+lb.prod.vmware.haf.              IN A    192.168.8.7
 
 dhcp-192-168-8-10.prod.vmware.haf.  IN A    192.168.8.10
 dhcp-192-168-8-11.prod.vmware.haf.  IN A    192.168.8.11
@@ -99,16 +103,16 @@ rhel7-rac-d-vip-1.prod.vmware.haf.  IN A 192.168.8.87
 rhel7-rac-d-vip-2.prod.vmware.haf.  IN A 192.168.8.88
 rhel7-rac-d-vip-3.prod.vmware.haf.  IN A 192.168.8.89
 
-rhel7-rac-e-node-1.prod.vmware.haf. IN A 192.168.8.90
-rhel7-rac-e-node-2.prod.vmware.haf. IN A 192.168.8.91
-rhel7-rac-e-lis-1.prod.vmware.haf.  IN A 192.168.8.92
-rhel7-rac-e-lis-2.prod.vmware.haf.  IN A 192.168.8.93
-rhel7-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.94
-rhel7-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.95
-rhel7-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.96
-rhel7-rac-e-vip-1.prod.vmware.haf.  IN A 192.168.8.97
-rhel7-rac-e-vip-2.prod.vmware.haf.  IN A 192.168.8.98
-rhel7-rac-e-vip-3.prod.vmware.haf.  IN A 192.168.8.99
+rhel8-rac-e-node-1.prod.vmware.haf. IN A 192.168.8.90
+rhel8-rac-e-node-2.prod.vmware.haf. IN A 192.168.8.91
+rhel8-rac-e-lis-1.prod.vmware.haf.  IN A 192.168.8.92
+rhel8-rac-e-lis-2.prod.vmware.haf.  IN A 192.168.8.93
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.94
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.95
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.96
+rhel8-rac-e-vip-1.prod.vmware.haf.  IN A 192.168.8.97
+rhel8-rac-e-vip-2.prod.vmware.haf.  IN A 192.168.8.98
+rhel8-rac-e-vip-3.prod.vmware.haf.  IN A 192.168.8.99
 
 ;
 dhcp-192-168-8-100.prod.vmware.haf. IN A    192.168.8.100
@@ -226,7 +230,7 @@ dock                         IN      A      192.168.8.227
 
 devel                        IN      A      192.168.8.230
 vcenter                      IN      A      192.168.8.231
-vm-pc-installer              IN      A      192.168.8.232
+vcenter7                     IN      A      192.168.8.232
 vm-lightwave                 IN      A      192.168.8.233
 vm-pc-1                      IN      A      192.168.8.234
 vm-lb-1                      IN      A      192.168.8.235

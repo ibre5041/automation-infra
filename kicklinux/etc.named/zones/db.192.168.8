@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     prod.vmware.haf. admin.prod.vmware.haf. (
-                             47         ; Serial
+                             51         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
@@ -11,6 +11,12 @@ $TTL    604800
 ; PTR Records
 1  IN      PTR     gw.prod.vmware.haf.     ;
 2  IN      PTR     esxi-1.prod.vmware.haf.     ;
+3  IN      PTR     esxi-2.prod.vmware.haf.     ;
+4  IN      PTR     esxi-3.prod.vmware.haf.     ;
+5  IN      PTR     esxi-4.prod.vmware.haf.     ;
+
+6  IN      PTR     k8s.prod.vmware.haf.        ;
+7  IN      PTR     lb.prod.vmware.haf.         ;
 
 10 IN      PTR     dhcp-192-168-8-10.prod.vmware.haf.     ;
 11 IN      PTR     dhcp-192-168-8-11.prod.vmware.haf.     ;
@@ -89,16 +95,16 @@ $TTL    604800
 88 IN      PTR     rhel7-rac-d-vip-2.prod.vmware.haf.   ; 192.168.8.88
 89 IN      PTR     rhel7-rac-d-vip-3.prod.vmware.haf.   ; 192.168.8.89
 
-90 IN      PTR     rhel7-rac-e-node-1.prod.vmware.haf.  ; 192.168.8.90
-91 IN      PTR     rhel7-rac-e-node-2.prod.vmware.haf.  ; 192.168.8.91
-92 IN      PTR     rhel7-rac-e-lis-1.prod.vmware.haf.   ; 192.168.8.92
-93 IN      PTR     rhel7-rac-e-lis-2.prod.vmware.haf.   ; 192.168.8.93
-94 IN      PTR     rhel7-rac-e-scan.prod.vmware.haf.    ; 192.168.8.94
-95 IN      PTR     rhel7-rac-e-scan.prod.vmware.haf.    ; 192.168.8.95
-96 IN      PTR     rhel7-rac-e-scan.prod.vmware.haf.    ; 192.168.8.96
-97 IN      PTR     rhel7-rac-e-vip-1.prod.vmware.haf.   ; 192.168.8.97
-98 IN      PTR     rhel7-rac-e-vip-2.prod.vmware.haf.   ; 192.168.8.98
-99 IN      PTR     rhel7-rac-e-vip-3.prod.vmware.haf.   ; 192.168.8.99
+90 IN      PTR     rhel8-rac-e-node-1.prod.vmware.haf.  ; 192.168.8.90
+91 IN      PTR     rhel8-rac-e-node-2.prod.vmware.haf.  ; 192.168.8.91
+92 IN      PTR     rhel8-rac-e-lis-1.prod.vmware.haf.   ; 192.168.8.92
+93 IN      PTR     rhel8-rac-e-lis-2.prod.vmware.haf.   ; 192.168.8.93
+94 IN      PTR     rhel8-rac-e-scan.prod.vmware.haf.    ; 192.168.8.94
+95 IN      PTR     rhel8-rac-e-scan.prod.vmware.haf.    ; 192.168.8.95
+96 IN      PTR     rhel8-rac-e-scan.prod.vmware.haf.    ; 192.168.8.96
+97 IN      PTR     rhel8-rac-e-vip-1.prod.vmware.haf.   ; 192.168.8.97
+98 IN      PTR     rhel8-rac-e-vip-2.prod.vmware.haf.   ; 192.168.8.98
+99 IN      PTR     rhel8-rac-e-vip-3.prod.vmware.haf.   ; 192.168.8.99
 
 100 IN      PTR     dhcp-192-168-8-100.prod.vmware.haf.     ;
 101 IN      PTR     dhcp-192-168-8-101.prod.vmware.haf.     ;
@@ -216,7 +222,7 @@ $TTL    604800
 
 230 IN      PTR     devel.prod.vmware.haf. ; 192.168.8.230
 231 IN      PTR     vcenter.prod.vmware.haf. ; 192.168.8.231
-232 IN      PTR     vm-pc-installer.prod.vmware.haf. ; 192.168.8.232
+232 IN      PTR     vcenter7.prod.vmware.haf. ; 192.168.8.232
 233 IN      PTR     vm-lightwave.prod.vmware.haf. ; 192.168.8.233
 234 IN      PTR     vm-pc-1.prod.vmware.haf. ; 192.168.8.234
 235 IN      PTR     vm-lb-1.prod.vmware.haf. ; 192.168.8.235

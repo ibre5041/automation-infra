@@ -1,12 +1,13 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                             44         ; Serial
+                             51         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ; name servers
     IN      NS      kicklinux.prod.vmware.haf.
+
 
 ; PTR Records
 50 IN      PTR     rhel7-rac-a-node-1.barn.vmware.haf.  ; 10.0.0.50
@@ -53,16 +54,16 @@ $TTL    604800
 88 IN      PTR     rhel7-rac-d-vip-2.barn.vmware.haf.   ; 10.0.0.88
 89 IN      PTR     rhel7-rac-d-vip-3.barn.vmware.haf.   ; 10.0.0.89
 
-90 IN      PTR     rhel7-rac-e-node-1.barn.vmware.haf.  ; 10.0.0.90
-91 IN      PTR     rhel7-rac-e-node-2.barn.vmware.haf.  ; 10.0.0.91
-92 IN      PTR     rhel7-rac-e-lis-1.barn.vmware.haf.   ; 10.0.0.92
-93 IN      PTR     rhel7-rac-e-lis-2.barn.vmware.haf.   ; 10.0.0.93
-94 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.94
-95 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.95
-96 IN      PTR     rhel7-rac-e-scan.barn.vmware.haf.    ; 10.0.0.96
-97 IN      PTR     rhel7-rac-e-vip-1.barn.vmware.haf.   ; 10.0.0.97
-98 IN      PTR     rhel7-rac-e-vip-2.barn.vmware.haf.   ; 10.0.0.98
-99 IN      PTR     rhel7-rac-e-vip-3.barn.vmware.haf.   ; 10.0.0.99
+90 IN      PTR     rhel8-rac-e-node-1.barn.vmware.haf.  ; 10.0.0.90
+91 IN      PTR     rhel8-rac-e-node-2.barn.vmware.haf.  ; 10.0.0.91
+92 IN      PTR     rhel8-rac-e-lis-1.barn.vmware.haf.   ; 10.0.0.92
+93 IN      PTR     rhel8-rac-e-lis-2.barn.vmware.haf.   ; 10.0.0.93
+94 IN      PTR     rhel8-rac-e-scan.barn.vmware.haf.    ; 10.0.0.94
+95 IN      PTR     rhel8-rac-e-scan.barn.vmware.haf.    ; 10.0.0.95
+96 IN      PTR     rhel8-rac-e-scan.barn.vmware.haf.    ; 10.0.0.96
+97 IN      PTR     rhel8-rac-e-vip-1.barn.vmware.haf.   ; 10.0.0.97
+98 IN      PTR     rhel8-rac-e-vip-2.barn.vmware.haf.   ; 10.0.0.98
+99 IN      PTR     rhel8-rac-e-vip-3.barn.vmware.haf.   ; 10.0.0.99
 
 141 IN      PTR     rhel8-a.barn.vmware.haf. ; 10.0.0.141
 142 IN      PTR     rhel8-b.barn.vmware.haf. ; 10.0.0.142

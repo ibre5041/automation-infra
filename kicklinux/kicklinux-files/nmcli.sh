@@ -14,16 +14,15 @@ if [ -n "${H}" ]; then
 fi
 
 if [ -n "${IP_P}" ]; then
-    #nmcli con del ens224
-    #nmcli con del ens192
-
     nmcli con delete `nmcli --fields UUID con show | grep -v UUID`
 
-    nmcli con add save yes con-name net-prod ifname ens224 type ethernet ip4 ${IP_P}/24 gw4 192.168.8.1
-    nmcli con add save yes con-name net-barn ifname ens192 type ethernet ip4 ${IP_B}/24
+    if [ -n "${IP_B}" ]; then
+	nmcli con add save yes con-name net-barn ifname ens224 type ethernet ip4 ${IP_B}/24
+	nmcli con mod net-barn connection.autoconnect yes
+    fi
 
+    nmcli con add save yes con-name net-prod ifname ens192 type ethernet ip4 ${IP_P}/24 gw4 192.168.8.1
     nmcli con mod net-prod connection.autoconnect yes
-    nmcli con mod net-barn connection.autoconnect yes
 
     if [ -n "${DNS}" ]; then
         nmcli con mod net-prod +ipv4.dns ${DNS}

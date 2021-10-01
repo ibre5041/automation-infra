@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     ns1.barn.vmware.haf. admin.barn.vmware.haf. (
-                 44     ; Serial
+                 51     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -14,6 +14,7 @@ ns1.barn.vmware.haf.          IN      CNAME  kicklinux.barn.vmware.haf.
 kicklinux.barn.vmware.haf.    IN      A      10.0.0.200
 
 ; 192.168.8.0/24 - A records
+
 
 ;
 rhel7-rac-a-node-1.barn.vmware.haf. IN A 10.0.0.50
@@ -60,16 +61,16 @@ rhel7-rac-d-vip-1.barn.vmware.haf.  IN A 10.0.0.87
 rhel7-rac-d-vip-2.barn.vmware.haf.  IN A 10.0.0.88
 rhel7-rac-d-vip-3.barn.vmware.haf.  IN A 10.0.0.89
 
-rhel7-rac-e-node-1.barn.vmware.haf. IN A 10.0.0.90
-rhel7-rac-e-node-2.barn.vmware.haf. IN A 10.0.0.91
-rhel7-rac-e-lis-1.barn.vmware.haf.  IN A 10.0.0.92
-rhel7-rac-e-lis-2.barn.vmware.haf.  IN A 10.0.0.93
-rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.94
-rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.95
-rhel7-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.96
-rhel7-rac-e-vip-1.barn.vmware.haf.  IN A 10.0.0.97
-rhel7-rac-e-vip-2.barn.vmware.haf.  IN A 10.0.0.98
-rhel7-rac-e-vip-3.barn.vmware.haf.  IN A 10.0.0.99
+rhel8-rac-e-node-1.barn.vmware.haf. IN A 10.0.0.90
+rhel8-rac-e-node-2.barn.vmware.haf. IN A 10.0.0.91
+rhel8-rac-e-lis-1.barn.vmware.haf.  IN A 10.0.0.92
+rhel8-rac-e-lis-2.barn.vmware.haf.  IN A 10.0.0.93
+rhel8-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.94
+rhel8-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.95
+rhel8-rac-e-scan.barn.vmware.haf.   IN A 10.0.0.96
+rhel8-rac-e-vip-1.barn.vmware.haf.  IN A 10.0.0.97
+rhel8-rac-e-vip-2.barn.vmware.haf.  IN A 10.0.0.98
+rhel8-rac-e-vip-3.barn.vmware.haf.  IN A 10.0.0.99
 
 rhel8-a                      IN      A      10.0.0.141
 rhel8-b                      IN      A      10.0.0.142
