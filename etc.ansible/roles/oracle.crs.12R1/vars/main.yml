@@ -1,0 +1,8 @@
+---
+# vars file for oraclerestart
+
+oracle_major_version: "12.1"
+
+oracle_install_package_names: ["linuxamd64_12102_grid_1of2.zip", "linuxamd64_12102_grid_2of2.zip"]
+
+oracle_ver_path: "12.1.0.2"

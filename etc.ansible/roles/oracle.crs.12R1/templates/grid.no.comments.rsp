@@ -1,0 +1,35 @@
+oracle.install.responseFileVersion=/oracle/install/rspfmt_crsinstall_response_schema_v12.1.0
+ORACLE_HOSTNAME=rhel7-rac-d-node-1.prod.vmware.haf
+INVENTORY_LOCATION=/oracle/u01/oraInventory
+SELECTED_LANGUAGES=en
+oracle.install.option=CRS_CONFIG
+ORACLE_BASE=/oracle/u01/base
+ORACLE_HOME=/oracle/u01/gi/{{ oracle_ver_path }}
+oracle.install.asm.OSDBA=asmdba
+oracle.install.asm.OSOPER=asmoper
+oracle.install.asm.OSASM=asmadmin
+oracle.install.crs.config.gpnp.scanName={{ scan + '.' + domain_name }}
+oracle.install.crs.config.gpnp.scanPort=1521
+oracle.install.crs.config.ClusterType=STANDARD
+oracle.install.crs.config.clusterName={{ cluster_name }}
+oracle.install.crs.config.gpnp.configureGNS=false
+oracle.install.crs.config.autoConfigureClusterNodeVIP=false
+oracle.install.crs.config.gpnp.gnsOption=CREATE_NEW_GNS
+oracle.install.crs.config.clusterNodes={{  crs_node_list|join(',') }}
+oracle.install.crs.config.networkInterfaceList=ens192:10.0.0.0:5,ens224:192.168.8.0:1
+oracle.install.crs.config.storageOption=FLEX_ASM_STORAGE
+oracle.install.crs.config.sharedFileSystemStorage.votingDiskRedundancy=NORMAL
+oracle.install.crs.config.sharedFileSystemStorage.ocrRedundancy=NORMAL               	
+oracle.install.crs.config.useIPMI=false
+oracle.install.asm.diskGroup.name=XDATA
+oracle.install.asm.diskGroup.redundancy=EXTERNAL
+oracle.install.asm.diskGroup.AUSize=1
+oracle.install.asm.diskGroup.disks={{ asm_disk_partitions|join(',') }}
+oracle.install.asm.diskGroup.diskDiscoveryString=/dev/asmshared*p1
+oracle.install.asm.monitorPassword={{ password }}
+oracle.install.asm.SYSASMPassword={{ password }}
+oracle.install.crs.config.ignoreDownNodes=false               	
+oracle.install.config.managementOption=NONE
+oracle.install.config.omsPort=0
+
+

@@ -1,0 +1,134 @@
+---
+# tasks file for oracle.crs.12R2
+
+- name: delete response file
+  file:
+    path: /home/oracle/grid.rsp
+    state: absent
+
+- name: check if ~oracle/.crsbuild exists
+  stat: 
+    path: /home/oracle/.crsbuild
+  register: crsbuild_present
+
+- include_role: 
+    name: oracle.crs.os.setup
+    public: yes
+  when: crsbuild_present.stat.exists != True
+
+- include_role:
+    name: oracle.asm.disks
+    public: yes
+  when: crsbuild_present.stat.exists != True
+
+- name: "ora_1_env file"
+  template:
+    src: ora_1_env.ASM
+    dest: "/home/oracle/.ora_1_env"
+
+- name: "Gi fome"
+  file:
+    path: "/oracle/u01/gi/{{ oracle_ver_path }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+    recurse: yes
+    mode: '0755'
+  when: ansible_hostname == first_rac_node
+
+- name: wait for oracle-ohasd.service
+  systemd:
+    name: oracle-ohasd.service
+  register: oracle_ohasd_service
+
+- debug:
+    msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
+
+- name: check if Oracle CRS unpacked
+  stat: 
+    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/
+  register: crs_unpacked
+  
+- debug:
+    msg: "Install package exists: {{ crs_unpacked.stat.exists }} on {{ first_rac_node }}"
+
+- name: Include Role oracle.download.package
+  include_role: 
+    name: oracle.download.package
+  vars:
+    oracle_home: /oracle/u01/gi/{{ oracle_ver_path }}
+  when: crs_unpacked.stat.exists != True and ansible_hostname == first_rac_node
+
+- name: check if Oracle CRS set up
+  stat: 
+    path: /oracle/u01/oraInventory/oraInst.loc
+  register: crs_set_up
+  when: ansible_hostname == first_rac_node
+
+- debug:
+    msg: "Install oraInventory exists: {{ crs_set_up }} "
+
+- name: Build crs node list
+  set_fact:
+    crs_node_list : "{{ crs_node_list | default('') }}{{ dns_hosts[item]['fqdn'] }}:{{ dns_hosts[item]['vip'] }},"
+  with_items: "{{ ansible_play_batch }}"
+- name: crs node list
+  debug:
+    var: crs_node_list
+
+- include: setup.grid.yml
+  when: ansible_hostname == first_rac_node and crs_set_up.stat.exists != True
+
+# - name: orainstRoot.sh
+#   shell: /oracle/u01/oraInventory/orainstRoot.sh
+#   args:
+#     creates: /etc/oraInst.loc
+
+# - name: root.sh (1st node)
+#   shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+#   when: ansible_hostname == first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
+
+# - name: root.sh (other nodes)
+#   shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+#   when: ansible_hostname != first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
+
+# - name: check if ORACLE_HOME/DBA exists
+#   stat: 
+#     path: /oracle/u01/gi/{{ oracle_ver_path }}/DBA
+#   register: dba_dir_present
+
+# - name: execute config tools
+#   block:
+#     - name: "gridSetup.sh (part II)"
+#       shell: "./gridSetup.sh -silent -executeConfigTools -responseFile /home/oracle/grid.phase.1.rsp"
+#       args:
+#         chdir:   "/oracle/u01/gi/{{ oracle_ver_path }}"
+#       ignore_errors: true
+#       register: grid_setup_out2      
+#     - debug: 
+#         msg: "gridSetup.sh (part II) {{ grid_setup_out2 }}"
+#       when: grid_setup_out2.rc >= 0
+#     - debug: 
+#         msg: "Return code is {{ grid_setup_out2.rc }}"
+#       when: grid_setup_out2.rc >= 0
+
+#     - name: Create ~oracle/.crsbuild
+#       copy: content="{{ ansible_date_time.iso8601 }}" dest="/home/oracle/.crsbuild"
+
+#   become: yes
+#   become_user: oracle
+#   when: ansible_hostname == first_rac_node and crsbuild_present.stat.exists != True
+
+# - name: Create ~oracle/.crsbuild
+#   block:
+#     - name: Create ~oracle/.crsbuild (2nd node)
+#       copy: content="{{ ansible_date_time.iso8601 }}" dest="/home/oracle/.crsbuild"
+#   become: yes
+#   become_user: oracle
+#   when: ansible_hostname != first_rac_node and crsbuild_present.stat.exists != True
+
+# - name: crsstat
+#   template:
+#     src: crsstat.py
+#     dest: "/oracle/u01/gi/{{ oracle_ver_path }}/bin/"
+#     mode: '0755'
