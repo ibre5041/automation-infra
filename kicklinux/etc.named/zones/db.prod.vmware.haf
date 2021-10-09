@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     kicklinux.prod.vmware.haf. admin.prod.vmware.haf. (
-                 51     ; Serial
+                 52     ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
@@ -23,7 +23,7 @@ esxi-4.prod.vmware.haf.             IN A    192.168.8.5
 
 k8s.prod.vmware.haf.                IN A    192.168.8.6
 *.k8s.prod.vmware.haf.              IN A    192.168.8.6
-lb.prod.vmware.haf.              IN A    192.168.8.7
+lb.prod.vmware.haf.                 IN A    192.168.8.7
 
 dhcp-192-168-8-10.prod.vmware.haf.  IN A    192.168.8.10
 dhcp-192-168-8-11.prod.vmware.haf.  IN A    192.168.8.11
@@ -70,6 +70,7 @@ rhel7-rac-a-vip-1.prod.vmware.haf.  IN A 192.168.8.57
 rhel7-rac-a-vip-2.prod.vmware.haf.  IN A 192.168.8.58
 rhel7-rac-a-vip-3.prod.vmware.haf.  IN A 192.168.8.59
 
+;
 rhel7-rac-b-node-1.prod.vmware.haf. IN A 192.168.8.60
 rhel7-rac-b-node-2.prod.vmware.haf. IN A 192.168.8.61
 rhel7-rac-b-lis-1.prod.vmware.haf.  IN A 192.168.8.62
@@ -81,6 +82,7 @@ rhel7-rac-b-vip-1.prod.vmware.haf.  IN A 192.168.8.67
 rhel7-rac-b-vip-2.prod.vmware.haf.  IN A 192.168.8.68
 rhel7-rac-b-vip-3.prod.vmware.haf.  IN A 192.168.8.69
 
+;
 rhel7-rac-c-node-1.prod.vmware.haf. IN A 192.168.8.70
 rhel7-rac-c-node-2.prod.vmware.haf. IN A 192.168.8.71
 rhel7-rac-c-lis-1.prod.vmware.haf.  IN A 192.168.8.72
@@ -92,6 +94,7 @@ rhel7-rac-c-vip-1.prod.vmware.haf.  IN A 192.168.8.77
 rhel7-rac-c-vip-2.prod.vmware.haf.  IN A 192.168.8.78
 rhel7-rac-c-vip-3.prod.vmware.haf.  IN A 192.168.8.79
 
+;
 rhel7-rac-d-node-1.prod.vmware.haf. IN A 192.168.8.80
 rhel7-rac-d-node-2.prod.vmware.haf. IN A 192.168.8.81
 rhel7-rac-d-lis-1.prod.vmware.haf.  IN A 192.168.8.82
@@ -103,6 +106,7 @@ rhel7-rac-d-vip-1.prod.vmware.haf.  IN A 192.168.8.87
 rhel7-rac-d-vip-2.prod.vmware.haf.  IN A 192.168.8.88
 rhel7-rac-d-vip-3.prod.vmware.haf.  IN A 192.168.8.89
 
+;
 rhel8-rac-e-node-1.prod.vmware.haf. IN A 192.168.8.90
 rhel8-rac-e-node-2.prod.vmware.haf. IN A 192.168.8.91
 rhel8-rac-e-lis-1.prod.vmware.haf.  IN A 192.168.8.92
@@ -115,11 +119,6 @@ rhel8-rac-e-vip-2.prod.vmware.haf.  IN A 192.168.8.98
 rhel8-rac-e-vip-3.prod.vmware.haf.  IN A 192.168.8.99
 
 ;
-dhcp-192-168-8-100.prod.vmware.haf. IN A    192.168.8.100
-dhcp-192-168-8-101.prod.vmware.haf. IN A    192.168.8.101
-dhcp-192-168-8-102.prod.vmware.haf. IN A    192.168.8.102
-dhcp-192-168-8-104.prod.vmware.haf. IN A    192.168.8.104
-
 rh110.prod.vmware.haf.       IN      A      192.168.8.110
 rh111.prod.vmware.haf.       IN      A      192.168.8.111
 rh112.prod.vmware.haf.       IN      A      192.168.8.112
@@ -197,6 +196,16 @@ rac19-scan.prod.vmware.haf.           IN      A      192.168.8.186
 rac19-scan.prod.vmware.haf.           IN      A      192.168.8.187
 rac19-lis-1.prod.vmware.haf.          IN      A      192.168.8.188
 rac19-lis-2.prod.vmware.haf.          IN      A      192.168.8.189
+
+rac21-node-1.prod.vmware.haf.         IN      A      192.168.8.190
+rac21-node-2.prod.vmware.haf.         IN      A      192.168.8.191
+rac21-node-3.prod.vmware.haf.         IN      A      192.168.8.192
+rac21-lis-3.prod.vmware.haf.          IN      A      192.168.8.193
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.195
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.196
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.197
+rac21-lis-1.prod.vmware.haf.          IN      A      192.168.8.198
+rac21-lis-2.prod.vmware.haf.          IN      A      192.168.8.199
 
 rac1.prod.vmware.haf.        IN      A      192.168.8.201
 rac2.prod.vmware.haf.        IN      A      192.168.8.202
