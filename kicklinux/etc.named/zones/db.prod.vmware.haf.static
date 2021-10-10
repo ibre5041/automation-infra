@@ -1,0 +1,200 @@
+
+
+gw.prod.vmware.haf.                 IN A    192.168.8.1
+esxi-1.prod.vmware.haf.             IN A    192.168.8.2
+esxi-2.prod.vmware.haf.             IN A    192.168.8.3
+esxi-3.prod.vmware.haf.             IN A    192.168.8.4
+esxi-4.prod.vmware.haf.             IN A    192.168.8.5
+
+k8s.prod.vmware.haf.                IN A    192.168.8.6
+*.k8s.prod.vmware.haf.              IN A    192.168.8.6
+lb.prod.vmware.haf.                 IN A    192.168.8.7
+
+dhcp-192-168-8-10.prod.vmware.haf.  IN A    192.168.8.10
+dhcp-192-168-8-11.prod.vmware.haf.  IN A    192.168.8.11
+dhcp-192-168-8-12.prod.vmware.haf.  IN A    192.168.8.12
+dhcp-192-168-8-13.prod.vmware.haf.  IN A    192.168.8.13
+dhcp-192-168-8-14.prod.vmware.haf.  IN A    192.168.8.14
+dhcp-192-168-8-15.prod.vmware.haf.  IN A    192.168.8.15
+dhcp-192-168-8-16.prod.vmware.haf.  IN A    192.168.8.16
+dhcp-192-168-8-17.prod.vmware.haf.  IN A    192.168.8.17
+dhcp-192-168-8-18.prod.vmware.haf.  IN A    192.168.8.18
+dhcp-192-168-8-19.prod.vmware.haf.  IN A    192.168.8.19
+
+dhcp-192-168-8-20.prod.vmware.haf.  IN A    192.168.8.20
+dhcp-192-168-8-21.prod.vmware.haf.  IN A    192.168.8.21
+dhcp-192-168-8-22.prod.vmware.haf.  IN A    192.168.8.22
+dhcp-192-168-8-23.prod.vmware.haf.  IN A    192.168.8.23
+dhcp-192-168-8-24.prod.vmware.haf.  IN A    192.168.8.24
+dhcp-192-168-8-25.prod.vmware.haf.  IN A    192.168.8.25
+dhcp-192-168-8-26.prod.vmware.haf.  IN A    192.168.8.26
+dhcp-192-168-8-27.prod.vmware.haf.  IN A    192.168.8.27
+dhcp-192-168-8-28.prod.vmware.haf.  IN A    192.168.8.28
+dhcp-192-168-8-29.prod.vmware.haf.  IN A    192.168.8.29
+
+dhcp-192-168-8-30.prod.vmware.haf.  IN A    192.168.8.30
+dhcp-192-168-8-31.prod.vmware.haf.  IN A    192.168.8.31
+dhcp-192-168-8-32.prod.vmware.haf.  IN A    192.168.8.32
+dhcp-192-168-8-33.prod.vmware.haf.  IN A    192.168.8.33
+dhcp-192-168-8-34.prod.vmware.haf.  IN A    192.168.8.34
+dhcp-192-168-8-35.prod.vmware.haf.  IN A    192.168.8.35
+dhcp-192-168-8-36.prod.vmware.haf.  IN A    192.168.8.36
+dhcp-192-168-8-37.prod.vmware.haf.  IN A    192.168.8.37
+dhcp-192-168-8-38.prod.vmware.haf.  IN A    192.168.8.38
+dhcp-192-168-8-39.prod.vmware.haf.  IN A    192.168.8.39
+;
+rhel7-rac-a-node-1.prod.vmware.haf. IN A 192.168.8.50
+rhel7-rac-a-node-2.prod.vmware.haf. IN A 192.168.8.51
+rhel7-rac-a-lis-1.prod.vmware.haf.  IN A 192.168.8.52
+rhel7-rac-a-lis-2.prod.vmware.haf.  IN A 192.168.8.53
+rhel7-rac-a-scan.prod.vmware.haf.   IN A 192.168.8.54
+rhel7-rac-a-scan.prod.vmware.haf.   IN A 192.168.8.55
+rhel7-rac-a-scan.prod.vmware.haf.   IN A 192.168.8.56
+rhel7-rac-a-vip-1.prod.vmware.haf.  IN A 192.168.8.57
+rhel7-rac-a-vip-2.prod.vmware.haf.  IN A 192.168.8.58
+rhel7-rac-a-vip-3.prod.vmware.haf.  IN A 192.168.8.59
+;
+rhel7-rac-b-node-1.prod.vmware.haf. IN A 192.168.8.60
+rhel7-rac-b-node-2.prod.vmware.haf. IN A 192.168.8.61
+rhel7-rac-b-lis-1.prod.vmware.haf.  IN A 192.168.8.62
+rhel7-rac-b-lis-2.prod.vmware.haf.  IN A 192.168.8.63
+rhel7-rac-b-scan.prod.vmware.haf.   IN A 192.168.8.64
+rhel7-rac-b-scan.prod.vmware.haf.   IN A 192.168.8.65
+rhel7-rac-b-scan.prod.vmware.haf.   IN A 192.168.8.66
+rhel7-rac-b-vip-1.prod.vmware.haf.  IN A 192.168.8.67
+rhel7-rac-b-vip-2.prod.vmware.haf.  IN A 192.168.8.68
+rhel7-rac-b-vip-3.prod.vmware.haf.  IN A 192.168.8.69
+;
+rhel7-rac-c-node-1.prod.vmware.haf. IN A 192.168.8.70
+rhel7-rac-c-node-2.prod.vmware.haf. IN A 192.168.8.71
+rhel7-rac-c-lis-1.prod.vmware.haf.  IN A 192.168.8.72
+rhel7-rac-c-lis-2.prod.vmware.haf.  IN A 192.168.8.73
+rhel7-rac-c-scan.prod.vmware.haf.   IN A 192.168.8.74
+rhel7-rac-c-scan.prod.vmware.haf.   IN A 192.168.8.75
+rhel7-rac-c-scan.prod.vmware.haf.   IN A 192.168.8.76
+rhel7-rac-c-vip-1.prod.vmware.haf.  IN A 192.168.8.77
+rhel7-rac-c-vip-2.prod.vmware.haf.  IN A 192.168.8.78
+rhel7-rac-c-vip-3.prod.vmware.haf.  IN A 192.168.8.79
+;
+rhel7-rac-d-node-1.prod.vmware.haf. IN A 192.168.8.80
+rhel7-rac-d-node-2.prod.vmware.haf. IN A 192.168.8.81
+rhel7-rac-d-lis-1.prod.vmware.haf.  IN A 192.168.8.82
+rhel7-rac-d-lis-2.prod.vmware.haf.  IN A 192.168.8.83
+rhel7-rac-d-scan.prod.vmware.haf.   IN A 192.168.8.84
+rhel7-rac-d-scan.prod.vmware.haf.   IN A 192.168.8.85
+rhel7-rac-d-scan.prod.vmware.haf.   IN A 192.168.8.86
+rhel7-rac-d-vip-1.prod.vmware.haf.  IN A 192.168.8.87
+rhel7-rac-d-vip-2.prod.vmware.haf.  IN A 192.168.8.88
+rhel7-rac-d-vip-3.prod.vmware.haf.  IN A 192.168.8.89
+;
+rhel8-rac-e-node-1.prod.vmware.haf. IN A 192.168.8.90
+rhel8-rac-e-node-2.prod.vmware.haf. IN A 192.168.8.91
+rhel8-rac-e-lis-1.prod.vmware.haf.  IN A 192.168.8.92
+rhel8-rac-e-lis-2.prod.vmware.haf.  IN A 192.168.8.93
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.94
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.95
+rhel8-rac-e-scan.prod.vmware.haf.   IN A 192.168.8.96
+rhel8-rac-e-vip-1.prod.vmware.haf.  IN A 192.168.8.97
+rhel8-rac-e-vip-2.prod.vmware.haf.  IN A 192.168.8.98
+rhel8-rac-e-vip-3.prod.vmware.haf.  IN A 192.168.8.99
+;
+rac121-node-1.prod.vmware.haf.        IN      A      192.168.8.150
+rac121-node-2.prod.vmware.haf.        IN      A      192.168.8.151
+rac121-node-3.prod.vmware.haf.        IN      A      192.168.8.152
+rac121-lis-3.prod.vmware.haf.         IN      A      192.168.8.153
+rac121-scan.prod.vmware.haf.          IN      A      192.168.8.155
+rac121-scan.prod.vmware.haf.          IN      A      192.168.8.156
+rac121-scan.prod.vmware.haf.          IN      A      192.168.8.157
+rac121-lis-1.prod.vmware.haf.         IN      A      192.168.8.158
+rac121-lis-2.prod.vmware.haf.         IN      A      192.168.8.159
+;
+rac122-node-1.prod.vmware.haf.        IN      A      192.168.8.160
+rac122-node-2.prod.vmware.haf.        IN      A      192.168.8.161
+rac122-node-3.prod.vmware.haf.        IN      A      192.168.8.162
+rac122-lis-3.prod.vmware.haf.         IN      A      192.168.8.163
+rac122-scan.prod.vmware.haf.          IN      A      192.168.8.165
+rac122-scan.prod.vmware.haf.          IN      A      192.168.8.166
+rac122-scan.prod.vmware.haf.          IN      A      192.168.8.167
+rac122-lis-1.prod.vmware.haf.         IN      A      192.168.8.168
+rac122-lis-2.prod.vmware.haf.         IN      A      192.168.8.169
+;
+rac18-node-1.prod.vmware.haf.         IN      A      192.168.8.170
+rac18-node-2.prod.vmware.haf.         IN      A      192.168.8.171
+rac18-node-3.prod.vmware.haf.         IN      A      192.168.8.172
+rac18-lis-3.prod.vmware.haf.          IN      A      192.168.8.173
+rac18-scan.prod.vmware.haf.           IN      A      192.168.8.175
+rac18-scan.prod.vmware.haf.           IN      A      192.168.8.176
+rac18-scan.prod.vmware.haf.           IN      A      192.168.8.177
+rac18-lis-1.prod.vmware.haf.          IN      A      192.168.8.178
+rac18-lis-2.prod.vmware.haf.          IN      A      192.168.8.179
+;
+rac19-node-1.prod.vmware.haf.         IN      A      192.168.8.180
+rac19-node-2.prod.vmware.haf.         IN      A      192.168.8.181
+rac19-node-3.prod.vmware.haf.         IN      A      192.168.8.182
+rac19-lis-3.prod.vmware.haf.          IN      A      192.168.8.183
+rac19-scan.prod.vmware.haf.           IN      A      192.168.8.185
+rac19-scan.prod.vmware.haf.           IN      A      192.168.8.186
+rac19-scan.prod.vmware.haf.           IN      A      192.168.8.187
+rac19-lis-1.prod.vmware.haf.          IN      A      192.168.8.188
+rac19-lis-2.prod.vmware.haf.          IN      A      192.168.8.189
+;
+rac21-node-1.prod.vmware.haf.         IN      A      192.168.8.190
+rac21-node-2.prod.vmware.haf.         IN      A      192.168.8.191
+rac21-node-3.prod.vmware.haf.         IN      A      192.168.8.192
+rac21-lis-3.prod.vmware.haf.          IN      A      192.168.8.193
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.195
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.196
+rac21-scan.prod.vmware.haf.           IN      A      192.168.8.197
+rac21-lis-1.prod.vmware.haf.          IN      A      192.168.8.198
+rac21-lis-2.prod.vmware.haf.          IN      A      192.168.8.199
+
+rac1.prod.vmware.haf.        IN      A      192.168.8.201
+rac2.prod.vmware.haf.        IN      A      192.168.8.202
+pxe1.prod.vmware.haf.        IN      A      192.168.8.203
+pxe2.prod.vmware.haf.        IN      A      192.168.8.204
+gentoo.prod.vmware.haf.      IN      A      192.168.8.205
+dg.prod.vmware.haf.          IN      A      192.168.8.206
+kube-ext-ip.prod.vmware.haf. IN      A      192.168.8.207
+
+rac-cluster-scan             IN      A      192.168.8.208
+rac-cluster-scan             IN      A      192.168.8.209
+rac-cluster-scan             IN      A      192.168.8.210
+rac1-listener                IN      A      192.168.8.211
+rac2-listener                IN      A      192.168.8.212
+
+rhel7-template               IN      A      192.168.8.219
+
+rhel7-ora-a                  IN      A      192.168.8.213
+rhel7-ora-b                  IN      A      192.168.8.214
+rhel7-ora-c                  IN      A      192.168.8.215
+rhel7-ora-d                  IN      A      192.168.8.216
+rhel7-ora-e                  IN      A      192.168.8.217
+
+ceph1                        IN      A      192.168.8.221
+ceph2                        IN      A      192.168.8.222
+ceph3                        IN      A      192.168.8.223
+ceph4                        IN      A      192.168.8.224
+ceph5                        IN      A      192.168.8.225
+ceph6                        IN      A      192.168.8.226
+dock                         IN      A      192.168.8.227
+
+devel                        IN      A      192.168.8.230
+vcenter                      IN      A      192.168.8.231
+vcenter7                     IN      A      192.168.8.232
+vm-lightwave                 IN      A      192.168.8.233
+vm-pc-1                      IN      A      192.168.8.234
+vm-lb-1                      IN      A      192.168.8.235
+vro                          IN      A      192.168.8.236
+vra                          IN      A      192.168.8.237
+win7                         IN      A      192.168.8.238
+win2008                      IN      A      192.168.8.239
+
+rhel5                        IN      A      192.168.8.240
+rhel6                        IN      A      192.168.8.241
+rhel7                        IN      A      192.168.8.242
+
+rhel7-a                      IN      A      192.168.8.250
+rhel7-b                      IN      A      192.168.8.251
+rhel7-c                      IN      A      192.168.8.252
+rhel7-d                      IN      A      192.168.8.253
+rhel7-e                      IN      A      192.168.8.254
