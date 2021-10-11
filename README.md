@@ -22,7 +22,7 @@ vsphere-api directory:
  - delete.py, decomm VM
 
 # VM's HW definition
-- Oracle node has 2x NIC adapter(prod + barn/interconnect), 2x SCSI adapter( OS/APP DG + DATA disks)
+- Oracle node has 2x NIC adapters(prod + barn/interconnect), 2x SCSI adapter( OS/APP DG + DATA disks)
 
 
 .yaml config file:
