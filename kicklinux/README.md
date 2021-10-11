@@ -4,8 +4,8 @@ kicklinux is management jump-host VM (IP: 192.168.8.200, 10.0.0.200)
 
 ESXi inner config configurations
 
- - 192.168.8.0/24 is home local network managed by home DHCP (pciNumber:192, virtual eth adapter:ens192) "Public Network"
- - 10.0.0.0/24 is internal ESXi network managed by DHCP running on kicklinux machine(pciNumber:224, virtual eth adapter:ens224) "Barn Network". This one it not routed
+ - `192.168.8.0/24` is home local network managed by home DHCP (pciNumber:192, virtual eth adapter:ens192) "Public Network"
+ - `10.0.0.0/24` is internal ESXi network managed by DHCP running on kicklinux machine(pciNumber:224, virtual eth adapter:ens224) "Barn Network". This one it not routed
 
 Kickstart Linux VM configuration:
  - DHCP
@@ -112,8 +112,31 @@ Kickstart Linux VM configuration:
     -rw-r--r--. 2 root root 4052 Oct 20  2019 rhel7-b-ks.cfg
     -rw-r--r--. 2 root root 3441 Jul 20  2019 rhel7-ceph1-ks.cfg
 
- - HTTP
+ - HTTP is used for:
+ 
+   - anaconda-ks/kickstart unattended Linux installation
+   - yum repository
+   - HTTP source of binaries used by ansible 
+ 
+ HTTP config managed via this git repository:
+ 
+     [root@kicklinux conf]# pwd
+     /etc/httpd/conf
+     [root@kicklinux conf]# ls -l httpd.conf
+     lrwxrwxrwx. 1 root root 58 Oct 20  2019 httpd.conf -> /root/automation-infra/kicklinux/etc.httpd.conf.httpd.conf
+
  - DNS
+
+Bind resolves IPs in both VLANs. Also supports DDNS, so when a new VM is provisioned is is also registered in DNS.
+
+DNS config managed via this git repository:
+
+    [root@kicklinux etc]# pwd
+    /etc
+    [root@kicklinux etc]# ls -l /etc/named.conf /etc/named
+    lrwxrwxrwx. 1 root root 42 Oct 20  2019 /etc/named -> /root/automation-infra/kicklinux/etc.named
+    lrwxrwxrwx. 1 root root 47 Oct 20  2019 /etc/named.conf -> /root/automation-infra/kicklinux/etc.named.conf
+
  - Nexus (.rpm, Maven proxy)
  - ... etc
  
