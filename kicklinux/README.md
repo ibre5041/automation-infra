@@ -1,5 +1,6 @@
 # kicklinux
 This directory simply contains mine home-lab configurations.
+kicklinux is management jump-host VM (IP: 192.168.8.200, 10.0.0.200)
 
 ESXi inner config configurations
 
