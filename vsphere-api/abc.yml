@@ -1,0 +1,69 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 6G
+  cpu: 1
+  scsi:
+    - adapter:
+        pciSlotNumber: 32
+    - adapter:
+        pciSlotNumber: 128
+  disks:
+    - disk: rootdg
+      size: 20g
+      bus: 0
+    - disk: appdg
+      size: 20g
+      bus: 0
+  # network:
+  #   - adapter:
+  #       pciSlotNumber: 192
+  #       network: "Public Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: Kingston890G
+
+# Just create VM having 4 IPs, and then delete it:
+# ./clone.py -f abc.yml
+#
+# [root@kicklinux vsphere-api]# dig a-vip.prod.vmware.haf
+# ; <<>> DiG 9.11.4-P2-RedHat-9.11.4-9.P2.el7 <<>> a-vip.prod.vmware.haf
+# ;; global options: +cmd
+# ;; Got answer:
+# ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 9108
+# ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 3, AUTHORITY: 1, ADDITIONAL: 2
+#
+# ;; OPT PSEUDOSECTION:
+# ; EDNS: version: 0, flags:; udp: 4096
+# ;; QUESTION SECTION:
+# ;a-vip.prod.vmware.haf.         IN      A
+#
+# ;; ANSWER SECTION:
+# a-vip.prod.vmware.haf.  300     IN      A       192.168.8.104
+# a-vip.prod.vmware.haf.  300     IN      A       192.168.8.105
+# a-vip.prod.vmware.haf.  300     IN      A       192.168.8.106
+#
+# ./delete.py -f abc.yml
+#
+
+- machine:
+  name: abc
+  template: "RHEL7 Template"
+  addresses:
+    abc: 192.168.8.100
+
+- cluster:
+  name: rac19c
+  nodes: [abc]
+  # disks:
+  #   - disk:
+  #     size: 8
+  #     bus: 1
+  #     count: 4
+  addresses:
+    a-1: 192.168.8.101
+    a-2: 192.168.8.102 
+    a-3: 192.168.8.103 
+    a-vip: [192.168.8.104, 192.168.8.105, 192.168.8.106]
+
