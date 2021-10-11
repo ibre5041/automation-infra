@@ -95,6 +95,23 @@ Kickstart Linux VM configuration:
     LABEL Local
     LOCALBOOT 0Here two things which you need to change
  
+ Sub-directory images contains anaconda/kickstart config files, plus Centos base OS installation media.
+ But those are served over HTTP.
+ 
+    [root@kicklinux tftpboot]# ls -l images/
+    total 8
+    drwxr-xr-x. 5 root root 4096 Aug 23 22:06 centos
+    -rw-------. 1 root root 1387 Jul  2  2017 ks-rhel7.cfg
+    [root@kicklinux tftpboot]# ls -l images/centos/
+    total 108
+    drwxr-xr-x. 3 root root   20 Jul  2  2017 6
+    drwxr-xr-x. 3 root root   20 Jun 16  2019 7
+    drwxr-xr-x. 3 root root   20 Aug 23 15:55 8
+    -rw-r--r--. 2 root root 2053 Jul  2  2017 rhel6-ks.cfg
+    -rw-r--r--. 2 root root 4051 Jan 25  2020 rhel7-a-ks.cfg
+    -rw-r--r--. 2 root root 4052 Oct 20  2019 rhel7-b-ks.cfg
+    -rw-r--r--. 2 root root 3441 Jul 20  2019 rhel7-ceph1-ks.cfg
+
  - HTTP
  - DNS
  - Nexus (.rpm, Maven proxy)
