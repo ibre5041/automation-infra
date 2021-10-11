@@ -9,6 +9,10 @@ import sys
 import logging
 import argparse
 
+import dns.update
+import dns.query
+import dns.tsigkeyring
+
 from config import Config, Machine, VsCreadential
 
 import ssl
@@ -37,6 +41,36 @@ def delete_vm(service_instance, machine):
     task = vm.Destroy_Task()
     wait_for_tasks(service_instance, [task])
     logging.debug("{machine} destroyed.".format(machine=machine.nameVSphere))
+
+
+def dns_for_vm(machine):
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+
+    logging.debug("DNS records:")
+    for arecord in machine.addresses:        
+        logging.debug(" {} ({})".format(arecord, machine.addresses[arecord]))        
+        update = dns.update.Update(zone='prod.vmware.haf'
+                                   , keyname='dynamic.vmware.haf.'
+                                   , keyring=keyring
+                                   , keyalgorithm=dns.tsig.HMAC_SHA512)
+
+        ip = machine.addresses[arecord]
+        if isinstance(ip, list):
+            for i in ip:
+                update.delete(i, 'A')
+                response = dns.query.tcp(update, '192.168.8.200')
+                logging.debug(" A   DNS update response: {}".format(response.rcode()))
+        else:
+            update.delete(arecord, 'A')
+            response = dns.query.tcp(update, '192.168.8.200')
+            logging.debug(" A   DNS update response: {}".format(response.rcode()))
+
+            update.delete(arecord, 'TXT')
+            response = dns.query.tcp(update, '192.168.8.200')
+            logging.debug(" TXT DNS update response: {}".format(response.rcode()))
+
 
 # Start program
 if __name__ == "__main__":
@@ -69,4 +103,6 @@ if __name__ == "__main__":
 
     for machine in c.machines:
         delete_vm(service_instance=si, machine=machine)
+        dns_for_vm(machine)
+        dns_for_vm(c.cluster)
 

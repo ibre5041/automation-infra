@@ -19,6 +19,10 @@ import socket
 from add_shared_disk import add_data_disk, add_shared_disk
 import requests
 
+import dns.update
+import dns.query
+import dns.tsigkeyring
+
 import urllib3
 urllib3.disable_warnings()
 
@@ -93,7 +97,10 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     opt.value = '192.168.8.200'
     spec.extraConfig.append(opt)
 
-    prod_ip = socket.gethostbyname("{host}.prod.vmware.haf".format(host=machine.name))
+    try:
+        prod_ip = socket.gethostbyname("{host}.prod.vmware.haf".format(host=machine.name))
+    except:
+        prod_ip = machine.address[machine.name]
     opt = vim.option.OptionValue()
     opt.key = 'guestinfo.prod_ip'
     opt.value = prod_ip
@@ -184,7 +191,12 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
     for dev in vm.config.hardware.device:
         if hasattr(dev, 'macAddress'):
             vm_slot_number = dev.slotInfo.pciSlotNumber
-            adapter = next(a for a in machine.netAdapters if a['pciSlotNumber'] == vm_slot_number)
+            try:
+                adapter = next(a for a in machine.netAdapters if a['pciSlotNumber'] == vm_slot_number)
+            except StopIteration:
+                logging.debug("vm_slot_number: {}".format(vm_slot_number))
+                logging.debug("netAdapters: {}".format(machine.netAdapters))
+                adapter = None
             net_adapter_spec = vim.vm.device.VirtualDeviceSpec()
             net_adapter_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             net_adapter_spec.device = dev
@@ -193,7 +205,7 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
                 net_adapter_spec.device.macAddress = adapter['mac']
                 net_adapter_spec.device.macAddress = None
                 spec.deviceChange.append(net_adapter_spec)
-                logging.debug('Net Adapter PCI: {} assigning new MAC Address: {}'.format(vm_slot_number, dev.macAddress))
+                logging.debug('Net Adapter PCI: {} assigning new MAC Address: {}'.format(vm_slot_number, net_adapter_spec.device.addressType))
             try:    
                 net = get_obj(content, [vim.Network], adapter['network'])
                 net_adapter_spec.device.backing.network = net
@@ -254,6 +266,33 @@ def clone_vm(service_instance, machine, template_name, resource_pool=None):
         logging.debug(writemessage)
 
 
+def dns_for_vm(machine):
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+
+    logging.debug("DNS records:")
+    for arecord in machine.addresses:        
+        logging.debug(" {} ({})".format(arecord, machine.addresses[arecord]))        
+        update = dns.update.Update(zone='prod.vmware.haf'
+                                   , keyname='dynamic.vmware.haf.'
+                                   , keyring=keyring
+                                   , keyalgorithm=dns.tsig.HMAC_SHA512)
+
+        ip = machine.addresses[arecord]
+        if isinstance(ip, list):
+            for i in ip:
+                update.add(arecord, 300, 'A', i)
+                response = dns.query.tcp(update, '192.168.8.200')
+                logging.debug(" A   DNS update response: {}".format(response.rcode()))
+        else:
+            update.replace(arecord, 300, 'A', ip)
+            response = dns.query.tcp(update, '192.168.8.200')
+            logging.debug(" A   DNS update response: {}".format(response.rcode()))
+            logging.debug(type(response))
+            logging.debug(response.answer)
+
+
 # Start program
 if __name__ == "__main__":
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -288,6 +327,7 @@ if __name__ == "__main__":
     c.validate(content)
 
     for machine in c.machines:
+        dns_for_vm(machine)
         clone_vm(service_instance=si, machine=machine, template_name=(machine.template or 'RHEL8 Template'))
         for disk in machine.disks:
             if disk['bus'] == 0:
@@ -295,4 +335,5 @@ if __name__ == "__main__":
             add_data_disk(service_instance=si, machine=machine, disk=disk)
 
     if c.cluster:
+        dns_for_vm(c.cluster)
         add_shared_disk(service_instance=si, config=c)

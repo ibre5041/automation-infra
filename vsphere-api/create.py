@@ -179,6 +179,7 @@ if __name__ == "__main__":
     #sys.exit(0)
 
     for machine in c.machines:
+        dns_for_vm(machine)
         create_vm(service_instance=si, machine=machine)
 
     #for disk in c.cl

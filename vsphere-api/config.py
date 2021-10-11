@@ -48,6 +48,7 @@ class Cluster:
         self.datastore = 'Datastore'
         self.disks = []
         self.nodes = []
+        self.addresses = dict()
 
     @classmethod
     def createFromDict(cls, dictionary):
@@ -59,6 +60,11 @@ class Cluster:
         if 'nodes' in dictionary:
             for node in dictionary['nodes']:
                 retval.nodes.append(str(node))
+
+        if 'addresses' in dictionary and dictionary['addresses'] and isinstance(dictionary['addresses'], dict):
+            a = dictionary['addresses']
+            for name in a:
+                retval.addresses[name] = a[name]
 
         if retval.nodes:
             logging.debug('Cluster nodes: {nodes}'.format(nodes=str(retval.nodes)))
@@ -76,6 +82,7 @@ class Machine:
         self.datastore = 'Datastore'
         self.folder = 'Datacenter'
         self.template = 'RHEL7 Template'
+        self.addresses = dict()
 
     @classmethod
     def createFromDict(cls, dictionary, name=None):
@@ -119,6 +126,12 @@ class Machine:
             for adapter in dictionary['network']:
                 instance.netAdapters.append(adapter['adapter'])
 
+        if "addresses" in dictionary and dictionary['addresses'] and isinstance(dictionary['addresses'], dict):
+            a = dictionary['addresses']
+            for name in a:
+                instance.addresses[name] = a[name]
+
+
     def _sanitize(self):
         self.ramVSphere = self.ram
         self.nameVSphere = self.name
@@ -138,7 +151,10 @@ class Machine:
                 disk['scsiUnit'] = ( i if i < 7 else i+1)  # exclude num 7, reserved for SCSI Adapter
         self.pathVSphere = '[{datastore}] {vmname}/'.format(datastore=self.datastore, vmname=self.nameVSphere)
         #
-        ip = socket.gethostbyname(self.name)
+        try:
+            ip = socket.gethostbyname(self.name)
+        except:
+            ip = self.addresses[self.name]
         if ip:
             # machine id is the last byte of IP
             vmwareMACBase = "00:50:56:{:02d}:{:02d}:{:02d}"
@@ -236,7 +252,9 @@ if __name__ == "__main__":
     c = VsCreadential.load()
 
     # parse yaml file
-    cfg = Config.createFromYAML("rac-a.yaml")
+    ##cfg = Config.createFromYAML("rac-a.yaml")
 
     # parse yaml file
-    cfg = Config.createFromYAML("rac-a.yaml")
+    ##cfg = Config.createFromYAML("rac-a.yaml")
+
+    cfg = Config.createFromYAML("rac-19.yaml")
