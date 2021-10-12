@@ -1,18 +1,18 @@
 all:
   hosts:
-    rac122-a-node-1:
-      address: 192.168.8.60
-      listener: rac122-a-lis-1
-    rac122-a-node-2:
-      address: 192.168.8.61
-      listener: rac122-a-lis-1
+    rac21-a-node-1:
+      address: 192.168.8.90
+      listener: rac21-a-lis-1
+    rac21-a-node-2:
+      address: 192.168.8.91
+      listener: rac21-a-lis-2
   children:
     oracle:
       hosts:
-        rac122-a-node-1:
-        rac122-a-node-2:
+        rac21-a-node-1:
+        rac21-a-node-2:
       vars:
-        oracle-release: 122c
+        oracle-release: 21c
   vars:
     scsi:
     - adapter:
@@ -41,16 +41,16 @@ all:
       datastore: WD1T
 
     cluster:
-      clustername: rac122c-a
+      clustername: rac21c-a
       disks:
         - disk:
             size: 8
             bus: 1
             count: 4
       addresses:
-        rac122-a-lis-1: 192.168.8.63
-        rac122-a-lis-2: 192.168.8.64
-        rac122-a-scan: [192.168.8.67, 192.168.8.68, 192.168.8.69]
-
-    scan: rac122-a-scan
+        rac21-a-lis-1: 192.168.8.93
+        rac21-a-lis-2: 192.168.8.94
+        rac21-a-scan: [192.168.8.97, 192.168.8.98, 192.168.8.99]
+    
+    scan: rac21-a-scan
     password: Xb6a5ed2ff29f98d
