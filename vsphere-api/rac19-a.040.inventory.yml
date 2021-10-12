@@ -1,0 +1,51 @@
+all:
+  hosts:
+    rac19-a-node-1:
+      address: 192.168.8.40
+    rac19-a-node-2:
+      address: 192.168.8.41
+  children:
+    oracle:
+      hosts:
+        rac19-a-node-1:
+        rac19-a-node-2:
+      vars:
+        oracle-release: 19c
+  vars:
+    scsi:
+    - adapter:
+        pciSlotNumber: 16
+    - adapter:
+        pciSlotNumber: 32
+    disks:
+    - disk: rootdg
+      size: 10g
+      bus: 0
+    - disk: appdg
+      size: 60g
+      bus: 0
+    network:
+    - adapter:
+      pciSlotNumber: 192
+      network: "Public Network"
+    - adapter:
+      pciSlotNumber: 224
+      network: "Barn Network"      
+    ram: 4G
+    cpu: 2
+
+    vmware:
+      vm_folder: VmFolder
+      datastore: WD1T
+
+    cluster:
+      clustername: rac19c-a
+      disks:
+        - disk:
+            size: 8
+            bus: 1
+            count: 4
+      addresses:
+        rac19-a-lis-1: 192.168.8.43
+        rac19-a-lis-2: 192.168.8.44
+        rac19-a-scan: [192.168.8.47, 192.168.8.48, 192.168.8.49]
