@@ -1,0 +1,59 @@
+
+# default machine definition
+- default:
+  name: "Default"
+  ram: 12G
+  cpu: 2
+  scsi:
+    - adapter:
+        pciSlotNumber: 16
+    - adapter:
+        pciSlotNumber: 32
+
+  disks:
+    - disk: rootdg
+      size: 10g
+      bus: 0
+    - disk: appdg
+      size: 50g
+      bus: 0
+  network:
+    - adapter:
+        pciSlotNumber: 192
+        network: "Public Network"
+    - adapter:
+        pciSlotNumber: 224
+        network: "Barn Network"
+  vmware:
+    vm_folder: VmFolder
+    datastore: WD1T
+
+- machine:
+  name: kube-1
+  template: "RHEL7 Template"
+  addresses:
+    kube-1: 192.168.8.111
+
+- machine:
+  name: kube-2
+  template: "RHEL7 Template"
+  addresses:
+    kube-2: 192.168.8.112
+
+- machine:
+  name: kube-3
+  template: "RHEL7 Template"
+  addresses:
+    kube-3: 192.168.8.113
+
+- machine:
+  name: kube-4
+  template: "RHEL7 Template"
+  addresses:
+    kube-4: 192.168.8.114
+
+- machine:
+  name: kube-5
+  template: "RHEL7 Template"
+  addresses:
+    kube-5: 192.168.8.115
