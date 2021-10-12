@@ -26,26 +26,30 @@
         network: "Barn Network"
   vmware:
     vm_folder: VmFolder
-    datastore: Kingston890G
+    datastore: WD1T
 
 
 - machine:
-  name: rhel7-rac-b-node-1
-  template: default
-  network:
-
+  name: rac121-node-1
+  template: "RHEL7 Template"
+  addresses:
+    rac121-node-1: 192.168.8.60
 
 - machine:
-  name: rhel7-rac-b-node-2
-  template: default
-
+  name: rac121-node-2
+  template: "RHEL7 Template"
+  addresses:
+    rac121-node-2: 192.168.8.61
 
 - cluster:
-  name: rac-a
-  nodes: [rhel7-rac-b-node-1, rhel7-rac-b-node-2]
+  name: rac121c-a
+  nodes: [rac121-a-node-1,rac121-a-node-2]
   disks:
     - disk:
-      size: 16
+      size: 8
       bus: 1
-      count: 3
-
+      count: 4
+  addresses:
+    rac121-a-lis-1: 192.168.8.63
+    rac121-a-lis-2: 192.168.8.64
+    rac121-a-scan: [192.168.8.67, 192.168.8.68, 192.168.8.69]

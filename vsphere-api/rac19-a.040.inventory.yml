@@ -31,7 +31,7 @@ all:
     - adapter:
       pciSlotNumber: 224
       network: "Barn Network"      
-    ram: 4G
+    ram: 16G
     cpu: 2
 
     vmware:

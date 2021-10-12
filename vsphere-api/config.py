@@ -266,7 +266,7 @@ class Config:
         # Load Ansible inventory, use ansible's mechanism to merge variable from diffent levels
         loader = DataLoader()
         # Sources can be a single path or comma separated paths
-        inventory = InventoryManager(loader=loader, sources='rac-19.inventory.yml')
+        inventory = InventoryManager(loader=loader, sources=inventory_file)
         variable_manager = VariableManager(loader=loader, inventory=inventory)
         
         for host in inventory.hosts:
@@ -357,5 +357,5 @@ if __name__ == "__main__":
 
     #cfg = Config.createFromYAML("rac-19.yaml")
     
-    cfg = Config.createFromInventory("rac-19.inventory.yml")
+    cfg = Config.createFromInventory("rac19-a.040.inventory.yml")
 

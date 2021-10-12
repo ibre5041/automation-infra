@@ -1,5 +1,7 @@
 
 # default machine definition
+# original config format
+# see identical ansible format: rac19-a.040.inventory.yml
 - default:
   name: "Default"
   ram: 16G
@@ -9,7 +11,6 @@
         pciSlotNumber: 16
     - adapter:
         pciSlotNumber: 32
-
   disks:
     - disk: rootdg
       size: 10g
@@ -27,24 +28,30 @@
   vmware:
     vm_folder: VmFolder
     datastore: WD1T
-
-
-- machine:
-  name: rhel7-rac-a-node-1
-  template: default
-  network:
-
+  template: "RHEL7 Template"
 
 - machine:
-  name: rhel7-rac-a-node-2
+  name: rac19-a-node-1
   template: default
+  template: "RHEL7 Template"
+  addresses:
+    rac19-a-node-1: 192.168.8.40
 
+- machine:
+  name: rac19-a-node-2
+  template: "RHEL7 Template"
+  addresses:
+    rac19-a-node-2: 192.168.8.41
 
 - cluster:
-  name: rac-a
-  nodes: [rhel7-rac-a-node-1, rhel7-rac-a-node-2]
+  name: rac19c-a
+  nodes: [rac19-a-node-1, rac19-a-node-2]
   disks:
     - disk:
       size: 8
       bus: 1
       count: 4
+  addresses:
+    rac19-a-lis-1: 192.168.8.43
+    rac19-a-lis-2: 192.168.8.44
+    rac19-a-scan: [192.168.8.47, 192.168.8.48, 192.168.8.49]
