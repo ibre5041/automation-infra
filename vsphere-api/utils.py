@@ -62,3 +62,118 @@ def get_resourcePools(entity):
       pools += get_resourcePools(pool)
    pools.append(entity)
    return pools
+
+import dns.reversename
+import dns.update
+import dns.query
+import dns.tsigkeyring
+
+import logging
+
+def create_dns_record(new_hostname, domain, new_ipaddress):
+    PRIMARY_DNS_SERVER_IP = '192.168.8.200'
+    TTL = 300
+
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+    
+    logging.debug("DNS record A")
+    ### Create A Record
+    # Set the domain name with a trailing dot (to stop auto substitution of zone)
+    dns_domain = '%s.' % (domain)
+    # Prepare the payload for DNS record update in the given zone/domain (dns_domain)
+
+    logging.debug(" {} ({})".format(new_hostname, new_ipaddress))
+    update = dns.update.Update(zone=dns_domain
+                               , keyname='dynamic.vmware.haf.'
+                               , keyring=keyring
+                               , keyalgorithm=dns.tsig.HMAC_SHA512)
+    # Inject the record details into the dns.update.Update class
+    update.replace(new_hostname, TTL, 'A', new_ipaddress)
+    # Submit the new record to the DNS server to apply the update
+    response = dns.query.tcp(update, PRIMARY_DNS_SERVER_IP, timeout=5)
+    flags = dns.flags.to_text(response.flags)
+    logging.debug(" A   DNS update response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
+
+    logging.debug("DNS record PTR")
+    ### Create reverse entry (PTR)
+    # Neat function to generate a reverse entry
+    reventry = dns.reversename.from_address(new_ipaddress)
+    revzone = ''
+    # Specify the reverse lookup zone based on the reverse IP address.
+    # The labels[X:] property allows you to specify which octet to use.
+    # e.g. 3: will apply the record to the 10.in-addr.arpa zone, 
+    # whereas 1: will apply it to the 72.23.10.in-addr.arpa zone
+    revzone = b'.'.join(dns.name.from_text(str(reventry)).labels[1:]) # 
+    revzone = revzone.decode()
+
+    # Prepare the payload for the DNS record update
+    raction = dns.update.Update(zone=revzone
+                                , keyname='dynamic.vmware.haf.'
+                                , keyring=keyring
+                                , keyalgorithm=dns.tsig.HMAC_SHA512)
+
+    # Although we are updating the reverse lookup zone, 
+    # the record needs to point back to the ‘test.example.com’ domain, not the 10.in-addr.arpa domain
+    new_host_fqdn = '%s.%s' % (new_hostname, dns_domain)
+    # Inject the updated record details into the the class, preparing for submission to the DNS server
+    raction.replace(reventry, TTL, dns.rdatatype.PTR, new_host_fqdn)
+    # submit the new record to the DNS server to apply the update
+    response = dns.query.tcp(raction, PRIMARY_DNS_SERVER_IP, timeout=5)
+    flags = dns.flags.to_text(response.flags)
+    logging.debug(" PTR DNS update response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
+
+
+def add_dns_record(new_hostname, domain, new_ipaddress):
+    PRIMARY_DNS_SERVER_IP = '192.168.8.200'
+    TTL = 300
+
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+    
+    logging.debug("DNS record A")
+    ### Create A Record
+    # Set the domain name with a trailing dot (to stop auto substitution of zone)
+    dns_domain = '%s.' % (domain)
+    # Prepare the payload for DNS record update in the given zone/domain (dns_domain)
+
+    logging.debug(" {} ({})".format(new_hostname, new_ipaddress))
+    update = dns.update.Update(zone=dns_domain
+                               , keyname='dynamic.vmware.haf.'
+                               , keyring=keyring
+                               , keyalgorithm=dns.tsig.HMAC_SHA512)
+    # Inject the record details into the dns.update.Update class
+    update.add(new_hostname, TTL, 'A', new_ipaddress)
+    # Submit the new record to the DNS server to apply the update
+    response = dns.query.tcp(update, PRIMARY_DNS_SERVER_IP, timeout=5)
+    flags = dns.flags.to_text(response.flags)
+    logging.debug(" A   DNS update response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
+
+
+def delete_dns_record(host, domain, ip):
+    PRIMARY_DNS_SERVER_IP = '192.168.8.200'
+
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+
+    dns_domain = '%s.' % (domain)
+
+    logging.debug("DNS records A")
+    logging.debug(" {} ({})".format(host, ip))
+    update = dns.update.Update(zone=dns_domain
+                               , keyname='dynamic.vmware.haf.'
+                               , keyring=keyring
+                               , keyalgorithm=dns.tsig.HMAC_SHA512)
+
+    update.delete(host, 'A')
+    response = dns.query.tcp(update, PRIMARY_DNS_SERVER_IP)
+    flags = dns.flags.to_text(response.flags)
+    logging.debug(" A   DNS delete response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
+
+    update.delete(host, 'TXT')
+    response = dns.query.tcp(update, PRIMARY_DNS_SERVER_IP)
+    flags = dns.flags.to_text(response.flags)
+    logging.debug(" TXT DNS delete response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))

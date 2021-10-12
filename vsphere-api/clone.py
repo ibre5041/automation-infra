@@ -19,6 +19,7 @@ import socket
 from add_shared_disk import add_data_disk, add_shared_disk
 import requests
 
+import dns.reversename
 import dns.update
 import dns.query
 import dns.tsigkeyring
@@ -271,26 +272,22 @@ def dns_for_vm(machine):
         "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
     })
 
-    logging.debug("DNS records:")
     for arecord in machine.addresses:        
-        logging.debug(" {} ({})".format(arecord, machine.addresses[arecord]))        
-        update = dns.update.Update(zone='prod.vmware.haf'
-                                   , keyname='dynamic.vmware.haf.'
-                                   , keyring=keyring
-                                   , keyalgorithm=dns.tsig.HMAC_SHA512)
-
+        logging.debug("DNS Record: {} ({})".format(arecord, machine.addresses[arecord]))        
         ip = machine.addresses[arecord]
         if isinstance(ip, list):
+            # update = dns.update.Update(zone='prod.vmware.haf'
+            #                            , keyname='dynamic.vmware.haf.'
+            #                            , keyring=keyring
+            #                            , keyalgorithm=dns.tsig.HMAC_SHA512)
             for i in ip:
-                update.add(arecord, 300, 'A', i)
-                response = dns.query.tcp(update, '192.168.8.200')
-                flags = dns.flags.to_text(response.flags)
-                logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
+                # update.add(arecord, 300, 'A', i)
+                # response = dns.query.tcp(update, '192.168.8.200')
+                # flags = dns.flags.to_text(response.flags)
+                # logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
+                add_dns_record(arecord, 'prod.vmware.haf', i)
         else:
-            update.replace(arecord, 300, 'A', ip)
-            response = dns.query.tcp(update, '192.168.8.200')
-            flags = dns.flags.to_text(response.flags)
-            logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
+            create_dns_record(arecord, 'prod.vmware.haf', ip)
 
 
 # Start program
@@ -342,8 +339,8 @@ if __name__ == "__main__":
         for disk in machine.disks:
             if disk['bus'] == 0:
                 continue
-            add_data_disk(service_instance=si, machine=machine, disk=disk)
+            #add_data_disk(service_instance=si, machine=machine, disk=disk)
 
     if c.cluster:
         dns_for_vm(c.cluster)
-        add_shared_disk(service_instance=si, config=c)
+        #add_shared_disk(service_instance=si, config=c)

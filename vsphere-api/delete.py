@@ -39,32 +39,12 @@ def delete_vm(service_instance, machine):
 
 
 def dns_for_vm(machine):
-    keyring = dns.tsigkeyring.from_text({
-        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
-    })
-
-    logging.debug("DNS records:")
-    for arecord in machine.addresses:        
-        logging.debug(" {} ({})".format(arecord, machine.addresses[arecord]))        
-        update = dns.update.Update(zone='prod.vmware.haf'
-                                   , keyname='dynamic.vmware.haf.'
-                                   , keyring=keyring
-                                   , keyalgorithm=dns.tsig.HMAC_SHA512)
-
+    for arecord in machine.addresses:
         ip = machine.addresses[arecord]
         if isinstance(ip, list):
-            for i in ip:
-                update.delete(i, 'A')
-                response = dns.query.tcp(update, '192.168.8.200')
-                logging.debug(" A   DNS update response: {}".format(response.rcode()))
+            delete_dns_record(arecord, 'prod.vmware.haf', None)
         else:
-            update.delete(arecord, 'A')
-            response = dns.query.tcp(update, '192.168.8.200')
-            logging.debug(" A   DNS update response: {}".format(response.rcode()))
-
-            update.delete(arecord, 'TXT')
-            response = dns.query.tcp(update, '192.168.8.200')
-            logging.debug(" TXT DNS update response: {}".format(response.rcode()))
+            delete_dns_record(arecord, 'prod.vmware.haf', ip)
 
 
 # Start program

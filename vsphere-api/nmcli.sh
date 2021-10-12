@@ -40,4 +40,4 @@ if [ -n "${IP_P}" ]; then
     pvresize /dev/sdb1
 fi
 
-
+history -c
