@@ -16,11 +16,6 @@ import dns.tsigkeyring
 from config import Config, Machine, VsCreadential
 
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-
-logging.basicConfig(stream=sys.stdout,
-                    level=logging.DEBUG,
-                    format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
 
 
 def delete_vm(service_instance, machine):
@@ -74,18 +69,34 @@ def dns_for_vm(machine):
 
 # Start program
 if __name__ == "__main__":
-    config = VsCreadential.load('.credentials.yaml')
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    logging.basicConfig(stream=sys.stdout,
+                        level=logging.DEBUG,
+                        format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--file',
-                        required=False,
-                        action='store',
-                        help='Config filename to process', default='rhel7-a.yaml')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-f', '--file',
+                       required=False,
+                       action='store',
+                       help='Config filename to process in .yaml format')
+
+    group.add_argument('-i', '--inventory',
+                       required=False,
+                       action='store',
+                       help='Config filename to process in ansible inventory format')
 
     args = parser.parse_args()
 
     # parse yaml file
-    c = Config.createFromYAML(args.file)
+    if args.file:
+        c = Config.createFromYAML(args.file)
+    else:
+        c = Config.createFromInventory(args.inventory)
+    
+    # Config
+    config = VsCreadential.load('.credentials.yaml')
     # Connect
     si = SmartConnect(
         host=config.hostname,
@@ -99,10 +110,9 @@ if __name__ == "__main__":
 
     c.validate(content)
 
-    #sys.exit(0)
-
     for machine in c.machines:
         delete_vm(service_instance=si, machine=machine)
         dns_for_vm(machine)
+    if c.cluster:
         dns_for_vm(c.cluster)
 

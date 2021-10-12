@@ -284,13 +284,13 @@ def dns_for_vm(machine):
             for i in ip:
                 update.add(arecord, 300, 'A', i)
                 response = dns.query.tcp(update, '192.168.8.200')
-                logging.debug(" A   DNS update response: {}".format(response.rcode()))
+                flags = dns.flags.to_text(response.flags)
+                logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
         else:
             update.replace(arecord, 300, 'A', ip)
             response = dns.query.tcp(update, '192.168.8.200')
-            logging.debug(" A   DNS update response: {}".format(response.rcode()))
-            logging.debug(type(response))
-            logging.debug(response.answer)
+            flags = dns.flags.to_text(response.flags)
+            logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
 
 
 # Start program
@@ -302,15 +302,25 @@ if __name__ == "__main__":
                         format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--file',
-                        required=False,
-                        action='store',
-                        help='Config filename to process', default='rhel7-a.yaml')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-f', '--file',
+                       required=False,
+                       action='store',
+                       help='Config filename to process in .yaml format')
+
+    group.add_argument('-i', '--inventory',
+                       required=False,
+                       action='store',
+                       help='Config filename to process in ansible inventory format')
 
     args = parser.parse_args()
 
     # parse yaml file
-    c = Config.createFromYAML(args.file)
+    if args.file:
+        c = Config.createFromYAML(args.file)
+    else:
+        c = Config.createFromInventory(args.inventory)
+
     # Connect
     config = VsCreadential.load('.credentials.yaml')
     #

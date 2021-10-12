@@ -3,10 +3,14 @@ import json
 import logging
 import sys
 import copy
-import utils
 import socket
+import utils
 
 from pyVmomi import vim
+
+from ansible.parsing.dataloader import DataLoader
+from ansible.inventory.manager import InventoryManager
+from ansible.vars.manager import VariableManager
 
 
 class VsCreadential:
@@ -37,7 +41,7 @@ class VsCreadential:
 
                     if "validateSSL" in c:
                         retval.ssl = c['validateSSL']
-
+            content['config']['password'] = '****'
             logging.debug(json.dumps(content, indent=4, sort_keys=True))
         return retval
 
@@ -46,7 +50,6 @@ class Cluster:
     def __init__(self):
         self.disks = []  # assume all disks are local, attached to 1st scsi adapter
         self.datastore = 'Datastore'
-        self.disks = []
         self.nodes = []
         self.addresses = dict()
 
@@ -55,7 +58,12 @@ class Cluster:
         retval = cls()
         if 'disks' in dictionary:
             for disk in dictionary['disks']:
-                retval.disks.append(disk)
+                # It looks like yaml parser and ansible yaml parser produce different
+                # Data structures for the same input
+                if disk['disk']:
+                    retval.disks.append(disk['disk'])
+                else:
+                    retval.disks.append(disk)
 
         if 'nodes' in dictionary:
             for node in dictionary['nodes']:
@@ -116,6 +124,11 @@ class Machine:
 
         if "disks" in dictionary:
             for d in dictionary['disks']:
+                # It looks like yaml parser and ansible yaml parser produce different
+                # Data structures for the same input
+                #if d['disk']:
+                #    instance.disks.append(d['disk'])
+                #else:
                 instance.disks.append(d)
         if "vmware" in dictionary:
             if "vm_folder" in dictionary['vmware']:
@@ -124,7 +137,12 @@ class Machine:
                 instance.datastore = dictionary['vmware']['datastore']
         if "network" in dictionary and dictionary['network']:
             for adapter in dictionary['network']:
-                instance.netAdapters.append(adapter['adapter'])
+                # It looks like yaml parser and ansible yaml parser produce different
+                # Data structures for the same input
+                if adapter['adapter']:
+                    instance.netAdapters.append(adapter['adapter'])
+                else:
+                    instance.netAdapters.append(adapter)
 
         if "addresses" in dictionary and dictionary['addresses'] and isinstance(dictionary['addresses'], dict):
             a = dictionary['addresses']
@@ -154,6 +172,8 @@ class Machine:
         try:
             ip = socket.gethostbyname(self.name)
         except:
+            if self.name not in self.addresses:
+                logging.error("Cloud not deduce IP for: {}".format(self.name))
             ip = self.addresses[self.name]
         if ip:
             # machine id is the last byte of IP
@@ -238,6 +258,84 @@ class Config:
                 print(exc)
         return retval
 
+
+    @classmethod
+    def createFromInventory(cls, inventory_file):
+        retval = cls()
+
+        # Load Ansible inventory, use ansible's mechanism to merge variable from diffent levels
+        loader = DataLoader()
+        # Sources can be a single path or comma separated paths
+        inventory = InventoryManager(loader=loader, sources='rac-19.inventory.yml')
+        variable_manager = VariableManager(loader=loader, inventory=inventory)
+        
+        for host in inventory.hosts:
+            hv = inventory.get_host(host).get_vars()
+            h  = inventory.get_host(host)
+            # Get host's vars
+            host_vars = variable_manager.get_vars(host=h, task=None, include_hostvars=True, include_delegate_to=True, use_cache=True)
+            print(json.dumps(host_vars, indent=4))
+
+            # There variables are expected by VM machine definition
+            # "name" - aka hostname
+            # "template" - a VM template to clone from
+            # "ram"
+            # "cpu"
+            # "scsi"
+            #   - adapter
+            # "disks"
+            #   - 
+            # "vmware"
+            #   - vm_folder
+            #   - dataloader
+            # "network"
+            #   - adapter
+            # "addresses"
+            name = host_vars['inventory_hostname_short']
+            defaultMachine  = Machine(name)
+            mdict = dict({'addresses': {}})
+            if "template" in host_vars:
+                mdict['template'] = host_vars['template']
+            if "ram" in host_vars:
+                mdict['ram'] = host_vars['ram']
+            if "cpu" in host_vars:
+                mdict['cpu'] = host_vars['cpu']
+            if "scsi" in host_vars:
+                mdict['scsi'] = host_vars['scsi']
+
+            if "disks" in host_vars:
+                mdict['disks'] = host_vars['disks']
+
+            if "vmware" in host_vars:
+                mdict['vmware'] = host_vars['vmware']
+
+            if "network" in host_vars and host_vars['network']:
+                mdict['network'] = host_vars['network']
+
+            # Note: machine has key address (singular) while cluster has key addresses (plural)
+            if "address" in host_vars and host_vars['address'] and isinstance(host_vars['address'], str):
+                ip = host_vars['address']
+                mdict['addresses'][name] = ip
+
+            machine = defaultMachine.updateFromDict(mdict)
+            retval.machines.append(machine)
+            logging.debug('Machine loaded: {:<20} CPU: {:<2} RAM: {:<4} Storage: {}'
+                          .format(machine.name
+                                  , machine.cpu
+                                  , machine.ram
+                                  , str(machine.disks)
+                              )
+            )
+
+            if 'cluster' in host_vars and not retval.cluster:
+                logging.debug(host_vars['cluster'])
+                cluster = host_vars['cluster']
+                retval.cluster = Cluster.createFromDict(cluster)
+            if retval.cluster:
+                retval.cluster.nodes.append(name)
+
+        return retval
+
     def validate(self, content):
         for m in self.machines:
             m.validate(content)
@@ -257,4 +355,7 @@ if __name__ == "__main__":
     # parse yaml file
     ##cfg = Config.createFromYAML("rac-a.yaml")
 
-    cfg = Config.createFromYAML("rac-19.yaml")
+    #cfg = Config.createFromYAML("rac-19.yaml")
+    
+    cfg = Config.createFromInventory("rac-19.inventory.yml")
+
