@@ -264,7 +264,7 @@ oracle.install.crs.config.clusterNodes=rhel7-rac-a-node-1.prod.vmware.haf:rhel7-
 # For example: eth0:140.87.24.0:1,eth1:10.2.1.0:2,eth2:140.87.52.0:3
 #
 #-------------------------------------------------------------------------------
-oracle.install.crs.config.networkInterfaceList=ens192:10.0.0.0:5,ens224:192.168.8.0:1
+oracle.install.crs.config.networkInterfaceList=ens224:10.0.0.0:5,ens192:192.168.8.0:1
 
 #------------------------------------------------------------------------------
 # Specify 'true' if you would like to configure Grid Infrastructure Management

@@ -55,7 +55,7 @@ path.logs: /var/log/elasticsearch
 #
 #network.host: 192.168.0.1
 network.bind_host: "0.0.0.0"
-network.publish_host: _ens224:ipv4_
+network.publish_host: _ens192:ipv4_
 
 #
 # Set a custom port for HTTP:
