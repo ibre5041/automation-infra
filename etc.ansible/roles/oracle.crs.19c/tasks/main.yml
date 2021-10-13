@@ -47,7 +47,7 @@
     state: directory
     owner: oracle
     group: oinstall
-    recurse: yes
+    #recurse: yes
     mode: '0755'
 
 - name: Include Role oracle.download.package
