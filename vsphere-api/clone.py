@@ -276,18 +276,13 @@ def dns_for_vm(machine):
         logging.debug("DNS Record: {} ({})".format(arecord, machine.addresses[arecord]))        
         ip = machine.addresses[arecord]
         if isinstance(ip, list):
-            # update = dns.update.Update(zone='prod.vmware.haf'
-            #                            , keyname='dynamic.vmware.haf.'
-            #                            , keyring=keyring
-            #                            , keyalgorithm=dns.tsig.HMAC_SHA512)
             for i in ip:
-                # update.add(arecord, 300, 'A', i)
-                # response = dns.query.tcp(update, '192.168.8.200')
-                # flags = dns.flags.to_text(response.flags)
-                # logging.debug(" A   DNS update response: {} {}".format(response.rcode(), flags))
                 add_dns_record(arecord, 'prod.vmware.haf', i)
         else:
             create_dns_record(arecord, 'prod.vmware.haf', ip)
+            byte = ip.split('.')[-1]
+            barn_ip = '10.0.0.' + byte
+            create_dns_record(arecord, 'barn.vmware.haf', barn_ip)
 
 
 # Start program
@@ -339,8 +334,8 @@ if __name__ == "__main__":
         for disk in machine.disks:
             if disk['bus'] == 0:
                 continue
-            #add_data_disk(service_instance=si, machine=machine, disk=disk)
+            add_data_disk(service_instance=si, machine=machine, disk=disk)
 
     if c.cluster:
         dns_for_vm(c.cluster)
-        #add_shared_disk(service_instance=si, config=c)
+        add_shared_disk(service_instance=si, config=c)

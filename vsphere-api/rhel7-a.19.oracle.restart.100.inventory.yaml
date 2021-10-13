@@ -33,7 +33,7 @@ all:
 
     vmware:
       vm_folder: VmFolder
-      datastore: WD1T
+      datastore: Kingston890G
 
     cluster:
       clustername: rhel7a-19

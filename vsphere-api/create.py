@@ -149,6 +149,24 @@ def create_vm(service_instance, machine):
     logging.debug("{machine} state: {state}".format(machine=machine.nameVSphere, state=str(vm.runtime.powerState)))
 
 
+def dns_for_vm(machine):
+    keyring = dns.tsigkeyring.from_text({
+        "dynamic.vmware.haf.": "jn694IwJ9IP4i5yGtSdIZJTFeFpVEvK2wa78gHVX8PohLNBQVYQd+JyGNX8A3hju8WmsNVo1Oq58YS93HR4HIQ=="
+    })
+
+    for arecord in machine.addresses:        
+        logging.debug("DNS Record: {} ({})".format(arecord, machine.addresses[arecord]))        
+        ip = machine.addresses[arecord]
+        if isinstance(ip, list):
+            for i in ip:
+                add_dns_record(arecord, 'prod.vmware.haf', i)
+        else:
+            create_dns_record(arecord, 'prod.vmware.haf', ip)
+            byte = ip.split('.')[-1]
+            barn_ip = '10.0.0.' + byte
+            create_dns_record(arecord, 'barn.vmware.haf', barn_ip)
+
+
 # Start program
 if __name__ == "__main__":
     # parse yaml file

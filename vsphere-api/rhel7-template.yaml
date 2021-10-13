@@ -1,12 +1,24 @@
-
+#
+# Create an empty VM:
+#  
+# copy rhel7-ks.cfg => /var/lib/tftpboot/images/centos/rhel7-ks.cfg
+# prepare Centos7 installation under: /var/lib/tftpboot/images/centos/7/
+# 
+# ./create.py -f rhel7-template.yml
+# 
+# kickstart will install whole empty OS
+# 
+# shutdown this VM
+# convert it into template "RHEL7 Template"
+#
 # default machine definition
 - default:
   name: "Default"
-  ram: 2G
+  ram: 6G
   cpu: 1
   scsi:
     - adapter:
-        pciSlotNumber: 128
+        pciSlotNumber: 12
   disks:
     - disk: rootdg
       size: 20g
@@ -25,8 +37,7 @@
     vm_folder: VmFolder
     datastore: Kingston890G
 
-
 - machine:
   name: rhel7-template
-  template: default
-  network:
+  template: "RHEL7 Template"
+
