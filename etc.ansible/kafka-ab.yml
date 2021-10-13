@@ -1,6 +1,0 @@
-all:
-  hosts:
-    rhel7-a:
-    rhel7-b:
-
-  vars:
