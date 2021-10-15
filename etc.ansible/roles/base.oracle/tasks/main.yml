@@ -39,6 +39,7 @@
   yum:
     name: "{{ oracle_os_packages }}"
     state: latest
+  tags: packages
 
 - name: Stop firewall
   systemd:
@@ -82,16 +83,5 @@
   copy:
     src: 99-oracle-limits.conf
     dest: /etc/security/limits.d/99-oracle-limits.conf
-
-# - name: Oracle CRS/Restart required packages
-#   yum: 
-#     name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++
-#     state=latest
-
-# - name: Oracle CRS/Restart required packages
-#   yum: 
-#     name=cvuqdisk
-#     state=latest
-#     disable_gpg_check=yes 
 
 - include: filesystem.yml

@@ -4,4 +4,42 @@
   - base.host
   - base.oracle
   tasks:
+    - name: response file
+      template:
+        src: "{{ oracle_db_response_file }}"
+        dest: "{{ oracle_install_dir_temp }}/"
+        owner: "{{ oracle_os_user }}"
+        group: "{{ oracle_os_group }}"
+
+    - name: ORACLE_HOME directory
+      file:
+        path: "{{ oracle_install_dir_prod}}/{{ oracle_db_ver_path }}"
+        state: directory
+        owner: "{{ oracle_os_user }}"
+        group: "{{ oracle_os_group }}"
+        mode: '0775'
+    
+    # ssh rhel7-golden
+    # su - oracle
+    # cd /oracle/u01/product/19.12.0.0
+    # unzip /oinstall/19/LINUX.X64_193000_db_home.zip
+    # rm -rf OPatch
+    # unzip /oinstall/19/p6880880_190000_Linux-x86-64.zip
+    # export ORACLE_HOME=${PWD}
+    # ./runInstaller -silent -applyRU ../../tmp/32895426/32904851 -responseFile ../../tmp/db.no.comments.19c.rsp
+    # ./OPatch/opatch apply -silent   ../../tmp/32876380/
+    # ./OPatch/opatch apply -silent   ../../tmp/32895426/32916816
+    #
+    # ./runInstaller -creategoldimage -exclFiles $ORACLE_HOME/log,$ORACLE_HOME/.patch_storage -destinationlocation ${PWD}/.. -silent
+    #
+    # [oracle@rhel7-golden 19.12.0.0]$ ./OPatch/opatch lspatches
+    # 32916816;OCW RELEASE UPDATE 19.12.0.0.0 (32916816)
+    # 32876380;OJVM RELEASE UPDATE: 19.12.0.0.210720 (32876380)
+    # 32904851;Database Release Update : 19.12.0.0.210720 (32904851)
+
+
+
+
+
+   
     

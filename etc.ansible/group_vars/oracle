@@ -82,12 +82,14 @@ oracle_os_packages_rhel8:
   - libnsl
   - policycoreutils-python-utils
 
-oracle_install_root: /oracle/u01
-oracle_install_temp: /oracle/u01/tmp
+oracle_install_dir_root: /oracle/u01
+oracle_install_dir_temp: "{{ oracle_install_dir_root}}/tmp"
+oracle_install_dir_base: "{{ oracle_install_dir_root}}/base"
+oracle_install_dir_prod: "{{ oracle_install_dir_root}}/product"
 
-oracle_install_package_names:
+#oracle_install_package_names:
 
-oracle_inventory_location: "{{ oracle_install_root}}/oraInventory}}"
+oracle_inventory_location: "{{ oracle_install_dir_root}}/oraInventory"
 
 oracle_os_user: oracle
 oracle_os_uid: 800
@@ -105,3 +107,4 @@ oracle_os_groups:
     gid: 804
   - group: asmoper
     gid: 805
+
