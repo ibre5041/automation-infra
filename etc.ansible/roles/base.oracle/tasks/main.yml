@@ -1,5 +1,5 @@
 ---
-# tasks file for oraclebase
+# tasks file for base.oracle
 
 - debug: var=ansible_memory_mb
 - debug: msg="total RAM is {{ ansible_memory_mb.real.total }} required 4096M "
@@ -9,6 +9,20 @@
 - debug: msg="MEM {{ mem }}"
 - debug: msg="SHMA {{ shma }}"
 - debug: msg="SHMM {{ shmm }}"
+
+- name: System details
+  debug: msg="{{ item }}"
+  with_items: 
+  - "{{ ansible_distribution }}"
+  - "{{ ansible_distribution_version }}"
+  - "{{ ansible_distribution_major_version }}"
+
+- name: Kernel parameters for Oracle 
+  sysctl:
+    name:  "{{ item['sysctl'] }}"
+    value: "{{ item['value'] }}"
+    sysctl_file: /etc/sysctl.d/98-oracle.conf
+  loop: "{{ oracle_os_sysctl }}"
 
 - name: tuned oracle dir
   file:
@@ -21,82 +35,33 @@
     src: tuned.conf
     dest: /usr/lib/tuned/oracle/tuned.conf
 
-- name: System details
-  debug: msg="{{ item }}"
-  with_items: 
-  - "{{ ansible_distribution }}"
-  - "{{ ansible_distribution_version }}"
-  - "{{ ansible_distribution_major_version }}"
-
-- name: oracle .rpms
+- name: "Ensure Oracle required .rpms are installed: {{ oracle_os_packages | join(' ') }}"
   yum:
-    name: glibc-devel,libstdc++-devel,libaio-devel,libXtst,perl-Data-Dumper,unzip,libXrender,bc,net-tools,make
+    name: "{{ oracle_os_packages }}"
     state: latest
 
-- name: oracle rhel7 packages
-  yum:
-    name: compat-libstdc++-33,compat-libcap1
-    state: latest
-  when: ansible_distribution_major_version == "7"
-
-- name: oracle rhel8 packages
-  yum:
-    name: libnsl,policycoreutils-python-utils
-    state: latest
-  when: ansible_distribution_major_version == "8"
-
-- include: sysctl.yml
-
-- name: stop firewall
+- name: Stop firewall
   systemd:
     name: firewalld.service
     state: stopped
     enabled: no
 
-- name: Ensure group "oinstall" exists
+- name: Ensure Oracle required OS groups exist
   group:
-    name: oinstall
-    gid: 800
-
-- name: Ensure group "dba" exists
-  group:
-    name: dba
-    gid: 801
-
-- name: Ensure group "oper" exists
-  group:
-    name: oper
-    gid: 802
-
-- name: Ensure group "asmadmin" exists
-  group:
-    name: asmadmin
-    gid: 803
-
-- name: Ensure group "asmdba" exists
-  group:
-    name: asmdba
-    gid: 804
-
-- name: Ensure group "asmoper" exists
-  group:
-    name: asmoper
-    gid: 805
+    name: "{{ item['group'] }}"
+    gid:  "{{ item['gid'] }}"
+  loop: "{{ oracle_os_groups }}"
 
 - name: Add the user "oracle"
   user:
     name: oracle
     shell: /bin/bash
-    uid: 800
-    group: oinstall
+    uid:    "{{ oracle_os_uid }}"
+    group:  "{{ oracle_os_group }}"
+    groups: "{{ oracle_os_groups | map(attribute='group') | list }}"
     comment: "Oracle instalation owner"
-    groups: oinstall,dba,oper,asmadmin,asmdba,asmoper
     append: yes
     system: yes
-    password: '$6$a5MJYlNAPSevwLhh$m1EJvszxPAMkwumqCQcHS07fLyLPYTWUyPFR7K58hghtDyiSL0GF.svFSA8f7MxkBXUx8uTczpPIJKrb1O14h'
-
-- user: 
-    name: oracle
     # python -c 'import crypt; print crypt.crypt("acror", "$1$SomeSalt$")'
     password: "$1$SomeSalt$V2yJBnrIRWQytrgM9BB2Y1"
 
@@ -113,69 +78,20 @@
     dest: /etc/sudoers.d/oracle
     mode: '0440'
 
-- name: Oracle CRS/Restart required packages
-  yum: 
-    name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++
-    state=latest
-
-- name: Oracle CRS/Restart required packages
-  yum: 
-    name=cvuqdisk
-    state=latest
-    disable_gpg_check=yes 
-
-- name: Create a logical volume u01
-  lvol:
-    vg: vg01
-    lv: u01
-    size: 80%VG
-    shrink: no
-
-- name: Create /dev/vg01/u01
-  filesystem:
-    fstype: ext4
-    dev: /dev/vg01/u01
-
-- name: Mount /dev/vg01/u01
-  mount:
-    path: /oracle
-    src: /dev/vg01/u01
-    state: mounted
-    fstype: auto
-
-- name: u01 directory
-  file:
-    path: /oracle/u01
-    owner: root
-    group: oinstall
-    mode: '0775'
-    state: directory
-
 - name: Limits
   copy:
     src: 99-oracle-limits.conf
     dest: /etc/security/limits.d/99-oracle-limits.conf
 
-- name: 'Extend the / (root)'
-  lvol:
-    vg: vg00
-    lv: lv_root
-    size: 10g
-    shrink: no
-    resizefs: yes
+# - name: Oracle CRS/Restart required packages
+#   yum: 
+#     name=device-mapper-multipath,ksh,sysstat,smartmontools,gcc-c++
+#     state=latest
 
-- name: 'Extend the /tmp'
-  lvol:
-    vg: vg00
-    lv: lv_tmp
-    size: 2g
-    shrink: no
-    resizefs: yes
+# - name: Oracle CRS/Restart required packages
+#   yum: 
+#     name=cvuqdisk
+#     state=latest
+#     disable_gpg_check=yes 
 
-- name: 'Extend the u01'
-  lvol:
-    vg: vg01
-    lv: u01
-    size: 29G
-    shrink: no
-    resizefs: yes
+- include: filesystem.yml

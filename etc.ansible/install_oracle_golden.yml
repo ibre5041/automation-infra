@@ -1,0 +1,7 @@
+---
+- hosts: oracle
+  roles:
+  - base.host
+  - base.oracle
+  tasks:
+    

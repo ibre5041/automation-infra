@@ -1,24 +1,25 @@
 ---
-# tasks file for basehost
+
+# tasks file for base.host
+
 - name: Clean yum repos
   shell: "yum clean all"
+  args:
+    warn: false # set warn=false to prevent warning
+  changed_when: false
 
 - name: DNS search
   copy:
     src: resolv.conf
     dest: /etc/resolv.conf
 
-- name: Nexus .repo(x86_64)
+- name: "Repo file: {{ item }}"
   copy:
-    src: KS_x86_64.repo
+    src: "{{ item }}"
     dest: /etc/yum.repos.d/
-  tags: packages
-
-- name: Nexus .repo(noarch)
-  copy:
-    src: KS_noarch.repo
-    dest: /etc/yum.repos.d/
-  tags: packages
+  loop:
+    - KS_x86_64.repo
+    - KS_noarch.repo
 
 - name: Base packages
   yum: 
@@ -55,14 +56,8 @@
     shrink: no
     resizefs: yes
 
-- name: 'Extend /var fs'
-  lvol:
-    vg: vg00
-    lv: lv_tmp
-    size: 2G
-    shrink: no
-    resizefs: yes
-
 - name: Clean yum repos
   shell: "yum clean all"
-
+  args:
+    warn: false # set warn=false to prevent warning
+  changed_when: false

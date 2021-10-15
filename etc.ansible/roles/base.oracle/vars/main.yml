@@ -1,12 +1,6 @@
 ---
 # vars file for oraclebase
 
-mem: "{{ ansible_memory_mb.real.total * 1024 * 1024 }}"
-
-shma: "{{ ((mem | int) / 4096) | round | int }}"
-shmm: "{{ ((mem | int) * 0.8)  | round | int }}"
-
-# Empty global variables to be used by further roles
-asm_disks: []
-asm_disk_partitions: []
-
+oracle_os_packages: "{{ oracle_os_packages_all \
+                    + (oracle_os_packages_rhel7 if ansible_distribution_major_version == '7' else [] )
+                    + (oracle_os_packages_rhel8 if ansible_distribution_major_version == '8' else [] ) }}"
