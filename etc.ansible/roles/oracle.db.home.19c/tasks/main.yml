@@ -1,14 +1,18 @@
 ---
 # tasks file for oracledatabase 19c
 
+- name: oracle_oh_response_file 
+  debug:
+    var: oracle_oh_response_file 
+
 - name: delete response file
   file:
-    path: /home/oracle/db.rsp
+    path:  "{{ oracle_install_dir_temp }}/{{ oracle_oh_response_file }}"
     state: absent
 
 - name: check if oracle home installed
   stat:
-    path: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
+    path: "{{ oracle_home }}/bin/extjob"
   register: oracle_home_installed
 
 - debug:
@@ -18,31 +22,42 @@
   template:
     src: ora_2_env
     dest: "/home/oracle/.ora_2_env"
-    owner: oracle
-    group: oinstall
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
 
 - name: check if install package exists
   stat: 
-    path: /oracle/u01/db/{{ oracle_ver_path }}/bin
+    path: "{{ oracle_home }}/bin"
   register: install_package
   
 - debug:
     msg: "Install package exists: {{ install_package.stat.exists }}"
 
+- name: "Directory {{ oracle_home }}"
+  file:
+    path:  "{{ oracle_home }}"
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
+    mode: '0775'
+    state: directory
+
 - name: Include Role oracle.download.package
   include_role:
     name: oracle.download.package
   vars:
-    oracle_home: "/oracle/u01/db/{{ oracle_ver_path }}"
+    #oracle_home: "{{ oracle_home }}"
   when: oracle_home_installed.stat.exists != True and install_package.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)
 
 - include: setup.db.yml
-  when: oracle_home_installed.stat.exists != True
   when: oracle_home_installed.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)
 
+- name: "Check ownership of {{ oracle_home }}/bin/extjob"
+  stat: 
+    path: "{{ oracle_home }}/bin/extjob"
+  register: extjob_permissions
+
 - name: db root.sh
-  shell: "/oracle/u01/db/{{ oracle_ver_path }}/root.sh"
+  shell: "{{ oracle_home }}/root.sh"
   args:
     chdir: "/"
-    creates: "/oracle/u01/db/{{ oracle_ver_path }}/bin/extjob"
-  ignore_errors: true
+  when: extjob_permissions.stat.uid != 0

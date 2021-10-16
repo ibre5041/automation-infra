@@ -3,17 +3,29 @@
   roles:
   - base.host
   - base.oracle
+  vars:
+    oracle_sid:              "{{ oracle_install_space[oracle_release]['oracle_sid'] }}"
+    oracle_db_name:          "{{ oracle_install_space[oracle_release]['oracle_db_name'] }}"
+    oracle_unique_name:      "{{ oracle_install_space[oracle_release]['oracle_unique_name'] }}"
+    oracle_oh_response_file: "{{ oracle_install_space[oracle_release]['oracle_oh_response_file'] }}"
+    oracle_db_ver_path:      "{{ oracle_install_space[oracle_release]['oracle_db_ver_path'] }}"
+    oracle_db_media:         "{{ oracle_install_space[oracle_release]['oracle_db_media'] }}"
+    oracle_home:             "{{ oracle_install_dir_prod }}/{{ oracle_db_ver_path }}"
+
   tasks:
+    - debug:
+        var: oracle_install_type
+        
     - name: response file
       template:
-        src: "{{ oracle_db_response_file }}"
+        src: "{{ oracle_oh_response_file }}"
         dest: "{{ oracle_install_dir_temp }}/"
         owner: "{{ oracle_os_user }}"
         group: "{{ oracle_os_group }}"
 
     - name: ORACLE_HOME directory
       file:
-        path: "{{ oracle_install_dir_prod}}/{{ oracle_db_ver_path }}"
+        path: "{{ oracle_home }}"
         state: directory
         owner: "{{ oracle_os_user }}"
         group: "{{ oracle_os_group }}"
@@ -37,9 +49,3 @@
     # 32876380;OJVM RELEASE UPDATE: 19.12.0.0.210720 (32876380)
     # 32904851;Database Release Update : 19.12.0.0.210720 (32904851)
 
-
-
-
-
-   
-    

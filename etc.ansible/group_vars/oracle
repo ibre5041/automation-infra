@@ -1,5 +1,56 @@
 ---
 
+# default instalation type, possible values are:
+# standalone, restart, rac
+# if you want to override any of these define same variable in
+# inventory host_var (on host level)
+oracle_install_type: standalone
+
+oracle_install_dir_root: /oracle/u01
+oracle_install_dir_temp: "{{ oracle_install_dir_root}}/tmp"
+oracle_install_dir_base: "{{ oracle_install_dir_root}}/base"
+oracle_install_dir_prod: "{{ oracle_install_dir_root}}/product"
+
+oracle_inventory_location: "{{ oracle_install_dir_root}}/oraInventory"
+
+oracle_os_user: oracle
+oracle_os_uid: 800
+oracle_os_group: oinstall
+oracle_os_groups:
+  - group: oinstall
+    gid: 800
+  - group: dba
+    gid: 801
+  - group: oper
+    gid: 802
+  - group: asmadmin
+    gid: 803
+  - group: asmdba
+    gid: 804
+  - group: asmoper
+    gid: 805
+
+oracle_install_space:
+  19c:
+    oracle_sid:         "TEST19C"
+    oracle_db_name:     "TEST19C"
+    oracle_unique_name: "TEST19C"
+    oracle_oh_response_file: db.no.comments.19c.rsp
+    oracle_db_response_file: dbca.no.comments.19c.rsp
+    oracle_db_ver_release: 19c
+    oracle_db_ver_path: 19.12.0.0
+    oracle_db_media: db_home_19_12.zip
+
+  18c:
+    oracle_sid:         "TEST18C"
+    oracle_db_name:     "TEST18C"
+    oracle_unique_name: "TEST18C"
+    oracle_oh_response_file: db.no.comments.18c.rsp
+    oracle_db_response_file: dbca.no.comments.18c.rsp
+    oracle_db_ver_release: 18c
+    oracle_db_ver_path: 18.0.0.0
+    oracle_db_media: LINUX.X64_180000_db_home.zip
+
 oracle_os_sysctl:
   - sysctl: kernel.shmmni
     value: "4096"
@@ -81,30 +132,3 @@ oracle_os_packages_rhel7:
 oracle_os_packages_rhel8:
   - libnsl
   - policycoreutils-python-utils
-
-oracle_install_dir_root: /oracle/u01
-oracle_install_dir_temp: "{{ oracle_install_dir_root}}/tmp"
-oracle_install_dir_base: "{{ oracle_install_dir_root}}/base"
-oracle_install_dir_prod: "{{ oracle_install_dir_root}}/product"
-
-#oracle_install_package_names:
-
-oracle_inventory_location: "{{ oracle_install_dir_root}}/oraInventory"
-
-oracle_os_user: oracle
-oracle_os_uid: 800
-oracle_os_group: oinstall
-oracle_os_groups:
-  - group: oinstall
-    gid: 800
-  - group: dba
-    gid: 801
-  - group: oper
-    gid: 802
-  - group: asmadmin
-    gid: 803
-  - group: asmdba
-    gid: 804
-  - group: asmoper
-    gid: 805
-

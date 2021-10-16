@@ -17,6 +17,16 @@ all:
         rac19-b-node-3:
       vars:
         oracle-release: 19c
+    oracle_crs:
+      hosts:
+        rac19-b-node-1:
+        rac19-b-node-2:
+        rac19-b-node-3:
+    oracle_19
+      hosts:
+        rac19-b-node-1:
+        rac19-b-node-2:
+        rac19-b-node-3:
   vars:
     scsi:
     - adapter:

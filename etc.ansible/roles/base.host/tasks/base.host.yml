@@ -23,7 +23,7 @@
 
 - name: Base packages
   yum: 
-    name: wget,mlocate,strace,psmisc,nfs-utils,emacs-nox,patch,gcc,xauth
+    name: wget,mlocate,strace,psmisc,nfs-utils,emacs-nox,patch,gcc,xauth,epel-release
     state: latest
     lock_timeout: 160
     disable_gpg_check: yes 
