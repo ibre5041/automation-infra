@@ -1,0 +1,15 @@
+[Unit]
+Description=WebLogic Adminserver service
+ 
+[Service]
+Type=simple
+WorkingDirectory=/wls/domains/base_domain/
+ExecStart=/wls/domains/base_domain/bin/startWebLogic.sh
+ExecStop=/wls/domains/base_domain/bin/stopWebLogic.sh
+User=wls
+Group=oinstall
+KillMode=process
+LimitNOFILE=65535
+ 
+[Install]
+WantedBy=multi-user.target

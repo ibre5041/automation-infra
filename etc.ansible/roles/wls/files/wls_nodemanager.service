@@ -1,0 +1,17 @@
+[Unit]
+Description=WebLogic nodemanager service
+ 
+[Service]
+Type=simple
+# Note that the following three parameters should be changed to the correct paths
+# on your own system
+WorkingDirectory=/wls/domains/base_domain/
+ExecStart=/wls/domains/base_domain/bin/startNodeManager.sh
+ExecStop=/wls/domains/base_domain/bin/stopNodeManager.sh
+User=wls
+Group=oinstall
+KillMode=process
+LimitNOFILE=65535
+ 
+[Install]
+WantedBy=multi-user.target

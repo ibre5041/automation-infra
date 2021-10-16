@@ -1,0 +1,20 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+# https://oracle-base.com/articles/12c/weblogic-silent-installation-12c
+export MW_HOME=/wls/middleware
+export WLS_HOME=$MW_HOME/wlserver
+export WL_HOME=$WLS_HOME
+# Set to the appropriate JAVA_HOME.
+#export JAVA_HOME=/u01/app/oracle/jdk1.8.0_77
+#export PATH=$JAVA_HOME/bin:$PATH
+
+export PATH

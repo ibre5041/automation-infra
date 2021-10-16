@@ -1,0 +1,226 @@
+---
+# tasks file for wlsbase
+
+# https://oracle-base.com/articles/12c/weblogic-silent-installation-12c
+
+# warning: /var/cache/yum/x86_64/7/KS_x86_64/packages/jdk-8u251-linux-x64.rpm: Header V3 RSA/SHA256 Signature, key ID ec551f03: NOKEY
+- name: wls .rpms
+  yum:
+    name: net-tools,jdk,libXrender,libXtst
+    state: latest
+    disable_gpg_check: yes
+
+- name: Ensure group "oinstall" exists
+  group:
+    name: oinstall
+    gid: 800
+
+- name: Add the user "wls"
+  user:
+    name: wls
+    shell: /bin/bash
+    uid: 900
+    group: oinstall
+    comment: "Wls instalation owner"
+    groups: oinstall
+    append: yes
+    system: yes
+    password: '$6$a5MJYlNAPSevwLhh$m1EJvszxPAMkwumqCQcHS07fLyLPYTWUyPFR7K58hghtDyiSL0GF.svFSA8f7MxkBXUx8uTczpPIJKrb1O14h'
+
+- user: 
+    name: wls
+    # python -c 'import crypt; print crypt.crypt("acror", "$1$SomeSalt$")'
+    password: "$1$SomeSalt$V2yJBnrIRWQytrgM9BB2Y1"
+
+- name: Add the user "wls" keys (1)
+  authorized_key:
+    user: wls
+    key: '{{ item }}'
+  with_file:
+    - autorized_keys.thinkpad
+
+- name: Wls sudo
+  copy:
+    src: sudoerrs
+    dest: /etc/sudoers.d/wls
+    mode: '0440'
+
+- name: Create a logical volume wls
+  lvol:
+    vg: vg01
+    lv: wls
+    size: 5g
+    shrink: no
+
+- name: Create /wls directory
+  file:
+    path: /wls
+    owner: wls
+    group: oinstall
+    mode: '0775'
+    state: directory
+
+- name: Create fs on /dev/vg01/wls
+  filesystem:
+    fstype: ext4
+    dev: /dev/vg01/wls
+
+- name: Mount /dev/vg01/wls on /wls
+  mount:
+    path: /wls
+    src: /dev/vg01/wls
+    state: mounted
+    fstype: auto
+
+
+- name: Create /wls/middleware directory
+  file:
+    path: /wls
+    owner: wls
+    group: oinstall
+    mode: '0775'
+    state: directory
+    recurse: yes
+
+- name: Create /wls/config/domains directory
+  file:
+    path: /wls
+    owner: wls
+    group: oinstall
+    mode: '0775'
+    state: directory
+    recurse: yes
+
+- name: Create /wls/config/applications directory
+  file:
+    path: /wls
+    owner: wls
+    group: oinstall
+    mode: '0775'
+    state: directory
+    recurse: yes
+
+- name: bash_profile
+  copy:
+    src: bash_profile
+    dest: /home/wls/.bash_profile
+
+- name: wls.rsp
+  template:
+    src: wls.rsp
+    dest: /home/wls/wls.rsp
+
+- name: fmw_infr.rsp
+  template:
+    src: fmw_infr.rsp
+    dest: /home/wls/fmw_infr.rsp
+
+- name: oraInst.loc
+  template:
+    src: oraInst.loc
+    dest: /wls/oraInst.loc
+
+- name: 'Extend the /tmp'
+  lvol:
+    vg: vg00
+    lv: lv_tmp
+    size: 1g
+    shrink: no
+    resizefs: yes
+
+- name: unzip install package http://192.168.8.200/oracle/FWM.14c/fmw_14.1.1.0.0_wls_Disk1_1of1.zip
+  unarchive:
+    src: http://192.168.8.200/oracle/FWM.14c/fmw_14.1.1.0.0_wls_Disk1_1of1.zip
+    dest: /home/wls
+    remote_src: yes
+
+# java -Xmx1024m -jar fmw_14.1.1.0.0_wls.jar -silent -responseFile /home/wls/wls.rsp -invPtrLoc /wls/oraInst.loc
+
+- name: "run wls installer"
+  block:
+    - name: run installer
+      shell: "java -Xmx1024m -jar fmw_14.1.1.0.0_wls.jar -silent -responseFile /home/wls/wls.rsp -invPtrLoc /wls/oraInst.loc"
+      args:
+        chdir: "/home/wls"
+        creates: "/wls/middleware/root.sh"
+      ignore_errors: true
+      register: installer_out
+
+    - debug: 
+        msg: "Return out {{ installer_out }}"
+      when: installer_out.rc >= 0
+
+    - debug: 
+        msg: "Return code is {{ installer_out.rc }}"
+      when: installer_out.rc >= 0
+
+    - fail:
+        msg: "installer failed"
+      when: installer_out.rc > 6
+
+  rescue:
+    - name: delete response file
+      file:
+        path: /home/wls/wls.rsp
+        state: absent
+
+    - fail:
+        msg: 'wls installer failed'
+
+  become: yes
+  become_user: wls
+
+- name: "run infra installer"
+  block:
+    - name: run installer
+      shell: "java -Xmx1024m -jar fmw_14.1.1.0.0_wls.jar -silent -responseFile /home/wls/fmw_infr.rsp -invPtrLoc /wls/oraInst.loc"
+      args:
+        chdir: "/home/wls"
+        #creates: "/wls/middleware/root.sh"
+      ignore_errors: true
+      register: infra_out
+
+    - debug: 
+        msg: "Return out {{ infra_out }}"
+      when: infra_out.rc >= 0
+
+    - debug: 
+        msg: "Return code is {{ infra_out.rc }}"
+      when: infra_out.rc >= 0
+    - fail:
+        msg: "installer failed"
+      when: infra_out.rc > 6
+
+  rescue:
+    - name: delete response file
+      file:
+        path: /home/wls/fmw_infr.rsp
+        state: absent
+
+    - fail:
+        msg: 'infra installer failed'
+
+  become: yes
+  become_user: wls
+
+- name: Configure Firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: clean /tmp directory
+  find:
+    name: /tmp
+    file_type: directory
+    patterns:
+      - "orcl*.tmp"
+      - 'OraInstall*'
+  register: find_results
+
+- name: clean /tmp directory
+  file:
+    path: "{{ item['path'] }}"
+    state: absent
+  with_items: "{{ find_results['files'] }}"
+
