@@ -1,5 +1,5 @@
 ---
-# defaults file for oraclerestart
+# defaults file for oracle home 
 
 oracle_sid:              "{{ oracle_install_space[oracle_release]['oracle_sid'] }}"
 oracle_db_name:          "{{ oracle_install_space[oracle_release]['oracle_db_name'] }}"

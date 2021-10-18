@@ -1,0 +1,10 @@
+---
+- hosts: all
+  roles:
+  - base.host
+  - wls
+
+#
+# Admin location:
+# rhel7-b:7001/console
+#

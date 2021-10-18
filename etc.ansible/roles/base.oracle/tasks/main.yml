@@ -68,7 +68,7 @@
 
 - name: Add the user "oracle" keys (1)
   authorized_key:
-    user: oracle
+    user: "{{ oracle_os_user }}"
     key: '{{ item }}'
   with_file:
     - autorized_keys.thinkpad

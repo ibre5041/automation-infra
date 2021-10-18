@@ -3,46 +3,33 @@
 
 - name: "Oracle KB"
   file:
-    path: "/home/oracle/.ORACLE_KB"
+    path: "/home/{{ oracle_os_user }}/.ORACLE_KB"
     state: directory
-    owner: oracle
-    group: oinstall
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
 
 - name: "DBA home"
   file:
-    path: "/oracle/u01/db/DBA"
+    path: "{{ oracle_install_dir_root }}/DBA"
     state: directory
-    owner: oracle
-    group: oinstall
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
     mode: '0755'
 
 - name: Oracle profile
   yum:
-    name=haf-oracle-profile,haf-oracle-rlwrap
+    name=haf-oracle-profile
     state=latest
     disable_gpg_check=yes
 
-- name: delete install grid.rsp
-  file:
-    path: /home/oracle/grid.rsp
-    state: absent
+- name: Oracle profile
+  yum:
+    name: rlwrap
+    disable_gpg_check: yes
 
-- name: delete install directory
-  file:
-    path: /home/oracle/grid
-    state: absent
-
-- name: delete install directory
-  file:
-    path: /home/oracle/database
-    state: absent
-
-# - name: delete install db.rsp
-#   file:
-#     path: /home/oracle/db.rsp
-#     state: absent
-
-- name: delete install dbca.rsp
-  file:
-    path: /home/oracle/dbca.rsp
-    state: absent
+- name: "Delete all files in: {{ oracle_install_dir_temp }}"
+  shell: "find {{ oracle_install_dir_temp }} -type f -delete"
+  args:
+    chdir: "{{ oracle_install_dir_temp }}"
+    warn: false # set warn=false to prevent warning
+  changed_when: false

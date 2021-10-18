@@ -56,8 +56,12 @@
     path: "{{ oracle_home }}/bin/extjob"
   register: extjob_permissions
 
+- name: extjob_permissions
+  debug:
+    var: extjob_permissions
+
 - name: db root.sh
   shell: "{{ oracle_home }}/root.sh"
   args:
     chdir: "/"
-  when: extjob_permissions.stat.uid != 0
+  when: extjob_permissions.stat.exists == false or extjob_permissions.stat.uid != 0

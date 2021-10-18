@@ -4,26 +4,26 @@
     - name: ACFS Centos path
       copy:
         src: acfs.centos.patch
-        dest: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
+        dest: "{{ oracle_home }}/lib/"
 
     - name: Apply patch ACFS Centos patch
       patch:
         src: acfs.centos.patch
-        basedir: /oracle/u01/gi/{{ oracle_ver_path }}/lib/
+        basedir: "{{ oracle_home }}/lib/"
         strip: 0
 
     - name: install grid.rsp
       template:
         src: grid.no.comments.rsp
-        dest: /home/oracle/grid.rsp
+        dest: "{{ oracle_install_dir_temp }}/grid.rsp"
         mode: '0640'
-        owner: oracle
+        owner: "{{ oracle_os_user }}"
 
     - name: "gridSetup.sh (part I)"
-      shell: "./gridSetup.sh -silent -responseFile /home/oracle/grid.rsp"
+      shell: "./gridSetup.sh -silent -responseFile {{ oracle_install_dir_temp }}/grid.rsp"
       args:
-        chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
-        creates: "/oracle/u01/oraInventory/oraInst.loc"
+        chdir: "{{ oracle_home }}"
+        creates: "{{ oracle_inventory_location }}/oraInst.loc"
       ignore_errors: true
       register: grid_setup_out
     - debug: 
@@ -36,22 +36,7 @@
         msg: "./gridSetup.sh -executeConfigTools failed"
       when: grid_setup_out.rc > 6
 
-  rescue:
-    - name: delete response file
-      file:
-        path: /home/oracle/grid.rsp
-        state: absent
-
-    - fail:
-        msg: '"./gridSetup.sh failed'
-
   become: yes
   become_user: oracle
   # Condition to be set on caller level
   # when: ansible_hostname == first_rac_node
-
-
-- name: delete install grid.rsp
-  file:
-    path: /home/oracle/grid.rsp
-    state: absent

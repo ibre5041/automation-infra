@@ -1,14 +1,9 @@
 ---
 # tasks file for oraclerestart 19c
 
-- name: delete response file
-  file:
-    path: /home/oracle/grid.rsp
-    state: absent
-
 - name: check if ~oracle/.crsbuild exists
   stat:
-    path: /home/oracle/.crsbuild
+    path: "/home/{{ oracle_os_user }}/.crsbuild"
   register: crsbuild_present
 
 - include_role:
@@ -19,7 +14,15 @@
 - name: "ora_1_env file"
   template:
     src: ora_1_env.ASM
-    dest: "/home/oracle/.ora_1_env"
+    dest: "/home/{{ oracle_os_user }}/.ora_1_env"
+
+- name: CRS HOME
+  file:
+    path: "{{ oracle_home }}"
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
+    mode: '0775'
+    state: directory
 
 - name: wait for oracle-ohasd.service
   systemd:
@@ -31,7 +34,7 @@
 
 - name: check if Oracle CRS unpacked
   stat: 
-    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/
+    path: "{{ oracle_home }}/bin/"
   register: crs_unpacked
   
 - debug:
@@ -41,7 +44,8 @@
   include_role:
     name: oracle.download.package
   vars:
-    oracle_home: "/oracle/u01/gi/{{ oracle_ver_path }}"
+    # oracle_db_media, oracle_release, oracle_install_dir_temp oracle_home are passed here
+    # 
   when: crs_unpacked.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"
 
 - name: check if Oracle CRS set up
@@ -57,12 +61,12 @@
   when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"
   
 - name: orainstRoot.sh
-  shell: /oracle/u01/oraInventory/orainstRoot.sh
+  shell: "{{ oracle_inventory_location }}/orainstRoot.sh"
   args:
     creates: /etc/oraInst.loc
 
 - name: root.sh   
-  shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+  shell: "{{ oracle_home }}/root.sh"
   when: oracle_ohasd_service.status.LoadState == "not-found"
 
 - name: wait for oracle-ohasd.service
@@ -76,7 +80,7 @@
     msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
 
 - name: Check asm configured
-  command: "sh -c '/oracle/u01/gi/{{ oracle_ver_path }}/bin/crsctl status res ora.asm | grep ONLINE'"
+  command: "sh -c '{{ oracle_home }}/bin/crsctl status res ora.asm | grep ONLINE'"
   register: oracle_asm_status
   ignore_errors: true
 
@@ -86,9 +90,9 @@
 - name: "Execute Config Tools gridSetup.sh (part II)"
   block:
     - name: Grid Setup ASM
-      shell: "./gridSetup.sh -executeConfigTools -responseFile /home/oracle/grid.rsp -silent"
+      shell: "./gridSetup.sh -executeConfigTools -responseFile {{ oracle_install_dir_temp}}/grid.no.comments.rsp -silent"
       args:
-        chdir: "/oracle/u01/gi/{{ oracle_ver_path }}"
+        chdir: "{{ oracle_home }}"
       ignore_errors: true
       register: grid_setup_out2
     - debug:
@@ -105,19 +109,19 @@
   become_user: oracle
   when: oracle_asm_status.stdout is not match(".*ONLINE")
 
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
-    owner: oracle
-    group: oinstall
-    mode: '6755'
+# - name: file perm fixup
+#   file:
+#     path:  "{{ oracle_home }}/bin/oracle"
+#     owner: "{{ oracle_os_user }}"
+#     group: "{{ oracle_os_group }}"
+#     mode: '6755'
 
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}
-    owner: root
-    group: oinstall
-    mode: '0755'
+# - name: file perm fixup
+#   file:
+#     path:  "{{ oracle_home }}"
+#     owner: root
+#     group: "{{ oracle_os_group }}"
+#     mode: '0755'
 
 - name: Create ~oracle/.crsbuild
   block:

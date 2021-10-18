@@ -1,14 +1,19 @@
 all:
   hosts:
-    rhel7a-19-restart:
-      address: 192.168.8.100
+    rhel7-golden:
+      address: 192.168.8.104
+      # override group_vars oracle (only here, vars from inventory have higher precenve)
+      # priority 9 = inventory host_vars/* 
+      # oracle_install_type: rac | standalone | restart
+      oracle_install_type: standalone
       oracle_release: 19c
+      oracle_password: X3r03koegjogje
   children:
     oracle:
       hosts:
-        rhel7a-19-restart:
-      vars:
+        rhel7-golden:
   vars:
+    
     scsi:
     - adapter:
         pciSlotNumber: 16
@@ -33,14 +38,4 @@ all:
 
     vmware:
       vm_folder: VmFolder
-      datastore: Kingston890G
-
-    cluster:
-      clustername: rhel7a-19
-      disks:
-        - disk:
-            size: 8
-            bus: 1
-            count: 4
-
-    password: Xb6a5ed2ff29f98d
+      datastore: WD1T

@@ -13,6 +13,9 @@ oracle_install_dir_prod: "{{ oracle_install_dir_root}}/product"
 
 oracle_inventory_location: "{{ oracle_install_dir_root}}/oraInventory"
 
+# Oracle DB password, override this in inventory/host_vars
+oracle_password: X43ljflkjfslkjslj
+
 oracle_os_user: oracle
 oracle_os_uid: 800
 oracle_os_group: oinstall
@@ -40,6 +43,8 @@ oracle_install_space:
     oracle_db_ver_release: 19c
     oracle_db_ver_path: 19.12.0.0
     oracle_db_media: db_home_19_12.zip
+    oracle_gi_media: grid_home_2020-06-09_05-15-41PM.zip
+    # oracle_gi_media: LINUX.X64_193000_grid_home.zip
 
   18c:
     oracle_sid:         "TEST18C"
@@ -50,6 +55,7 @@ oracle_install_space:
     oracle_db_ver_release: 18c
     oracle_db_ver_path: 18.0.0.0
     oracle_db_media: LINUX.X64_180000_db_home.zip
+    oracle_gi_media: LINUX.X64_180000_grid_home.zip
 
 oracle_os_sysctl:
   - sysctl: kernel.shmmni
@@ -132,3 +138,10 @@ oracle_os_packages_rhel7:
 oracle_os_packages_rhel8:
   - libnsl
   - policycoreutils-python-utils
+
+oracle_os_packages_crs:
+  - gcc-c++
+
+
+
+

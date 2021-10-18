@@ -2,12 +2,14 @@ all:
   hosts:
     rhel7b-19-restart:
       address: 192.168.8.150
+      oracle_install_type: restart
+      oracle_release: 19c
+      oracle_password: X4ollkflkfjslkjfglksj
   children:
     oracle:
       hosts:
         rhel7b-19-restart:
-      vars:
-        oracle-release: 19c
+
   vars:
     scsi:
     - adapter:
@@ -35,12 +37,10 @@ all:
       vm_folder: VmFolder
       datastore: Kingston890G
 
-    # cluster:
-    #   clustername: rhel7b-19
-    #   disks:
-    #     - disk:
-    #         size: 8
-    #         bus: 1
-    #         count: 4
-
-    password: Xb6a5ed2ff29f98d
+    cluster:
+      oracle_clustername: rhel7b-19
+      disks:
+        - disk:
+            size: 8
+            bus: 1
+            count: 4

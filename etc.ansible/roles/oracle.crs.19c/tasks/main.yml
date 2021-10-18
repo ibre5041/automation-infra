@@ -1,14 +1,9 @@
 ---
 # tasks file for oracle crs 19c
 
-- name: delete response file
-  file:
-    path: /home/oracle/grid.rsp
-    state: absent
-
 - name: check if ~oracle/.crsbuild exists
   stat: 
-    path: /home/oracle/.crsbuild
+    path: "/home/{{ oracle_os_user }}/.crsbuild"
   register: crsbuild_present
 
 - include_role: 
@@ -23,7 +18,7 @@
 - name: "ora_1_env file"
   template:
     src: ora_1_env.ASM
-    dest: "/home/oracle/.ora_1_env"
+    dest: "/home/{{ oracle_os_user }}/.ora_1_env"
 
 - name: wait for oracle-ohasd.service
   systemd:
@@ -35,18 +30,18 @@
 
 - name: check if Oracle CRS unpacked
   stat: 
-    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/
+    path: "{{ oracle_home }}/bin/"
   register: crs_unpacked
   
 - debug:
     msg: "Install package exists: {{ crs_unpacked.stat.exists }} on {{ first_rac_node }}"
 
-- name: "Directory /oracle/u01/gi"
+- name: "Directory {{ oracle_home }}"
   file:
-    path: "/oracle/u01/gi"
+    path: "{{ oracle_home }}"
     state: directory
-    owner: oracle
-    group: oinstall
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
     #recurse: yes
     mode: '0755'
 
@@ -54,12 +49,12 @@
   include_role:
     name: oracle.download.package
   vars:
-    oracle_home: "/oracle/u01/gi/{{ oracle_ver_path }}"
+    
   when: crs_unpacked.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found" and ansible_hostname == first_rac_node
 
 - name: check if Oracle CRS set up
   stat: 
-    path: /oracle/u01/oraInventory/ContentsXML
+    path: "{{ oracle_inventory_location }}/ContentsXML"
   register: crs_set_up
 
 - debug:
@@ -71,16 +66,16 @@
   when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found" and ansible_hostname == first_rac_node
 
 - name: orainstRoot.sh
-  shell: /oracle/u01/oraInventory/orainstRoot.sh
+  shell: "{{ oracle_inventory_location }}/orainstRoot.sh"
   args:
     creates: /etc/oraInst.loc
 
 - name: root.sh (1st node)
-  shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+  shell: "{{ oracle_home }}/root.sh"
   when: ansible_hostname == first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
 
 - name: root.sh (other nodes)
-  shell: /oracle/u01/gi/{{ oracle_ver_path }}/root.sh
+  shell: "{{ oracle_home }}/root.sh"
   when: ansible_hostname != first_rac_node and oracle_ohasd_service.status.LoadState == "not-found"
 
 - name: wait for oracle-ohasd.service
@@ -94,7 +89,7 @@
     msg: "oracle-ohasd.service {{ oracle_ohasd_service.status.LoadState }}"
 
 - name: Check asm configured
-  command: "sh -c '/oracle/u01/gi/{{ oracle_ver_path }}/bin/crsctl status res ora.asm | grep ONLINE'"
+  command: "sh -c '{{ oracle_home }}/bin/crsctl status res ora.asm | grep ONLINE'"
   register: oracle_asm_status
   ignore_errors: true
 
@@ -105,24 +100,24 @@
   include: config.grid.yml
   when: crs_set_up.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found" and ansible_hostname == first_rac_node
 
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
-    owner: oracle
-    group: oinstall
-    mode: '6755'
+# - name: file perm fixup
+#   file:
+#     path: /oracle/u01/gi/{{ oracle_ver_path }}/bin/oracle
+#     owner: oracle
+#     group: oinstall
+#     mode: '6755'
 
-- name: file perm fixup
-  file:
-    path: /oracle/u01/gi/{{ oracle_ver_path }}
-    owner: root
-    group: oinstall
-    mode: '0755'
+# - name: file perm fixup
+#   file:
+#     path: /oracle/u01/gi/{{ oracle_ver_path }}
+#     owner: root
+#     group: oinstall
+#     mode: '0755'
 
 - name: crsstat
   copy:
     src: crsstat.py
-    dest: "/oracle/u01/gi/{{ oracle_ver_path }}/bin/"
+    dest: "{{ oracle_home }}/bin/"
     mode: '0755'
 
 - name: Create ~oracle/.crsbuild

@@ -1,7 +1,7 @@
 ---
-# vars file for oraclerestart
+# vars file for oracle crs
 
-oracle_major_version: "19"
+#oracle_major_version: "19"
 
 # Golden Image HOWTO:
 # http://www.ludovicocaldara.net/dba/2018/11/
@@ -22,7 +22,7 @@ oracle_major_version: "19"
 #
 #oracle_install_package_name: "LINUX.X64_193000_grid_home.zip"
 #oracle_install_package_name: "grid_home_2020-02-29_03-04-07PM.zip"
-oracle_install_package_name: "grid_home_2020-06-09_05-15-41PM.zip"
+#oracle_install_package_name: "grid_home_2020-06-09_05-15-41PM.zip"
 
-oracle_ver_path: "19.7.0.0"
+#oracle_ver_path: "19.7.0.0"
 

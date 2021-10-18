@@ -54,21 +54,27 @@
       debug:
         msg: "init_cluster_database: {{ init_cluster_database }}"
 
-    - name: install dbca.rsp
+    - name: Install dbca.rsp
       template:
-        src: dbca.gp.no.comments.rsp
-        dest: /home/oracle/dbca.rsp
+        src: dbca.no.comments.19.rsp
+        dest:  "{{ oracle_install_dir_temp }}/dbca.rsp"
         mode: '0640'
-        owner: oracle
-        group: oinstall
+        owner: "{{ oracle_os_user }}"
+        group: "{{ oracle_os_group }}"
 
     - name: "Create database"
-      shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile /home/oracle/dbca.rsp"
+      shell: "./dbca -ignorePreReqs -ignorePrereqFailure -silent -createDatabase -responseFile {{ oracle_install_dir_temp }}/dbca.rsp"
       args:
-        chdir: "/oracle/u01/db/{{ oracle_ver_path }}/bin/"
+        chdir: "{{ oracle_home }}/bin/"
         creates: "/oracle/u01/base/cfgtoollogs/dbca/{{ oracle_sid }}/{{ oracle_sid }}.log"
       ignore_errors: true
       register: db_create_out
+
+    # - name: delete install dbca.rsp
+    #   file:
+    #     path: "{{ oracle_install_dir_temp }}/dbca.rsp"
+    #     state: absent
+
     - debug: 
         msg: "Return code is {{ db_create_out }}"
       when: db_create_out.rc >= 0
@@ -76,19 +82,5 @@
         msg: "Return code is {{ db_create_out.rc }}"
       when: db_create_out.rc > 0
 
-  rescue:
-    - name: delete install dbca.rsp
-      file:
-        path: /home/oracle/dbca.rsp
-        state: absent
-
-    - fail:
-        msg: './dcba failed'
-
   become: yes
   become_user: oracle
-
-- name: delete install dbca.rsp
-  file:
-    path: /home/oracle/dbca.rsp
-    state: absent

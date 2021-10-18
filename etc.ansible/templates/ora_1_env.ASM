@@ -1,7 +1,7 @@
 export ORACLE_SID=+ASM{{crs_node_index | default('') }}
-export CRS_HOME=/oracle/u01/gi/{{ oracle_ver_path }}
-export ORACLE_BASE=/oracle/u01/base
-export ORACLE_HOME=/oracle/u01/gi/{{ oracle_ver_path }}
+#export CRS_HOME={{ oracle_home }}
+export ORACLE_BASE={{ oracle_install_dir_base }}
+export ORACLE_HOME={{ oracle_home }}
 
 export NLS_DATE_FORMAT='dd/mm/yyyy hh24:mi'
 export PATH=$(echo $PATH | sed 's/oracle.*\/bin//g'):$ORACLE_HOME/bin

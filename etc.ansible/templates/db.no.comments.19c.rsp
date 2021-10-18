@@ -13,7 +13,7 @@ oracle.install.db.OSRACDBA_GROUP=dba
 oracle.install.db.rootconfig.executeRootScript=false
 
 # Uncomment this line for CRS
-oracle.install.db.CLUSTER_NODES={{ db_node_list | default([]) | sort() | join(',') }}
+#oracle.install.db.CLUSTER_NODES={{ db_node_list | default([]) | sort() | join(',') }}
 
 oracle.install.db.config.starterdb.type=GENERAL_PURPOSE
 oracle.install.db.ConfigureAsContainerDB=false
