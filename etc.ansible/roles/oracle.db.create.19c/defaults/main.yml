@@ -18,3 +18,4 @@ init_instance_list: []
 oracle_diskgroup: "+XDATA"
 oracle_datafiles: "{{ oracle_install_dir_root + '/data' if                oracle_install_type == 'standalone' else oracle_diskgroup }}"
 oracle_flasharea: "{{ oracle_install_dir_root + '/flash_recovery_area' if oracle_install_type == 'standalone' else oracle_diskgroup }}"
+

@@ -26,3 +26,4 @@
 
 #oracle_ver_path: "19.7.0.0"
 
+first_rac_node: "{{ ansible_play_batch | sort() | first }}"
