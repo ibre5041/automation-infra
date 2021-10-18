@@ -177,3 +177,30 @@ def delete_dns_record(host, domain, ip):
     response = dns.query.tcp(update, PRIMARY_DNS_SERVER_IP)
     flags = dns.flags.to_text(response.flags)
     logging.debug(" TXT DNS delete response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
+
+    if ip:
+        ### Create reverse entry (PTR)
+        # Neat function to generate a reverse entry
+        reventry = dns.reversename.from_address(ip)
+        revzone = ''
+        # Specify the reverse lookup zone based on the reverse IP address.
+        # The labels[X:] property allows you to specify which octet to use.
+        # e.g. 3: will apply the record to the 10.in-addr.arpa zone, 
+        # whereas 1: will apply it to the 72.23.10.in-addr.arpa zone
+        revzone = b'.'.join(dns.name.from_text(str(reventry)).labels[1:]) # 
+        revzone = revzone.decode()
+        # Prepare the payload for the DNS record update
+        raction = dns.update.Update(zone=revzone
+                                    , keyname='dynamic.vmware.haf.'
+                                    , keyring=keyring
+                                    , keyalgorithm=dns.tsig.HMAC_SHA512)
+
+        # Although we are updating the reverse lookup zone, 
+        # the record needs to point back to the ‘test.example.com’ domain, not the 10.in-addr.arpa domain
+        host_fqdn = '%s.%s' % (host, dns_domain)
+        # Inject the updated record details into the the class, preparing for submission to the DNS server
+        raction.delete(reventry, dns.rdatatype.PTR)
+        # submit the new record to the DNS server to apply the update
+        response = dns.query.tcp(raction, PRIMARY_DNS_SERVER_IP, timeout=5)
+        flags = dns.flags.to_text(response.flags)
+        logging.debug(" PTR DNS delete response: {} {}".format(dns.rcode.to_text(response.rcode()), flags))
