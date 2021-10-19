@@ -36,10 +36,9 @@ export_env () {
     export ORACLE_HOME="${2}"
     export ORACLE_BASE="${3}"
 
-    get_status
-    echo "Alert_Log $alert_log"
+    get_instance
 
-    export ALERT_LOG="$alert_log"
+    export ALERT_LOG="$ora_alert_log"
     # if [ -d "/oracle/u01/DBA" -a -x "/oracle/u01/DBA" ]; then
     # 	cd "/oracle/u01/DBA"
     # elif [ -d "${ORACLE_BASE}" ]; then
@@ -61,31 +60,26 @@ export_env () {
     fi
 }
 
-get_status () {
+get_instance () {
     eval `${SCRIPT_DIR}/profile.py -i`
     ora_product=$(echo "$ora_banner" | sed 's/ Release .*$//g')
 
-    ora_type=""
-
-    if [ $uptime_d -gt 1 ]; then
-	status=$(printf "Up ($ora_status) %d days %02d:%02d:%02d" $uptime_d $uptime_h $uptime_m $uptime_s)
-    elif [ $uptime_d -eq 1 ]; then
-	status=$(printf "Up ($ora_status) %d day %02d:%02d:%02d" $uptime_d $uptime_h $uptime_m $uptime_s)
-    else
-	status=$(printf "Up ($ora_status) %02d:%02d:%02d" $uptime_h $uptime_m $uptime_s)
-    fi
-
-    if [ $ora_dg_on -ge 1 -a "$ora_rac_on" = "FALSE" ]; then
-	ext_status="($ora_dg_role)"
-	ora_type="DG"
-    elif [ $ora_dg_on -eq 0 -a "$ora_rac_on" = "TRUE" ]; then
-	ext_status="(${ora_rac_nodes}-RAC)"
-	ora_type="RAC"
-    elif [ $ora_dg_on -ge 1 -a "$ora_rac_on" = "TRUE" ]; then
-	ext_status="($ora_dg_role in ${ora_rac_nodes}-RAC)"
-	ora_type="DGRAC"
+    status="Up ($ora_status) $ora_uptime"
+    
+    if [ -n "${ora_dg_on}" ]; then
+	if [ "${ora_dg_on}" -ge 1 -a "$ora_rac_on" = "FALSE" ]; then
+	    ext_status="($ora_dg_role)"
+	    ora_type="DG"
+	elif [ "${ora_dg_on}" -eq 0 -a "$ora_rac_on" = "TRUE" ]; then
+	    ext_status="(${ora_rac_nodes}-RAC)"
+	    ora_type="RAC"
+	elif [ "${ora_dg_on}" -ge 1 -a "$ora_rac_on" = "TRUE" ]; then
+	    ext_status="($ora_dg_role in ${ora_rac_nodes}-RAC)"
+	    ora_type="DGRAC"
+	fi
     else
 	ext_status=""
+	ora_type=""
     fi
 }
 
@@ -143,7 +137,7 @@ if [ -t 0 ] && [ tty ]; then
     printf "                              Oracle Database List\n"
     printf "                              ********************\n\n"
     printf "p=======================================================================================q\n"
-    printf "| No Type  ORACLE_SID KB Version           Status                                       |\n"
+    printf "| No Type  ORACLE_SID    Version           Status                                       |\n"
     printf "|---------------------------------------------------------------------------------------|\n"
     num=0
     declare -A HOMES
@@ -168,9 +162,10 @@ if [ -t 0 ] && [ tty ]; then
             fi 
         else 
             export ORACLE_SID ORACLE_BASE ORACLE_HOME
-            get_status "${ORACLE_SID}" "${ORACLE_HOME}" "${ORACLE_BASE}"
+            get_instance "${ORACLE_SID}" "${ORACLE_HOME}" "${ORACLE_BASE}"
         fi
-        printf "|%3.3s %5.5s %-10.10s %-s  %-17.17s %-45.45s|\n" "$num" "$ora_type" "$ORACLE_SID" " " "$ora_version" "$status $ext_status"
+	#rintf "| No   Type  ORACLE_SID    Version           Status                                       |\n"
+        printf "|%3.3s %5.5s %-10.10s    %-17.17s %-45.45s|\n" "$num" "$ora_type" "$ORACLE_SID" "$ora_version" "$status $ext_status"
         alias X-${ORACLE_SID}="export_env '$ORACLE_SID' '$ORACLE_HOME' '$ORACLE_BASE' && print_status"
         unset ORACLE_SID ORACLE_BASE ORACLE_HOME ora_version status ext_status ora_type
     done < <(${SCRIPT_DIR}/profile.py -l)
