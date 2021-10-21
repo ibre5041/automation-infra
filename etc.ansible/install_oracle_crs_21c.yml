@@ -16,5 +16,5 @@
   - oracle.db.create.21c
   - oracle.post.install
   vars:
-    password: Xb6a5ed2ff29f98d
-    cluster_name: c19
+    oracle_password: Xb6a5ed2ff29f98d
+    oracle_cluster_name: c19

@@ -16,7 +16,7 @@ all:
         rac19-a-node-1:
         rac19-a-node-2:
       vars:
-        oracle-release: 19c
+        oracle_release: 19c
   vars:
     scsi:
     - adapter:
@@ -28,7 +28,7 @@ all:
       size: 10g
       bus: 0
     - disk: appdg
-      size: 60g
+      size: 100g
       bus: 0
     network:
     - adapter:
@@ -45,7 +45,7 @@ all:
       datastore: WD1T
 
     cluster:
-      clustername: rac19c-a
+      oracle_cluster_name: rac19c-a
       disks:
         - disk:
             size: 8
@@ -57,4 +57,4 @@ all:
         rac19-a-scan: [192.168.8.47, 192.168.8.48, 192.168.8.49]
     
     scan: rac19-a-scan
-    password: Xb6a5ed2ff29f98d
+    oracle_password: Xb6a5ed2ff29f98d

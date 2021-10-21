@@ -44,7 +44,7 @@ all:
       datastore: WD1T
 
     cluster:
-      clustername: rac21c-a
+      oracle_cluster_name: rac21c-a
       disks:
         - disk:
             size: 8
@@ -56,4 +56,4 @@ all:
         rac21-a-scan: [192.168.8.97, 192.168.8.98, 192.168.8.99]
     
     scan: rac21-a-scan
-    password: Xb6a5ed2ff29f98d
+    oracle_password: Xb6a5ed2ff29f98d

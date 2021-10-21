@@ -48,10 +48,10 @@ all:
 
     vmware:
       vm_folder: VmFolder
-      datastore: WD1T
+      datastore: Kingston890G
 
     cluster:
-      clustername: rac19c-b
+      oracle_cluster_name: rac19c-b
       disks:
         - disk:
             size: 8
@@ -64,4 +64,4 @@ all:
         rac19-b-scan: [192.168.8.57, 192.168.8.58, 192.168.8.59]
 
     scan: rac19-b-scan
-    password: Xb6a5ed2ff29f98d
+    oracle_password: Xb6a5ed2ff29f98d

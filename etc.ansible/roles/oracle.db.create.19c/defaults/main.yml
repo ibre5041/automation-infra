@@ -4,18 +4,14 @@
 oracle_sid:              "{{ oracle_install_space[oracle_release]['oracle_sid'] }}"
 oracle_db_name:          "{{ oracle_install_space[oracle_release]['oracle_db_name'] }}"
 oracle_unique_name:      "{{ oracle_install_space[oracle_release]['oracle_unique_name'] }}"
-#oracle_db_response_file: "{{ oracle_install_space[oracle_release]['oracle_db_response_file'] }}"
+oracle_db_response_file: "{{ oracle_install_space[oracle_release]['oracle_db_response_file'] }}"
 oracle_db_ver_path:      "{{ oracle_install_space[oracle_release]['oracle_db_ver_path'] }}"
 oracle_db_media:         "{{ oracle_install_space[oracle_release]['oracle_db_media'] }}"
 oracle_home:             "{{ oracle_install_dir_prod }}/{{ oracle_db_ver_path }}"
-
-oracle_db_response_file: dbca.no.comments.19.rsp
 
 init_undo_list: []
 init_thread_list: []
 init_instance_list: []
 
-oracle_diskgroup: "+XDATA"
-oracle_datafiles: "{{ oracle_install_dir_root + '/data' if                oracle_install_type == 'standalone' else oracle_diskgroup }}"
-oracle_flasharea: "{{ oracle_install_dir_root + '/flash_recovery_area' if oracle_install_type == 'standalone' else oracle_diskgroup }}"
+init_cluster_database:   "{{ 'cluster_database=true' if oracle_install_type == 'rac' else 'cluster_database=false' }}"
 

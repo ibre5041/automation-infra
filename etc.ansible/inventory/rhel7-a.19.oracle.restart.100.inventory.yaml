@@ -3,6 +3,8 @@ all:
     rhel7a-19-restart:
       address: 192.168.8.100
       oracle_release: 19c
+      oracle_install_type: restart
+
   children:
     oracle:
       hosts:
@@ -36,11 +38,10 @@ all:
       datastore: Kingston890G
 
     cluster:
-      clustername: rhel7a-19
+      oracle_cluster_name: rhel7a-19
       disks:
         - disk:
             size: 8
             bus: 1
-            count: 4
+            count: 3
 
-    password: Xb6a5ed2ff29f98d

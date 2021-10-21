@@ -90,7 +90,7 @@
 - name: "Execute Config Tools gridSetup.sh (part II)"
   block:
     - name: Grid Setup ASM
-      shell: "./gridSetup.sh -executeConfigTools -responseFile {{ oracle_install_dir_temp}}/grid.no.comments.rsp -silent"
+      shell: "./gridSetup.sh -executeConfigTools -responseFile {{ oracle_install_dir_temp}}/{{ oracle_gi_response_file }} -silent"
       args:
         chdir: "{{ oracle_home }}"
       ignore_errors: true

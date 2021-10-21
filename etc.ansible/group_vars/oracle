@@ -13,8 +13,14 @@ oracle_install_dir_prod: "{{ oracle_install_dir_root}}/product"
 
 oracle_inventory_location: "{{ oracle_install_dir_root}}/oraInventory"
 
+oracle_cluster_name: "CDEFAULT"
+
 # Oracle DB password, override this in inventory/host_vars
 oracle_password: X43ljflkjfslkjslj
+
+oracle_diskgroup: "XDATA"
+oracle_datafiles: "{{ oracle_install_dir_root + '/data'                if oracle_install_type == 'standalone' else '+' + oracle_diskgroup }}"
+oracle_flasharea: "{{ oracle_install_dir_root + '/flash_recovery_area' if oracle_install_type == 'standalone' else '+' + oracle_diskgroup }}"
 
 oracle_os_user: oracle
 oracle_os_uid: 800
@@ -34,10 +40,23 @@ oracle_os_groups:
     gid: 805
 
 oracle_install_space:
+  21c:
+    oracle_sid:         "TEST21C"
+    oracle_db_name:     "TEST21C"
+    oracle_unique_name: "TEST21C"
+    oracle_gi_response_file: grid.no.comments.21c.rsp
+    oracle_oh_response_file: db.no.comments.21c.rsp
+    oracle_db_response_file: dbca.no.comments.21c.rsp
+    oracle_db_ver_release: 21c
+    oracle_db_ver_path: 21.3.0.0
+    oracle_db_media: LINUX.X64_213000_db_home.zip
+    oracle_gi_media: LINUX.X64_213000_grid_home.zip
+
   19c:
     oracle_sid:         "TEST19C"
     oracle_db_name:     "TEST19C"
     oracle_unique_name: "TEST19C"
+    oracle_gi_response_file: grid.no.comments.19c.rsp
     oracle_oh_response_file: db.no.comments.19c.rsp
     oracle_db_response_file: dbca.no.comments.19c.rsp
     oracle_db_ver_release: 19c
@@ -50,6 +69,7 @@ oracle_install_space:
     oracle_sid:         "TEST18C"
     oracle_db_name:     "TEST18C"
     oracle_unique_name: "TEST18C"
+    oracle_gi_response_file: grid.no.comments.18c.rsp
     oracle_oh_response_file: db.no.comments.18c.rsp
     oracle_db_response_file: dbca.no.comments.18c.rsp
     oracle_db_ver_release: 18c
@@ -141,7 +161,4 @@ oracle_os_packages_rhel8:
 
 oracle_os_packages_crs:
   - gcc-c++
-
-
-
 

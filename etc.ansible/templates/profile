@@ -47,6 +47,7 @@ export_env () {
 
     export NLS_DATE_FORMAT='dd/mm/yyyy hh24:mi'
     export PATH=$(echo $PATH | sed 's:\:/oracle[^:]*::g'):$ORACLE_HOME/bin
+    # set NLS_LANG to AL32UTF8 (note NLS_DATE_FORMAT is ignored unless NLS_LANG is set)
     export NLS_LANG=_.AL32UTF8
 
     alias cdl="cd $ALERT_LOG && ls -ltr && pwd"
@@ -214,8 +215,6 @@ if [ -t 0 ] && [ tty ]; then
         export_env "${ORACLE_SID}" "${ORACLE_HOME}" "${ORACLE_BASE}" && print_status
     fi
 
-  # set NLS_LANG to AL32UTF8 (note NLS_DATE_FORMAT is ignored unless NLS_LANG is set)
-  export NLS_LANG=_.AL32UTF8
   # Oracle sqlplus enhancements - sqlpath, history, auto-completion
   if [ -x /bin/rlwrap ]; then
       alias SVRMGRL="rlwrap -if ~/DBA/sqlplus.dict sqlplus '/ as sysdba'"

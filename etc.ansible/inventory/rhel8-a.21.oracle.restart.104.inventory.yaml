@@ -2,12 +2,15 @@ all:
   hosts:
     rhel7a-21-restart:
       address: 192.168.8.104
+      oracle_release: 21c
+      oracle_install_type: restart
+
   children:
     oracle:
       hosts:
         rhel7a-21-restart:
       vars:
-        oracle-release: 21c
+
   vars:
     scsi:
     - adapter:
@@ -34,13 +37,13 @@ all:
     vmware:
       vm_folder: VmFolder
       datastore: WD1T
+    template: "RHEL8 Template"
 
     cluster:
-      clustername: rhel7a-21
+      oracle_cluster_name: rhel7a-21
       disks:
         - disk:
             size: 8
             bus: 1
             count: 4
 
-    password: Xb6a5ed2ff29f98d

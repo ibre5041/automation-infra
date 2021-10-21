@@ -38,7 +38,7 @@ all:
       datastore: Kingston890G
 
     cluster:
-      oracle_clustername: rhel7b-19
+      oracle_cluster_name: rhel7b-19
       disks:
         - disk:
             size: 8

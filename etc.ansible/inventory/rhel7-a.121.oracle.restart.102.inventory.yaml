@@ -2,12 +2,15 @@ all:
   hosts:
     rhel7a-121-restart:
       address: 192.168.8.102
+      oracle_release: 121c
+      oracle_password: Xb6a5ed2ff29f98d
+      oracle_install_type: restart
   children:
     oracle:
       hosts:
         rhel7a-19-restart:
       vars:
-        oracle-release: 121c
+
   vars:
     scsi:
     - adapter:
@@ -36,11 +39,10 @@ all:
       datastore: WD1T
 
     cluster:
-      clustername: rhel7a-121
+      oracle_cluster_name: rhel7a-121
       disks:
         - disk:
             size: 8
             bus: 1
             count: 4
 
-    password: Xb6a5ed2ff29f98d

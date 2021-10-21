@@ -12,7 +12,7 @@ all:
         rac122-a-node-1:
         rac122-a-node-2:
       vars:
-        oracle-release: 122c
+        oracle_release: 122c
   vars:
     scsi:
     - adapter:
@@ -41,7 +41,7 @@ all:
       datastore: WD1T
 
     cluster:
-      clustername: rac122c-a
+      oracle_cluster_name: rac122c-a
       disks:
         - disk:
             size: 8
@@ -53,4 +53,4 @@ all:
         rac122-a-scan: [192.168.8.67, 192.168.8.68, 192.168.8.69]
 
     scan: rac122-a-scan
-    password: Xb6a5ed2ff29f98d
+    oracle_password: Xb6a5ed2ff29f98d
