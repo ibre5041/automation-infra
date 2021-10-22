@@ -15,15 +15,4 @@
 # lvextend /oracle/u01/gi/ (+30g)
 # ./gridSetup.sh -createGoldImage -destinationLocation /oracle/u01/gi/ -silent
 
-# Note: there is dependecy between this and grid.rsp
-# Base install package does not support
-#  oracle.install.crs.configureGIMR=true
-# While pathed Golden image does
-#
-#oracle_install_package_name: "LINUX.X64_193000_grid_home.zip"
-#oracle_install_package_name: "grid_home_2020-02-29_03-04-07PM.zip"
-#oracle_install_package_name: "grid_home_2020-06-09_05-15-41PM.zip"
-
-#oracle_ver_path: "19.7.0.0"
-
 first_rac_node: "{{ ansible_play_batch | sort() | first }}"

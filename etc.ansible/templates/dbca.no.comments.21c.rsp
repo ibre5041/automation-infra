@@ -12,7 +12,7 @@ numberOfPDBs=0
 useLocalUndoForPDBs=true
 
 # uncomment for RAC
-#nodelist={{ db_node_list | default([]) | join(',') }}
+nodelist={{ db_node_list | default([]) | join(',') }}
 
 templateName={{ oracle_home }}/assistants/dbca/templates/New_Database.dbt
 sysPassword={{ oracle_password }}

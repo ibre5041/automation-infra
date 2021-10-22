@@ -154,10 +154,12 @@ oracle_os_packages_all:
 oracle_os_packages_rhel7:
   - compat-libstdc++-33
   - compat-libcap1
+  - ntp
 
 oracle_os_packages_rhel8:
   - libnsl
   - policycoreutils-python-utils
+  - chrony
 
 oracle_os_packages_crs:
   - gcc-c++

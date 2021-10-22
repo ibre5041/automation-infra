@@ -27,7 +27,7 @@ all:
       size: 10g
       bus: 0
     - disk: appdg
-      size: 60g
+      size: 100g
       bus: 0
     network:
     - adapter:
@@ -42,7 +42,7 @@ all:
     vmware:
       vm_folder: VmFolder
       datastore: WD1T
-
+    template: "RHEL8 Template"
     cluster:
       oracle_cluster_name: rac21c-a
       disks:

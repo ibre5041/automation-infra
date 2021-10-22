@@ -7,7 +7,7 @@ all:
       oracle_install_type: rac      
     rac18-a-node-2:
       address: 192.168.8.61
-      listener: rac18-a-lis-1
+      listener: rac18-a-lis-2
       oracle_release: 18c
       oracle_install_type: rac
   children:
@@ -27,7 +27,7 @@ all:
       size: 10g
       bus: 0
     - disk: appdg
-      size: 60g
+      size: 100g
       bus: 0
     network:
     - adapter:
@@ -45,9 +45,10 @@ all:
 
     cluster:
       oracle_cluster_name: rac18c-a
+      # A lot of space for GIMR database
       disks:
         - disk:
-            size: 8
+            size: 16
             bus: 1
             count: 4
       addresses:

@@ -1,18 +1,8 @@
 
-- name: "CRS prerequisities"
-  yum:
-    name: ntp
-
 - name: cvuqdisk
   yum:
     name: cvuqdisk
     disable_gpg_check: yes
-
-- name: "Enable/start ntpd"
-  systemd:
-    name: ntpd
-    enabled: yes
-    state: started
 
 - name: Extend the u01 mountpoint
   lvol:

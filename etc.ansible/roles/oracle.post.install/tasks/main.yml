@@ -16,20 +16,41 @@
     group: "{{ oracle_os_group }}"
     mode: '0755'
 
-- name: Oracle profile
+- name: python2 cx_Oracle drivers
   yum:
-    name=haf-oracle-profile
+    name=python2-cx_Oracle
     state=latest
     disable_gpg_check=yes
 
-- name: Oracle profile
+- name: Oracles bash_profile
+  template: 
+    src: profile
+    dest: "/home/{{ oracle_os_user }}/.bash_profile"
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
+
+- name: Oracles bash_profile helper script
+  template: 
+    src: profile.py
+    dest: "/home/{{ oracle_os_user }}/"
+    owner: "{{ oracle_os_user }}"
+    group: "{{ oracle_os_group }}"
+    mode:  "0755"
+
+# - name: Oracle profile
+#   yum:
+#     name=haf-oracle-profile
+#     state=latest
+#     disable_gpg_check=yes
+
+- name: EPEL rlwrap
   yum:
     name: rlwrap
     disable_gpg_check: yes
 
-- name: "Delete all files in: {{ oracle_install_dir_temp }}"
-  shell: "find {{ oracle_install_dir_temp }} -type f -delete"
-  args:
-    chdir: "{{ oracle_install_dir_temp }}"
-    warn: false # set warn=false to prevent warning
-  changed_when: false
+# - name: "Delete all files in: {{ oracle_install_dir_temp }}"
+#   shell: "find {{ oracle_install_dir_temp }} -type f -delete"
+#   args:
+#     chdir: "{{ oracle_install_dir_temp }}"
+#     warn: false # set warn=false to prevent warning
+#   changed_when: false

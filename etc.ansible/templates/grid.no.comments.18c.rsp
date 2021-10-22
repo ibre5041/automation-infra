@@ -17,7 +17,7 @@ oracle.install.crs.config.clusterNodes={{ crs_node_list | default([]) | join(','
 oracle.install.crs.config.networkInterfaceList=ens224:10.0.0.0:5,ens192:192.168.8.0:1
 oracle.install.crs.config.gpnp.gnsOption=CREATE_NEW_GNS
 oracle.install.asm.configureGIMRDataDG=false
-oracle.install.crs.config.storageOption=               	
+oracle.install.crs.config.storageOption=FLEX_ASM_STORAGE
 oracle.install.crs.config.useIPMI=false
 
 oracle.install.asm.storageOption=ASM
