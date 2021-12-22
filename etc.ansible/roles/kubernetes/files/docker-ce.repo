@@ -1,8 +1,8 @@
 [docker-ce-stable]
 name=Docker CE Stable - $basearch
-#baseurl=https://download.docker.com/linux/centos/7/$basearch/stable
-baseurl=http://192.168.8.200:8081/repository/Docker/
-enabled=1
+baseurl=https://download.docker.com/linux/centos/$releasever/$basearch/stable
+#baseurl=http://192.168.8.200:8081/repository/Docker/
+enabled=0
 gpgcheck=1
 ## gpgkey=https://download.docker.com/linux/centos/gpg
 
