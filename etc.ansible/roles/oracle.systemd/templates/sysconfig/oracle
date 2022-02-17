@@ -1,8 +1,0 @@
-# The ORACLE_HOME that runs the listener
-LISTENER_ORACLE_HOME=/oracle/u01/product/19.12.0.0
-
-# Database-user under which the databases are started
-#ORACLE_DATABASE_USER=oracle
-
-# Interval to run the cgroup-checker in seconds
-#CGROUP_CHECK_INTERVAL=120

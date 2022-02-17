@@ -12,18 +12,10 @@ Type=notify
 SyslogIdentifier=oracle-service
 TimeoutStartSec=5min
 TimeoutStopSec=5min
-
-# Please keep this in-sync with 99-oracle-limits.conf
-# https://martincarstenbach.wordpress.com/2021/06/17/shell-limits-oracle-single-instance-and-systemd-in-oracle-linux-8-4/
-#LimitNOFILE=16384
-#LimitMEMLOCK=128G
-LimitNOFILE=4096:131072
-LimitNPROC=16384:16384
-LimitSTACK=10485760:33554432
-LimitMEMLOCK=infinity
-
+LimitNOFILE=16384
+LimitMEMLOCK=128G
 ExecStart=/usr/libexec/oracle-systemd-service
-ExecReload=/usr/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGUSR2
 KillMode=process
 
