@@ -65,6 +65,8 @@
   systemd: 
     name=network-reachable
     daemon_reload=yes
+    enabled=yes
+    state=started
 
 - name: systemd daemon-reload
   systemd: 
