@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import glob
 import os
@@ -59,21 +59,27 @@ class database():
         
         # This will fail on ASM, DBA_* views are nor accessible
         if self.ora_status not in ['STARTED', 'MOUNTED', 'DOWN']:
+            if self.ora_version.startswith('11'):
+                bundle = self.fetch_single_value(
+                    """ SELECT nvl(max(ID) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME),0) 
+                    FROM sys.registry$history where BUNDLE_SERIES='PSU' """)
+                if bundle:
+                    self.ora_version = self.ora_version.rstrip('0') + str(bundle)
             if self.ora_version.startswith('12'):
-                self.ora_version = self.fetch_single_value(
+                bundle = self.fetch_single_value(
                     """ select MIN(BUNDLE_ID) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) BUNDLE_ID 
                     from dba_registry_sqlpatch where status = 'SUCCESS' """)
-            elif self.ora_version.startswith('18'):
-                self.ora_version = self.fetch_single_value(
-                    """ select max(TARGET_VERSION) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) 
-                    FROM dba_registry_sqlpatch where status='SUCCESS' """) 
-            else: #ora_version.startswith('19'):
-                self.ora_version = self.fetch_single_value(
+                if bundle:
+                    self.ora_version = self.ora_version.rstrip('0') + str(bundle)
+            elif int(self.ora_version[0:2]) >= 18:
+                bundle = self.fetch_single_value(
                     """ SELECT distinct REGEXP_SUBSTR(description, '[0-9]{2}.[0-9]{1,2}.[0-9].[0-9].[0-9]{6}') as VER
                     from dba_registry_sqlpatch 
                     where TARGET_VERSION in 
                     (SELECT max(TARGET_VERSION) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) as VER 
                     FROM dba_registry_sqlpatch where status='SUCCESS' and FLAGS not like '%J%') and ACTION = 'APPLY' """)
+                if bundle:
+                    self.ora_version = str(bundle)
 
         # Alert log dest
         diag_dest = self.fetch_single_value(
@@ -272,7 +278,9 @@ class homes():
             proc = subprocess.Popen([orabase], stdout=subprocess.PIPE, env={'ORACLE_HOME': ORACLE_HOME})
             for line in iter(proc.stdout.readline,''):
                 if line.strip():
-                    ORACLE_BASE = line.strip()
+                    ORACLE_BASE = line.strip().decode()
+                else:
+                    break
         return ORACLE_BASE
     
 
