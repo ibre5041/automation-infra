@@ -1,0 +1,66 @@
+---
+# tasks file for oracle.systemd
+
+- debug:
+    var: ansible_default_ipv4.gateway
+
+- name: systemd-python
+  yum:
+    name: systemd-python
+  when: ansible_distribution_major_version == '7'
+
+- name: python3-systemd
+  yum:
+    name: python3-systemd
+  when: ansible_distribution_major_version == '8'
+
+- name: /etc/sysconfig/network-reachable
+  template:
+    src: sysconfig/network-reachable
+    dest: /etc/sysconfig/network-reachable
+
+- name: /etc/sysconfig/oracle
+  template:
+    src: sysconfig/oracle
+    dest: /etc/sysconfig/oracle
+
+- name: /usr/libexec/oracle-systemd-service
+  template:
+    src: libexec/oracle-systemd-service.py2
+    dest: /usr/libexec/oracle-systemd-service
+    mode: 0755
+  when: ansible_distribution_major_version == '7'
+
+- name: /usr/libexec/oracle-systemd-service
+  template:
+    src: libexec/oracle-systemd-service.py3
+    dest: /usr/libexec/oracle-systemd-service
+    mode: 0755
+  when: ansible_distribution_major_version == '8'
+
+- name: /usr/libexec/network-reachable
+  template:
+    src: libexec/network-reachable
+    dest: /usr/libexec/network-reachable
+    mode: 0755
+
+- name: /etc/systemd/system/network-reachable.service
+  template:
+    src: systemd/network-reachable.service
+    dest: /etc/systemd/system/network-reachable.service
+
+- name: /etc/systemd/system/oracle.service
+  template:
+    src: systemd/oracle.service
+    dest: /etc/systemd/system/oracle.service
+
+- name: systemd daemon-reload
+  systemd: 
+    name=network-reachable
+    daemon_reload=yes
+
+- name: systemd daemon-reload
+  systemd: 
+    name=oracle
+    enabled=yes
+    daemon_reload=yes
