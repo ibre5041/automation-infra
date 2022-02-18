@@ -282,7 +282,8 @@ class homes():
                                     break
                         pass
                     
-                    self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME, running=True)
+                    if ORACLE_HOME:
+                        self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME, running=True)
 
             #except FileNotFoundError: # Python3
             except EnvironmentError as e:
