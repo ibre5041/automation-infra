@@ -79,6 +79,10 @@
     dest: /etc/sudoers.d/oracle
     mode: '0440'
 
+# TODO, systemd hapily ignores this
+# https://martincarstenbach.wordpress.com/2021/07/23/do-i-really-have-to-set-resource-limits-for-oracle-in-systemd-unit-files/
+# https://martincarstenbach.wordpress.com/2021/06/17/shell-limits-oracle-single-instance-and-systemd-in-oracle-linux-8-4/
+#
 - name: Limits
   copy:
     src: 99-oracle-limits.conf

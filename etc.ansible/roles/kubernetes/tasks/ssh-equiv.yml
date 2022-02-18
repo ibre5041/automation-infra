@@ -1,0 +1,87 @@
+
+# Accept ssh keys from all other cluster nodes
+- name: Generate ssh keys
+  local_action:
+    module: "user"
+    name: "{{ lookup('env','USER') }}"
+    generate_ssh_key: true
+    ssh_key_type: "{{ item.0 }}"
+    ssh_key_bits: "{{ item.1 }}"
+    ssh_key_file: "{{ playbook_dir }}/{{ item.0 }}_{{ item.1 }}_key"
+  with_together:
+  - [ 'rsa', 'dsa' ]
+  - [ 2048, 1024 ]
+  loop_control:
+    label: "{{ item.0 }}_{{ item.1 }}_key"
+
+- name: Cluster IP list
+  set_fact:
+    cluster_ip_list: "{{ cluster_ip_list }} + [ '{{ hostvars[ item ]['ansible_default_ipv4']['address'] }}' ]"
+  with_items:
+    - "{{ ansible_play_batch | sort() }}"
+  vars:
+    cluster_ip_list: []
+    
+- name: Install public key(root)
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', playbook_dir + '/rsa_2048_key.pub') }}"
+    key_options: "from=\"{{ cluster_ip_list | join(',')}}\",no-agent-forwarding,no-port-forwarding"
+
+- name: Install public key(k18s)
+  authorized_key:
+    user: k18s
+    key: "{{ lookup('file', playbook_dir + '/rsa_2048_key.pub') }}"
+    key_options: "from=\"{{ cluster_ip_list | join(',')}}\",no-agent-forwarding"
+
+- name: Install private key(root)
+  copy:
+    src: "{{ playbook_dir ~ '/rsa_2048_key' }}"
+    dest: "/root/.ssh/id_rsa"
+    mode: 0600
+    owner: root
+    group: root
+
+- name: Install private key(k18s)
+  copy:
+    src: "{{ playbook_dir ~ '/rsa_2048_key' }}"
+    dest: "/home/k18s/.ssh/id_rsa"
+    mode: 0600
+    owner: k18s
+    group: docker
+    
+- name: Accept ssh keys from all other cluster nodes
+  shell: "ssh -oStrictHostKeyChecking=no -oPasswordAuthentication=no {{ hostvars[ item ]['ansible_hostname'] }} hostname"
+  become: yes
+  become_user: root
+  with_items:
+    - "{{ ansible_play_batch }}"
+
+- name: Accept ssh keys from all other cluster nodes
+  shell: "ssh -oStrictHostKeyChecking=no -oPasswordAuthentication=no {{ hostvars[ item ]['ansible_hostname'] }} hostname"
+  become: yes
+  become_user: k18s
+  with_items:
+    - "{{ ansible_play_batch }}"
+
+# - name: Install cluster shell clush
+#   yum:
+#     name: clustershell
+#     state: present    
+#     enablerepo: Unsupported_EPEL
+    
+# - name: Cluster hostname list
+#   set_fact:
+#     cluster_hostname_list: "{{ cluster_hostname_list }} + [ '{{ hostvars[ item ]['ansible_hostname'] }}' ]"
+#   with_items:
+#     - "{{ ansible_play_batch | sort() }}"
+#   vars:
+#     cluster_hostname_list: []
+
+# - name: clush group config file
+#   template:
+#     src: clush.groups.cfg
+#     dest: /etc/clustershell/groups
+#     owner: root
+#     group: root
+#     mode: 0644

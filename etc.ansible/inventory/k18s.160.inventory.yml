@@ -1,0 +1,58 @@
+---
+all:
+  hosts:
+    # kube-lb:
+    #   address: 192.168.8.160
+    kube-1:
+      address: 192.168.8.161
+    kube-2:
+      address: 192.168.8.162
+    kube-3:
+      address: 192.168.8.163
+    kube-4:
+      address: 192.168.8.164
+    kube-5:
+      address: 192.168.8.165
+    kube-6:
+      address: 192.168.8.166
+  children:
+    kube:
+      hosts:
+        kube-1:
+        kube-2:
+        kube-3:
+        kube-4:
+        kube-5:
+        kube-6:
+      vars:
+  vars:
+    scsi:
+    - adapter:
+        pciSlotNumber: 16
+    - adapter:
+        pciSlotNumber: 32
+    disks:
+    - disk: rootdg
+      size: 10g
+      bus: 0
+    - disk: appdg
+      size: 16g
+      bus: 0
+    network:
+    - adapter:
+      pciSlotNumber: 192
+      network: "Public Network"
+    - adapter:
+      pciSlotNumber: 224
+      network: "Barn Network"      
+    ram: 16G
+    cpu: 2
+
+    vmware:
+      vm_folder: VmFolder
+      datastore: WD1T
+    template: "RHEL8 Template"
+    cluster:
+      addresses:
+        kube-vip-1: 192.168.8.167
+        kube-vip-2: 192.168.8.168
