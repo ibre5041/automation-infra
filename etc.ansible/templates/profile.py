@@ -247,6 +247,13 @@ class homes():
                     exefile = os.path.join(piddir, 'exe')
 
                     try:
+                        if self.facts_item[ORACLE_SID]['ORACLE_HOME']:
+                            self.add_sid(ORACLE_SID, running=True)
+                            continue
+                    except:
+                        pass
+
+                    try:
                         if not os.path.islink(exefile):
                             continue
                         oraclefile = os.readlink(exefile)
@@ -260,7 +267,12 @@ class homes():
                         ORACLE_HOME = None
 
                         if self.crsctl:
-                            dfilter = '((TYPE = ora.database.type) and (GEN_USR_ORA_INST_NAME = {}))'.format(ORACLE_SID)
+                            if cmd_line.startswith('asm'):
+                                dfiltertype = 'ora.asm.type'
+                                ORACLE_HOME = self.crs_home
+                            else:
+                                dfiltertype = 'ora.database.type'
+                            dfilter = '((TYPE = {}) and (GEN_USR_ORA_INST_NAME = {}))'.format(dfiltertype, ORACLE_SID)
                             proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
                             for line in iter(proc.stdout.readline,''):
                                 if line.decode('utf-8').startswith('ORACLE_HOME='):
@@ -279,25 +291,27 @@ class homes():
 
 
     def list_crs_instances(self):
-        hostname = socket.gethostname()
+        hostname = socket.gethostname().split('.')[0]
         if self.crsctl:
-            dfilter = '(TYPE = ora.database.type)'
-            proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
-            (ORACLE_HOME, ORACLE_SID) = (None, None)
-            for line in iter(proc.stdout.readline,''):
-                line = line.decode('utf-8')
-                if not line.strip():
-                    (ORACLE_HOME, ORACLE_SID) = (None, None)
-                if 'SERVERNAME({})'.format(hostname) in line and line.startswith('GEN_USR_ORA_INST_NAME'):
-                    (_, ORACLE_SID,) = line.strip().split('=')
-                if line.startswith('ORACLE_HOME='):
-                    (_, ORACLE_HOME,) = line.strip().split('=')
-                if ORACLE_SID and ORACLE_HOME:
-                    self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME)
-                    (ORACLE_HOME, ORACLE_SID) = (None, None)
-                proc.poll()
-                if proc.returncode is not None:
-                    break
+            for dfiltertype in ['ora.database.type']: # ora.asm.type does not report ORACLE_HOME
+            #for dfiltertype in ['ora.asm.type', 'ora.database.type']:
+                dfilter = '(TYPE = {})'.format(dfiltertype)
+                proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
+                (ORACLE_HOME, ORACLE_SID) = (None, None)
+                for line in iter(proc.stdout.readline,''):
+                    line = line.decode('utf-8')
+                    if not line.strip():
+                        (ORACLE_HOME, ORACLE_SID) = (None, None)
+                    if 'SERVERNAME({})'.format(hostname) in line and line.startswith('GEN_USR_ORA_INST_NAME'):
+                        (_, ORACLE_SID,) = line.strip().split('=')
+                    if line.startswith('ORACLE_HOME='):
+                        (_, ORACLE_HOME,) = line.strip().split('=')
+                    if ORACLE_SID and ORACLE_HOME:
+                        self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME)
+                        (ORACLE_HOME, ORACLE_SID) = (None, None)
+                    proc.poll()
+                    if proc.returncode is not None:
+                        break
 
 
     def base_from_home(self, ORACLE_HOME):
@@ -353,9 +367,9 @@ if __name__ == '__main__':
 
     if args.homes:
         h = homes()
+        h.list_crs_instances()
         h.list_processes()
         h.parse_oratab()
-        h.list_crs_instances()
 
         if args.debug:
             print(json.dumps(h.facts_item, indent=4))
