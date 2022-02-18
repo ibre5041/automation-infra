@@ -32,6 +32,9 @@ SCRIPT_DIR="$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
 
 # function to export variables and aliases only after the instance number is known
 export_env () {
+    if [[ -n "${ORACLE_HOME}" ]]; then
+	export OLD_HOME=`dirname $ORACLE_HOME`
+    fi
     export ORACLE_SID="${1}"
     export ORACLE_HOME="${2}"
     export ORACLE_BASE="${3}"
@@ -39,14 +42,13 @@ export_env () {
     get_instance
 
     export ALERT_LOG="$ora_alert_log"
-    # if [ -d "/oracle/u01/DBA" -a -x "/oracle/u01/DBA" ]; then
-    # 	cd "/oracle/u01/DBA"
-    # elif [ -d "${ORACLE_BASE}" ]; then
-    # 	cd "${ORACLE_BASE}"
-    # fi
 
     export NLS_DATE_FORMAT='dd/mm/yyyy hh24:mi'
-    export PATH=$(echo $PATH | sed 's:\:/oracle[^:]*::g'):$ORACLE_HOME/bin
+    if [[ -z "${OLD_HOME}" ]]; then
+	export PATH=$PATH:$ORACLE_HOME/bin
+    else
+	export PATH=$(echo $PATH | sed "s:\\:${OLD_HOME}[^:]*::g"):$ORACLE_HOME/bin
+    fi
     # set NLS_LANG to AL32UTF8 (note NLS_DATE_FORMAT is ignored unless NLS_LANG is set)
     export NLS_LANG=_.AL32UTF8
 
@@ -59,6 +61,15 @@ export_env () {
 	TERM_TITLE="${HOSTNAME%%.*}  ${ORACLE_SID}"
 	echo -ne "\033]0;${TERM_TITLE}\007"
     fi
+
+    case $TERM in
+	xterm*|vte*)
+            PROMPT_COMMAND='printf "\033]0;%s %s %s\007" "${HOSTNAME%%.*}" "${ORACLE_SID}" "${PWD/#$HOME/~}"'
+	    ;;
+	screen*)
+            PROMPT_COMMAND='printf "\033k%s %s %s\033\\" "${HOSTNAME%%.*}" "${ORACLE_SID}" "${PWD/#$HOME/~}"'
+	    ;;
+    esac
 }
 
 get_instance () {
@@ -132,7 +143,7 @@ if [ -t 0 ] && [ tty ]; then
     [ -x /usr/bin/resize ] && /usr/bin/resize
 
     # if we have our homebrew script to gather hw/os information in place, run it
-    [ -x $ORACLE_HOMEDIR/DBA/utils/hw_os_info.sh ] && $ORACLE_HOMEDIR/DBA/utils/hw_os_info.sh; printf "\n"
+    [ -x $ORACLE_HOMEDIR/dbadm/bin/hw_os_info.sh ] && $ORACLE_HOMEDIR/dbadm/bin/hw_os_info.sh; printf "\n"
 
     # display table with available Oracle Database and ASM instances
     printf "                              Oracle Database List\n"
@@ -209,21 +220,22 @@ if [ -t 0 ] && [ tty ]; then
 	    unset ORACLE_SID ORACLE_HOME ORACLE_BASE
 	    printf "\n  Invalid instance selection. No environment loaded.\n\n"
 	fi
-    fi
-    if [[ -n "${ORACLE_SID}" ]]; then
-        printf "\n  Loading environment for selected instance...${ORACLE_SID} ${ORACLE_HOME}\n\n"
-        export_env "${ORACLE_SID}" "${ORACLE_HOME}" "${ORACLE_BASE}" && print_status
+
+        if [[ -n "${ORACLE_SID}" ]]; then
+            printf "\n  Loading environment for selected instance...${ORACLE_SID} ${ORACLE_HOME}\n\n"
+            export_env "${ORACLE_SID}" "${ORACLE_HOME}" "${ORACLE_BASE}" && print_status
+	fi
     fi
 
   # Oracle sqlplus enhancements - sqlpath, history, auto-completion
   if [ -x /bin/rlwrap ]; then
-      alias SVRMGRL="rlwrap -if ~/DBA/sqlplus.dict sqlplus '/ as sysdba'"
-      alias ASMCMD="rlwrap asmcmd"
-      alias DGMGRL="rlwrap dgmgrl"
+      alias SVRMGRL="rlwrap -if ~/dbadm/share/sqlplus.dict --forget-matching '.*(conn|CONN|identified|IDENTIFIED)' sqlplus '/ as sysdba'"
+      alias DGMGRL="rlwrap  -if ~/dbadm/share/dgmgrl.dict  --forget-matching '.*(conn)' dgmgrl"
+      alias RMAN="rlwrap --forget-matching '.*(conn)'  rman"
       alias ASMCMD="rlwrap asmcmd"
   fi
-  if [ -r ${ORACLE_HOMEDIR}/DBA/login.sql ]; then
-      export ORACLE_PATH=${ORACLE_HOMEDIR}/DBA/
-      export SQLPATH=${ORACLE_HOMEDIR}/DBA/
+  if [ -r ${ORACLE_HOMEDIR}/dbadm/share/login.sql ]; then
+      export ORACLE_PATH=${ORACLE_HOMEDIR}/dbadm/share/
+      export SQLPATH=${ORACLE_HOMEDIR}/dbadm/share/
   fi
 fi
