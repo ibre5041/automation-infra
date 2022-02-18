@@ -10,6 +10,9 @@ k8s.prod.vmware.haf.                IN A    192.168.8.6
 *.k8s.prod.vmware.haf.              IN A    192.168.8.6
 lb.prod.vmware.haf.                 IN A    192.168.8.7
 
+lb.prod.vmware.haf.                 IN A    192.168.8.7
+win2019.prod.vmware.haf.            IN A    192.168.8.9
+
 dhcp-192-168-8-10.prod.vmware.haf.  IN A    192.168.8.10
 dhcp-192-168-8-11.prod.vmware.haf.  IN A    192.168.8.11
 dhcp-192-168-8-12.prod.vmware.haf.  IN A    192.168.8.12
