@@ -1,4 +1,6 @@
 ---
 # tasks file for kubernetes
+- import_tasks: docker.yml
 - import_tasks: install.yml
-- import_tasks: setup.yml
+- import_tasks: ssh-equiv.yml
+#- import_tasks: setup.yml

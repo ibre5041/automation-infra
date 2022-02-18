@@ -1,2 +1,15 @@
 ---
 # handlers file for kafka
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: restart docker
+  systemd: state=restarted name=docker daemon_reload=yes
+
+- name: reload NM
+  systemd: state=reloaded name=NetworkManager
+
+- name: swapoff
+  shell: "swapoff -a"
