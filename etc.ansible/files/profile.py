@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import glob
 import os
@@ -17,6 +17,20 @@ class database():
         try:
             connection = cx_Oracle.connect(user='/', mode=cx_Oracle.SYSDBA)
             self._cursor = connection.cursor()
+            self.ora_banner = None
+            self.ora_alert_log = None
+            self.ora_dbid = None
+            self.ora_dg_on = None
+            self.ora_dg_role = None
+            self.ora_rac_nodes = None
+            self.ora_rac_on = None
+            self.ora_status = None
+            self.ora_uptime = None
+            self.ora_version = None
+            self.ora_sgapga = None
+            self.ora_type = ''
+            self.sys_tbls = None
+
         except:
             self._cursor = None
             pass
@@ -33,80 +47,100 @@ class database():
             #sys.stderr.write("{} failed with: {}".format(sql, str(e)))
             #raise BaseException("{} failed with: {}".format(sql, str(e)))
             return ""
+        except TypeError as te:
+            # (retval,) = self._cursor.fetchone()
+            # TypeError: 'NoneType' object is not iterable (when dba_registry_sqlpatch is empty)
+            return ""
+
         
     def instance(self):
-        uptime = self.fetch_single_value(""" select NUMTODSINTERVAL(sysdate - startup_time, 'day') from v$instance """)
+        uptime = self.fetch_single_value(" select NUMTODSINTERVAL(sysdate - startup_time, 'day') from v$instance ")
         self.ora_uptime = str(uptime) if uptime else None
-        status = self.fetch_single_value(""" select status from v$instance """)
+        status = self.fetch_single_value(" select status from v$instance ")
         self.ora_status = status if status else 'DOWN'
-            
-        if self.ora_status not in ['STARTED', 'MOUNTED', 'DOWN']:
-            try:
-                self._cursor.execute(""" SELECT database_role, dbid FROM v$database """)
-                (self.ora_dg_role, self.ora_dbid,) = self._cursor.fetchone()
-            except:
-                (self.ora_dg_role, self.ora_dbid,) = (None, None)
 
+        self.ora_dbid = self.fetch_single_value(" SELECT dbid FROM v$database ")
+
+        if self.ora_status not in ['STARTED', 'MOUNTED', 'DOWN']:
             self.sys_tbls = self.fetch_single_value(
-                """ SELECT file_name FROM dba_data_files WHERE tablespace_name = 'SYSTEM' AND ROWNUM = 1 """)
+                " SELECT file_name FROM dba_data_files WHERE tablespace_name = 'SYSTEM' AND ROWNUM = 1 ")
         else:
-            (self.ora_dg_role, self.ora_dbid, self.sys_tbls) = (None, None, None)
+            self.sys_tbls = None
                 
-        self.banner = self.fetch_single_value(
-            """ SELECT banner FROM v$version WHERE banner LIKE '%Oracle Database%' """)
-        self.ora_version = self.fetch_single_value(
-            """ SELECT version from v$instance """)
+        self.ora_banner = self.fetch_single_value(" SELECT banner FROM v$version WHERE banner LIKE '%Oracle Database%' ")
+        self.ora_version = self.fetch_single_value(" SELECT version from v$instance ")
         
         # This will fail on ASM, DBA_* views are nor accessible
         if self.ora_status not in ['STARTED', 'MOUNTED', 'DOWN']:
+            if self.ora_version.startswith('11'):
+                bundle = self.fetch_single_value(
+                    """ SELECT nvl(max(ID) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME),0) 
+                    FROM sys.registry$history where BUNDLE_SERIES='PSU' """)
+                if bundle:
+                    self.ora_version = self.ora_version.rstrip('0') + str(bundle)
             if self.ora_version.startswith('12'):
-                self.ora_version = self.fetch_single_value(
+                bundle = self.fetch_single_value(
                     """ select MIN(BUNDLE_ID) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) BUNDLE_ID 
                     from dba_registry_sqlpatch where status = 'SUCCESS' """)
-            elif self.ora_version.startswith('18'):
-                self.ora_version = self.fetch_single_value(
-                    """ select max(TARGET_VERSION) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) 
-                    FROM dba_registry_sqlpatch where status='SUCCESS') """)        
-            else: #ora_version.startswith('19'):
-                self.ora_version = self.fetch_single_value(
+                if bundle:
+                    self.ora_version = self.ora_version.rstrip('0') + str(bundle)
+            elif int(self.ora_version[0:2]) >= 18:
+                bundle = self.fetch_single_value(
                     """ SELECT distinct REGEXP_SUBSTR(description, '[0-9]{2}.[0-9]{1,2}.[0-9].[0-9].[0-9]{6}') as VER
                     from dba_registry_sqlpatch 
                     where TARGET_VERSION in 
                     (SELECT max(TARGET_VERSION) KEEP (DENSE_RANK LAST ORDER BY ACTION_TIME) as VER 
-                    FROM dba_registry_sqlpatch where status='SUCCESS' and FLAGS not like '%J%') and ACTION = 'APPLY' """)
+                    FROM dba_registry_sqlpatch where status='SUCCESS' and FLAGS not like '%J%' AND PATCH_TYPE='RU') and ACTION = 'APPLY' """)
+                if bundle:
+                    self.ora_version = str(bundle)
 
         # Alert log dest
         diag_dest = self.fetch_single_value(
-            """ SELECT max(value) as diag_dest FROM v$parameter WHERE name = 'diagnostic_dest' """)
+            " SELECT max(value) as diag_dest FROM v$parameter WHERE name = 'diagnostic_dest' ")
         if diag_dest:
             self.ora_alert_log = self.fetch_single_value(
-                """ SELECT REPLACE(value,'cdump','trace') as alert_log from v$parameter where name ='core_dump_dest' """)
+                " SELECT REPLACE(value,'cdump','trace') as alert_log from v$parameter where name ='core_dump_dest' ")
         else:
             self.ora_alert_log = self.fetch_single_value(
-                """ SELECT value as alert_log FROM v$parameter WHERE name = 'background_dump_dest' """)
+                " SELECT value as alert_log FROM v$parameter WHERE name = 'background_dump_dest' ")
 
-        self.ora_dg_on = self.fetch_single_value(
-            """ SELECT count(*) as ora_dg_on FROM v$archive_dest WHERE status = 'VALID' AND target = 'STANDBY' """)
+        # RAC
         self.ora_rac_on = self.fetch_single_value(
-            """ SELECT value as ora_rac_on FROM v$parameter WHERE name = 'cluster_database' """)
+            " SELECT value as ora_rac_on FROM v$parameter WHERE name = 'cluster_database' ")
         self.ora_rac_nodes = self.fetch_single_value(
-            """ SELECT count(*) as ora_rac_nodes FROM v$active_instances """)
+            " SELECT count(*) as ora_rac_nodes FROM v$active_instances ")
+        if self.ora_rac_on == 'TRUE':
+            self.ora_type = 'RAC'
 
-    def status(self):
-        diag_dest = self.fetch_single_value(
-            """ SELECT max(value) as diag_dest FROM v$parameter WHERE name = 'diagnostic_dest' """)
-        if diag_dest:
-            self.ora_alert_log = self.fetch_single_value(
-                """ SELECT REPLACE(value,'cdump','trace') as alert_log from v$parameter where name ='core_dump_dest' """)
-        else:
-            self.ora_alert_log = self.fetch_single_value(
-                """ SELECT value as alert_log FROM v$parameter WHERE name = 'background_dump_dest' """)
+        self.ora_dg_role = self.fetch_single_value(" SELECT database_role FROM v$database ")
+        self.ora_dg_on = self.fetch_single_value(
+            " SELECT count(*) as ora_dg_on FROM v$archive_dest WHERE status = 'VALID' AND target = 'STANDBY' ")
+        ora_apply = self.fetch_single_value(" select count(1) from V$MANAGED_STANDBY where process like ('MRP%') ")
+        if ora_apply and ora_apply > 0:
+            self.ora_type += 'DG-'
+        elif self.ora_dg_on and self.ora_dg_on > 0:
+            self.ora_type += 'DG+'
 
         self.ora_sgapga = self.fetch_single_value(
             """ select max(case when name='sga_target' then display_value end) 
             ||'/'|| max(case when name='pga_aggregate_target' then display_value end) as SGAPGA
             from v$parameter where name in ('pga_aggregate_target','sga_target') """)
-        
+
+    def status(self):
+        diag_dest = self.fetch_single_value(
+            " SELECT max(value) as diag_dest FROM v$parameter WHERE name = 'diagnostic_dest' ")
+        if diag_dest:
+            self.ora_alert_log = self.fetch_single_value(
+                " SELECT REPLACE(value,'cdump','trace') as alert_log from v$parameter where name ='core_dump_dest' ")
+        else:
+            self.ora_alert_log = self.fetch_single_value(
+                " SELECT value as alert_log FROM v$parameter WHERE name = 'background_dump_dest' ")
+
+        self.ora_sgapga = self.fetch_single_value(
+            """ select max(case when name='sga_target' then display_value end) 
+            ||'/'|| max(case when name='pga_aggregate_target' then display_value end) as SGAPGA
+            from v$parameter where name in ('pga_aggregate_target','sga_target') """)
+
     def __str__(self):
         retval = ''
         for attribute, value in sorted(self.__dict__.items()):
@@ -212,10 +246,17 @@ class homes():
                     cmd_line = x.read().rstrip("\x00")
                     if not cmd_line.startswith('ora_pmon_') and not cmd_line.startswith('asm_pmon_'):
                         continue
-                    _, _, ORACLE_SID = cmd_line.split('_')
+                    _, _, ORACLE_SID = cmd_line.split('_', 2)
 
                     piddir = os.path.dirname(cmd_line_file)
                     exefile = os.path.join(piddir, 'exe')
+
+                    try:
+                        if self.facts_item[ORACLE_SID]['ORACLE_HOME']:
+                            self.add_sid(ORACLE_SID, running=True)
+                            continue
+                    except:
+                        pass
 
                     try:
                         if not os.path.islink(exefile):
@@ -231,14 +272,23 @@ class homes():
                         ORACLE_HOME = None
 
                         if self.crsctl:
-                            dfilter = '((TYPE = ora.database.type) and (GEN_USR_ORA_INST_NAME = {}))'.format(ORACLE_SID)
+                            if cmd_line.startswith('asm'):
+                                dfiltertype = 'ora.asm.type'
+                                ORACLE_HOME = self.crs_home
+                            else:
+                                dfiltertype = 'ora.database.type'
+                            dfilter = '((TYPE = {}) and (GEN_USR_ORA_INST_NAME = {}))'.format(dfiltertype, ORACLE_SID)
                             proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
                             for line in iter(proc.stdout.readline,''):
-                                if line.startswith('ORACLE_HOME='):
-                                    (_, ORACLE_HOME,) = line.strip().split('=')
+                                if line.decode('utf-8').startswith('ORACLE_HOME='):
+                                    (_, ORACLE_HOME,) = line.decode('utf-8').strip().split('=')
+                                proc.poll()
+                                if proc.returncode is not None:
+                                    break
                         pass
                     
-                    self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME, running=True)
+                    if ORACLE_HOME:
+                        self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME, running=True)
 
             #except FileNotFoundError: # Python3
             except EnvironmentError as e:
@@ -247,21 +297,27 @@ class homes():
 
 
     def list_crs_instances(self):
-        hostname = socket.gethostname()
+        hostname = socket.gethostname().split('.')[0]
         if self.crsctl:
-            dfilter = '(TYPE = ora.database.type)'
-            proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
-            (ORACLE_HOME, ORACLE_SID) = (None, None)
-            for line in iter(proc.stdout.readline,''):
-                if not line.strip():
-                    (ORACLE_HOME, ORACLE_SID) = (None, None)
-                if 'SERVERNAME({})'.format(hostname) in line and line.startswith('GEN_USR_ORA_INST_NAME'):
-                    (_, ORACLE_SID,) = line.strip().split('=')
-                if line.startswith('ORACLE_HOME='):
-                    (_, ORACLE_HOME,) = line.strip().split('=')
-                if ORACLE_SID and ORACLE_HOME:
-                    self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME)
-                    (ORACLE_HOME, ORACLE_SID) = (None, None)
+            for dfiltertype in ['ora.database.type']: # ora.asm.type does not report ORACLE_HOME
+            #for dfiltertype in ['ora.asm.type', 'ora.database.type']:
+                dfilter = '(TYPE = {})'.format(dfiltertype)
+                proc = subprocess.Popen([self.crsctl, 'stat', 'res', '-p', '-w', dfilter], stdout=subprocess.PIPE)
+                (ORACLE_HOME, ORACLE_SID) = (None, None)
+                for line in iter(proc.stdout.readline,''):
+                    line = line.decode('utf-8')
+                    if not line.strip():
+                        (ORACLE_HOME, ORACLE_SID) = (None, None)
+                    if 'SERVERNAME({})'.format(hostname) in line and line.startswith('GEN_USR_ORA_INST_NAME'):
+                        (_, ORACLE_SID,) = line.strip().split('=')
+                    if line.startswith('ORACLE_HOME='):
+                        (_, ORACLE_HOME,) = line.strip().split('=')
+                    if ORACLE_SID and ORACLE_HOME:
+                        self.add_sid(ORACLE_SID=ORACLE_SID, ORACLE_HOME=ORACLE_HOME)
+                        (ORACLE_HOME, ORACLE_SID) = (None, None)
+                    proc.poll()
+                    if proc.returncode is not None:
+                        break
 
 
     def base_from_home(self, ORACLE_HOME):
@@ -272,12 +328,14 @@ class homes():
             proc = subprocess.Popen([orabase], stdout=subprocess.PIPE, env={'ORACLE_HOME': ORACLE_HOME})
             for line in iter(proc.stdout.readline,''):
                 if line.strip():
-                    ORACLE_BASE = line.strip()
+                    ORACLE_BASE = line.strip().decode()
+                else:
+                    break
         return ORACLE_BASE
     
 
     def add_home(self, ORACLE_HOME):
-        if ORACLE_HOME not in self.homes:
+        if ORACLE_HOME not in self.homes and os.path.exists(os.path.join(ORACLE_HOME, 'bin', 'oracle')):
             ORACLE_BASE = self.base_from_home(ORACLE_HOME)
             self.homes[ORACLE_HOME] = {'ORACLE_HOME': ORACLE_HOME, 'ORACLE_BASE': ORACLE_BASE}
 
@@ -293,16 +351,19 @@ class homes():
                 sid['running'] = running
         else:
             self.add_home(ORACLE_HOME)
-            self.facts_item[ORACLE_SID] = {'ORACLE_SID': ORACLE_SID
-                                           , 'ORACLE_HOME': ORACLE_HOME
-                                           , 'ORACLE_BASE': self.homes[ORACLE_HOME]['ORACLE_BASE']
-                                           , 'running': running}
+            if ORACLE_HOME in self.homes:
+                self.facts_item[ORACLE_SID] = {'ORACLE_SID': ORACLE_SID
+                                               , 'ORACLE_HOME': ORACLE_HOME
+                                               , 'ORACLE_BASE': self.homes[ORACLE_HOME]['ORACLE_BASE']
+                                               , 'running': running}
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-l', '--homes',    required=False, action='store_true', help='List Oracle HOMEs')
+    group.add_argument('-L', '--oh',       required=False, action='store_true', help='Try to detect last OH')
+    group.add_argument('-C', '--crs',      required=False, action='store_true', help='Try to detect last CRS_HOME')
     group.add_argument('-i', '--instance', required=False, action='store_true', help='Describe database instance')
     group.add_argument('-s', '--status', required=False, action='store_true', help='Status of database instance')
     
@@ -313,20 +374,26 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.homes:
+    if args.homes or args.crs or args.oh:
         h = homes()
+        h.list_crs_instances()
         h.list_processes()
         h.parse_oratab()
-        h.list_crs_instances()
 
         if args.debug:
             print(json.dumps(h.facts_item, indent=4))
-        else:
+        elif args.homes:
             for k in sorted(h.facts_item.keys()):
                 print("{ORACLE_SID}\t{ORACLE_HOME}\t{ORACLE_BASE}"
                       .format(ORACLE_SID=k
                               , ORACLE_HOME=h.facts_item[k]['ORACLE_HOME']
                               , ORACLE_BASE=h.facts_item[k]['ORACLE_BASE']))
+        elif args.oh:
+            ohs = [ oh for oh in h.homes.keys() if oh != h.crs_home]
+            last_oh = sorted(ohs)[-1]
+            print(last_oh or '')
+        elif args.crs:
+            print(h.crs_home or '')
 
     if args.instance:
         if args.sid:
