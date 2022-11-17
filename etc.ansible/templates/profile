@@ -27,6 +27,7 @@
 set +aeu -o nolog
 trap "printf 'Goodbye.'; echo " 0
 trap 1 2 3
+shopt -s direxpand
 
 SCRIPT_DIR="$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
 
