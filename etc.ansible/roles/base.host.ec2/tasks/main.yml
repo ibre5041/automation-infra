@@ -1,0 +1,21 @@
+---
+
+# tasks file for base.host
+
+- name: Clean yum repos
+  shell: "yum clean all"
+  changed_when: false
+  tags: [clean]
+  
+- name: Base packages
+  yum: 
+    name: wget,strace,psmisc,nfs-utils,emacs-nox,patch,gcc,xauth,nvme-cli,lvm2
+    state: latest
+    lock_timeout: 160
+    disable_gpg_check: yes 
+  tags: [packages,slow]
+
+- name: Clean yum repos
+  shell: "yum clean all"
+  changed_when: false
+  tags: [clean]

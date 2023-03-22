@@ -115,8 +115,8 @@ oracle_os_sysctl:
     value: "{{ shmm }}"
 
   # PRCF-2010 : All connections to the remote nodes got refused. 
-  - sysctl: net.ipv6.bindv6only
-    value: '0'
+  #- sysctl: net.ipv6.bindv6only
+  #  value: '0'
 
   # https://access.redhat.com/documentation/en-us/reference_architectures/2017/html-single/deploying_oracle_rac_database_12c_release_2_on_red_hat_enterprise_linux_7/index#kernel_parameters
   - sysctl: vm.swappiness
@@ -150,7 +150,8 @@ oracle_os_packages_all:
   - lsof
   - strace
   - ksh
-
+  - smartmontools
+  
 oracle_os_packages_rhel7:
   - compat-libstdc++-33
   - compat-libcap1

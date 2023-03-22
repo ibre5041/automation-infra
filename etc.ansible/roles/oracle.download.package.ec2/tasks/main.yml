@@ -1,0 +1,6 @@
+---
+# tasks file for oracle.download.package
+
+- name: Download and unpack packages
+  include: download.package.yml
+
