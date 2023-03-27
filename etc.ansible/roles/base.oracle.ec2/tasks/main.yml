@@ -41,7 +41,7 @@
     name: "{{ oracle_os_packages }}"
     state: latest
   tags: [packages,slow]
-
+  
 # - name: Stop firewall
 #   systemd:
 #     name: firewalld.service

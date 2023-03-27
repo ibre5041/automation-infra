@@ -1,10 +1,11 @@
 
 - block:
-    - name: Download install package {{ image_name }}
-      get_url:
-        url: "{{ url_base }}/{{ image_name }}"
+    - name: Copy install package {{ image_name }}
+      copy:
+        src: "{{ dir_base }}/{{ image_name }}"
         dest: "{{ oracle_install_dir_temp }}/"
         mode: '0640'
+        remote_src: yes
 
     - name: unzip install package {{ image_name }}
       unarchive:

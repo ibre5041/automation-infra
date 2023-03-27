@@ -6,6 +6,13 @@
   shell: "yum clean all"
   changed_when: false
   tags: [clean]
+
+- name: Epel repo
+  template:
+    src: epel-el8.repo
+    dest: /etc/yum.repos.d/epel-el8.repo
+  when: epel_repo_mirror | default('') | length > 0
+  tags: [packages]
   
 - name: Base packages
   yum: 

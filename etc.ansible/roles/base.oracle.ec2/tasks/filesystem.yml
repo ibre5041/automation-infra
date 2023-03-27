@@ -23,6 +23,12 @@
     size: 1G
     shrink: no
 
+- name: Create swap on /dev/vg01/swap
+  filesystem:
+    fstype: swap
+    dev: /dev/vg01/swap
+
+# NOTE: this wont execute swapon -a. This ansible bug is from 2017. #23632
 - name: swapon
   mount:
     name: none
@@ -32,6 +38,11 @@
     passno: 0
     dump: 0
     state: present
+
+- name: Execute swapon -a
+  command: swapon -a
+  changed_when: false
+  failed_when: false
     
 - name: Create a logical volume u01
   lvol:

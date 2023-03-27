@@ -1,0 +1,5 @@
+[epel-el8]
+name=epel-el8
+enabled=0
+gpgcheck=0
+baseurl=https://linuxbuild.merck.com/pulp/content/MERCK/Library/custom/EPEL-EL8/epel-el8
