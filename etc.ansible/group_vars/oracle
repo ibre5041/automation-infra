@@ -61,8 +61,8 @@ oracle_install_space:
     oracle_db_response_file: dbca.no.comments.19c.rsp
     oracle_db_ver_release: 19c
     oracle_db_ver_path: 19.17.0.0
-    oracle_db_media: db_home_19_12.zip
-    oracle_gi_media: grid_home_2020-06-09_05-15-41PM.zip
+    oracle_db_media: db_home_2022_Oct.zip
+    oracle_gi_media: grid_home_2022_Oct.zip
     # oracle_gi_media: LINUX.X64_193000_grid_home.zip
 
   18c:

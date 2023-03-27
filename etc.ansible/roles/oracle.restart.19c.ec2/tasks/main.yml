@@ -47,8 +47,9 @@
     name: oracle.download.package.ec2
   vars:
     # Pass these variables to included role
-    dir_base: "/tmp/"
-    image_name: "grid_home_2022_Oct.zip"
+    # dir_base: "/tmp/"
+    url_base:   "{{ oracle_media_url_base }}"
+    image_name: "{{ oracle_gi_media }}"
     #oracle_install_dir_temp:
     #oracle_home:
   when: crs_unpacked.stat.exists != True and oracle_ohasd_service.status.LoadState == "not-found"

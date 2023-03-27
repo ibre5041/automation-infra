@@ -45,10 +45,11 @@
   include_role:
     name: oracle.download.package.ec2
   vars:
-    #oracle_home: "{{ oracle_home }}"
     # Pass these variables to included role
-    dir_base: "/tmp/"
-    image_name: "db_home_2022_Oct.zip"
+    # oracle_home: "{{ oracle_home }}"    
+    # dir_base: "/tmp/"
+    url_base:   "{{ oracle_media_url_base }}"        
+    image_name: "{{ oracle_db_media }}"
     #oracle_install_dir_temp:
   when: oracle_home_installed.stat.exists != True and install_package.stat.exists != True and ( first_rac_node is not defined or first_rac_node == ansible_hostname)
 
