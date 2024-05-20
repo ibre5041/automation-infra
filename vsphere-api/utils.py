@@ -1,9 +1,8 @@
 from pyVmomi import vim, vmodl
 
 def wait_for_tasks(service_instance, tasks):
-    """Given the service instance si and tasks, it returns after all the
-   tasks are complete
-   """
+    """Given the service instance si and tasks, it returns after all the tasks are complete
+    """
     property_collector = service_instance.content.propertyCollector
     task_list = [str(task) for task in tasks]
     # Create filter

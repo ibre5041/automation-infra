@@ -14,7 +14,7 @@
       size: 20g
       bus: 0
     - disk: appdg
-      size: 20g
+      size: 80g
       bus: 0
   network:
     # https://kb.vmware.com/s/article/2047927

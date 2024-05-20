@@ -6,21 +6,25 @@ import atexit
 import sys
 import logging
 import argparse
+import humanfriendly
 
 from config import Config, VsCreadential
 
 import ssl
 
-def _create_data_file(service_instance, machine, bus, unit, size):
+logging.basicConfig(stream=sys.stdout,
+                    level=logging.DEBUG,
+                    format='%(asctime)s - %(module)s - %(levelname)s - %(funcName)s: %(message)s')
+
+def _create_data_file(service_instance, machine, bus, unit, new_disk_kb):
+    logging.debug("Creating data file: {}, {}:{}, {}KB".format(machine.name, bus, unit, new_disk_kb))
     content = service_instance.RetrieveContent()
     path_on_ds = '[{datastore}] {machine}/'.format(datastore=machine.datastore, machine=machine.nameVSphere)
     dc = get_obj(content, [vim.Datacenter], 'Datacenter')
     ds_obj = get_obj(content, [vim.Datastore], machine.datastore)
 
-    gb = size
-    size = int(gb) * 1024 * 1024
     fileBackedVirtualDiskSpec = vim.VirtualDiskManager.FileBackedVirtualDiskSpec()
-    fileBackedVirtualDiskSpec.capacityKb = int(size)
+    fileBackedVirtualDiskSpec.capacityKb = int(new_disk_kb)
     # Using vim enums
     fileBackedVirtualDiskSpec.adapterType = vim.VirtualDiskManager.VirtualDiskAdapterType.lsiLogic
     fileBackedVirtualDiskSpec.diskType = vim.VirtualDiskManager.VirtualDiskType.eagerZeroedThick
@@ -91,6 +95,11 @@ def add_shared_disk(service_instance, config):
     first_machine = config.machine(config.cluster.nodes[0])
     vm = get_obj(content, [vim.VirtualMachine], first_machine.nameVSphere)
 
+    # for dev in vm.config.hardware.device:
+    #     logging.info(type(dev))
+    #     if isinstance(dev, vim.vm.device.VirtualDisk):
+    #         print(dev)        
+
     controller = None
     for dev in vm.config.hardware.device:
         if isinstance(dev, vim.vm.device.VirtualSCSIController):
@@ -123,7 +132,8 @@ def add_shared_disk(service_instance, config):
                         logging.error("LUNs 0-2 are reserved for OS")
                         return
 
-            path_name = _create_data_file(service_instance, first_machine, 1, unit_number, disk['size'])
+            new_disk_kb = int(humanfriendly.parse_size(str(disk['size']), binary=True) / 1024 )
+            path_name = _create_data_file(service_instance, first_machine, 1, unit_number, new_disk_kb)
 
             for node in config.cluster.nodes:
                 machine = config.machine(node)
@@ -172,7 +182,14 @@ def add_data_disk(service_instance, machine, disk):
         if isinstance(dev, vim.vm.device.VirtualSCSIController):
             if dev.busNumber == 0: # Ingnore bus 0, rootdg, appdg
                 continue
+            logging.debug('Found controller: ({}) {}'.format(dev.key, dev))
             controller = dev
+
+    for dev in vm.config.hardware.device:
+        if isinstance(dev, vim.vm.device.VirtualDisk):
+            logging.debug('Found disk: {} => {}'.format(dev.key, dev.controllerKey))
+            if dev.controllerKey == controller.key:
+                print(dev)
 
     if 'count' in disk:
         count = int(disk['count'])
@@ -194,7 +211,8 @@ def add_data_disk(service_instance, machine, disk):
                 if unit_number >= 16:
                     logging.debug("we don't support this many disks")
 
-        path_name = _create_data_file(service_instance, machine, 1, unit_number, disk['size'])
+        new_disk_kb = int(humanfriendly.parse_size(disk['size'], binary=True) / 1024 )
+        path_name = _create_data_file(service_instance, machine, 1, unit_number, new_disk_kb)
 
         # add disk here
         dev_changes = []

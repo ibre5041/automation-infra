@@ -61,8 +61,8 @@ def create_vm(service_instance, machine):
         scsi_ctr.device.slotInfo.pciSlotNumber = scsi_adapter['pciSlotNumber']
         scsi_ctr.device.controllerKey = 100
         scsi_ctr.device.deviceInfo = vim.Description()
-        scsi_ctr.device.deviceInfo.label = 'Shared SCSI'
-        scsi_ctr.device.deviceInfo.label = 'BUS for Shared SCSI disks'
+        #scsi_ctr.device.deviceInfo.label = 'Shared SCSI'
+        scsi_ctr.device.deviceInfo.label = 'BUS for Local SCSI disks'
         scsi_ctr.device.unitNumber = 3
         scsi_ctr.device.busNumber = i
         scsi_ctr.device.hotAddRemove = True
@@ -73,22 +73,23 @@ def create_vm(service_instance, machine):
         if i == 0:
             device = scsi_ctr.device
 
-    for i, disk in enumerate(machine.disks):
-        sizeB = humanfriendly.parse_size(disk['size'], binary=True)
-        controller = device
-        disk_spec = vim.vm.device.VirtualDeviceSpec()
-        disk_spec.fileOperation = "create"
-        disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
-        disk_spec.device = vim.vm.device.VirtualDisk()
-        disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
-        disk_spec.device.backing.eagerlyScrub = False
-        disk_spec.device.backing.thinProvisioned = True
-        disk_spec.device.backing.diskMode = 'persistent'
-        disk_spec.device.backing.fileName = disk['pathVSphere']
-        disk_spec.device.unitNumber = i
-        disk_spec.device.capacityInKB = int(sizeB / 1024)
-        disk_spec.device.controllerKey = controller.key
-        devices.append(disk_spec)
+    # for i, disk in enumerate(machine.disks):
+    #     sizeB = humanfriendly.parse_size(disk['size'], binary=True)
+    #     controller = device
+    #     disk_spec = vim.vm.device.VirtualDeviceSpec()
+    #     disk_spec.fileOperation = "create"
+    #     disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+    #     disk_spec.device = vim.vm.device.VirtualDisk()
+    #     disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+    #     disk_spec.device.backing.eagerlyScrub = False
+    #     disk_spec.device.backing.thinProvisioned = True
+    #     #disk_spec.device.backing.thinProvisioned = False
+    #     disk_spec.device.backing.diskMode = 'persistent'
+    #     disk_spec.device.backing.fileName = disk['pathVSphere']
+    #     disk_spec.device.unitNumber = i
+    #     disk_spec.device.capacityInKB = int(sizeB / 1024)
+    #     disk_spec.device.controllerKey = controller.key
+    #     devices.append(disk_spec)
 
     # dc = get_obj(content, [vim.Datacenter], 'Datacenter')
     # allhosts = []
@@ -142,6 +143,38 @@ def create_vm(service_instance, machine):
                                    )
     vm = wait_for_tasks(service_instance, [task])
     logging.debug("{machine} created.".format(machine=machine.nameVSphere))
+
+    controller = None
+    vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
+    for dev in vm.config.hardware.device:
+        if isinstance(dev, vim.vm.device.ParaVirtualSCSIController):
+            if dev.busNumber == 0:
+                controller = dev
+
+    for i, disk in enumerate(machine.disks):
+        devices = []
+        sizeB = humanfriendly.parse_size(disk['size'], binary=True)
+        disk_spec = vim.vm.device.VirtualDeviceSpec()
+        disk_spec.fileOperation = "create"
+        disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        disk_spec.device = vim.vm.device.VirtualDisk()
+        disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
+        disk_spec.device.backing.eagerlyScrub = False
+        disk_spec.device.backing.thinProvisioned = True
+        #disk_spec.device.backing.thinProvisioned = False
+        disk_spec.device.backing.diskMode = 'persistent'
+        disk_spec.device.backing.fileName = disk['pathVSphere']
+        disk_spec.device.unitNumber = i
+        disk_spec.device.capacityInKB = int(sizeB / 1024)
+        #disk_spec.device.controllerKey = controller.key
+        disk_spec.device.controllerKey = 1000
+        devices.append(disk_spec)
+
+        spec = vim.vm.ConfigSpec()
+        spec.deviceChange = devices
+        task = vm.ReconfigVM_Task(spec=spec)
+        wait_for_tasks(service_instance, [task])
+        logging.debug("{machine} disk added({i})".format(machine=machine.nameVSphere, i=i))
 
     vm = get_obj(content, [vim.VirtualMachine], machine.nameVSphere)
     task = vm.PowerOn()
