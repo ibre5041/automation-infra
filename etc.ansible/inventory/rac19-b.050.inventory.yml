@@ -10,17 +10,17 @@ all:
       listener: rac19-b-lis-2
       oracle_release: 19c
       oracle_install_type: rac
-    rac19-b-node-3:
-      address: 192.168.8.52
-      listener: rac19-b-lis-3
-      oracle_release: 19c
-      oracle_install_type: rac
+#    rac19-b-node-3:
+#      address: 192.168.8.52
+#      listener: rac19-b-lis-3
+#      oracle_release: 19c
+#      oracle_install_type: rac
   children:
     oracle:
       hosts:
         rac19-b-node-1:
         rac19-b-node-2:
-        rac19-b-node-3:
+#        rac19-b-node-3:
       vars:
 
   vars:
@@ -54,14 +54,15 @@ all:
       oracle_cluster_name: rac19c-b
       disks:
         - disk:
-            size: 8
+            size: 8G
             bus: 1
             count: 4
       addresses:
         rac19-b-lis-1: 192.168.8.53
         rac19-b-lis-2: 192.168.8.54
-        rac19-b-lis-3: 192.168.8.56
+#        rac19-b-lis-3: 192.168.8.56
         rac19-b-scan: [192.168.8.57, 192.168.8.58, 192.168.8.59]
 
     scan: rac19-b-scan
     oracle_password: Xb6a5ed2ff29f98d
+    template: "RHEL9 Template"

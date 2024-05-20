@@ -3,6 +3,28 @@ all:
   hosts:
     # kube-lb:
     #   address: 192.168.8.160
+    #   scsi:
+    #     - adapter:
+    #         pciSlotNumber: 16
+    #     - adapter:
+    #         pciSlotNumber: 32
+    #   disks:
+    #     - disk: rootdg
+    #       size: 10g
+    #       bus: 0
+    #     - disk: appdg
+    #       size: 10g
+    #       bus: 0
+    #   network:
+    #     - adapter:
+    #       pciSlotNumber: 192
+    #       network: "Public Network"
+    #     - adapter:
+    #       pciSlotNumber: 224
+    #       network: "Barn Network"      
+    #   ram: 8G
+    #   cpu: 2
+
     kube-1:
       address: 192.168.8.161
     kube-2:
@@ -25,6 +47,9 @@ all:
         kube-5:
         kube-6:
       vars:
+    # lb:
+    #   hosts:
+    #     kube-lb:
   vars:
     scsi:
     - adapter:
@@ -36,7 +61,7 @@ all:
       size: 10g
       bus: 0
     - disk: appdg
-      size: 16g
+      size: 100g
       bus: 0
     network:
     - adapter:
@@ -50,9 +75,11 @@ all:
 
     vmware:
       vm_folder: VmFolder
-      datastore: WD1T
+      datastore: Kingston890G
     template: "RHEL8 Template"
     cluster:
       addresses:
         kube-vip-1: 192.168.8.167
         kube-vip-2: 192.168.8.168
+        kube-vip-2: 192.168.8.169
+
