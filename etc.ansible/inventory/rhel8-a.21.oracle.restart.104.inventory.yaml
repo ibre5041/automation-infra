@@ -1,6 +1,6 @@
 all:
   hosts:
-    rhel7a-21-restart:
+    rhel8a-21-restart:
       address: 192.168.8.104
       oracle_release: 21c
       oracle_install_type: restart
@@ -8,7 +8,7 @@ all:
   children:
     oracle:
       hosts:
-        rhel7a-21-restart:
+        rhel8a-21-restart:
       vars:
 
   vars:
@@ -40,7 +40,7 @@ all:
     template: "RHEL8 Template"
 
     cluster:
-      oracle_cluster_name: rhel7a-21
+      oracle_cluster_name: rhel8a-21
       disks:
         - disk:
             size: 8
